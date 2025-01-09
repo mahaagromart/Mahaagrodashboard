@@ -11,6 +11,9 @@
     border-bottom: 1px solid grey;
     padding: 10px 20px; 
 } */
+
+
+
 .brandStyle {
     height: 70px;
     display: flex;
@@ -21,4 +24,7 @@
     font-size: 18px;
     background-color: #fff; /* Sidebar background color */
     margin-bottom: 16px;
+  }
+  body{
+    font-family: "Poppins", serif;
   }

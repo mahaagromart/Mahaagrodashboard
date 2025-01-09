@@ -1,4 +1,5 @@
 
+/* 
 
 
 .ant-menu-item {
@@ -10,4 +11,21 @@
     margin-left: 5% !important;
     margin-top: 12px !important;  
   }
+   */
+   .menu-container {
+    width: 250px; 
+    margin:auto; 
+    overflow-y: auto; 
+    height: 100vh;  
+    border-right: 1px solid black;  
+  }
   
+  .ant-menu-sub {
+    max-height: 300px; 
+    overflow-y: auto; 
+  }
+  
+  .ant-menu-inline .ant-menu-sub {
+    box-shadow: none;  
+  }
+   

@@ -1,4 +1,5 @@
-import React from 'react';
+
+
 import MenuList from './MenuList';
 import RouteContent from './RouteContent';
 
@@ -8,7 +9,7 @@ const Layout = () => {
     
       <div
         style={{
-          background: '#001529',
+          background: '#F4F7FE',
           color: 'white',
           padding: '10px 20px',
           textAlign: 'center',
@@ -16,14 +17,14 @@ const Layout = () => {
           fontWeight: 'bold',
         }}
       >
-        Header
+        
       </div>
 
      
       <div style={{ display: 'flex', flex: 1 }}>
         <MenuList/>
         <div style={{ flex: 1, padding: '20px', backgroundColor: '#f5f5f5' }}>
-        <RouteContent dateAdapter={AdapterDayjs}/>
+        <RouteContent/>
         </div>
       </div>
     </div>

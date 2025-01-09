@@ -1,11 +1,12 @@
 /* Header styles */
-.watery-header {
+/* .watery-header {
     padding: 0;
-    background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+    background: rgba(255, 255, 255, 0.2); 
+    background: #F4F7FE; 
     height: 80px;
-    margin: 2% auto;
+    margin-left: 38px;
     border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.4); /* Transparent border */
+
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -13,9 +14,29 @@
     top: 20px;
     z-index: 1000;
     width: 96%;
-    backdrop-filter: blur(10px); /* Blurry effect */
+    backdrop-filter: blur(10px); 
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;; 
+  } */
+  .watery-header {
+    padding: 0;
+    background-color: rgba(239, 242, 249, 0.6); /* Transparent background with #EFF2F9 */
+    height: 75px;
+    margin-left: 38px;
+    border-radius: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: sticky;
+    top: 20px;
+    z-index: 1000;
+    width: 96%;
+    backdrop-filter: blur(10px); /* Frosted glass effect */
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  }
+    margin-bottom: 5px; /* Slight bottom margin */
+}
+
   
   /* Buttons container */
   .header-buttons {
@@ -24,7 +45,7 @@
    margin-right:10px;
     background-color:#FFFFFF ;
     padding:10px;
-    border-radius: 25px;
+    border-radius: 25px; 
     width:300px;
     display:flex;
     justify-content: space-evenly;
@@ -35,14 +56,14 @@
   .header-icon-button {
     font-size: 16px;
     margin-left: 16px;
-    color: #000; /* White text color */
+    color: #000; 
     transition: color 0.3s ease, transform 0.3s ease;
     cursor: pointer;
   }
   
   .header-icon-button:hover {
-    color: #00bcd4; /* Light teal color on hover */
-    transform: scale(1.1); /* Slight zoom effect on hover */
+    color: #00bcd4; 
+    transform: scale(1.1);
   }
   .header-icon-button:nth-child(4){
     background-color: #11047A;
