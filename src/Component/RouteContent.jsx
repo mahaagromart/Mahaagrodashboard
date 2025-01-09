@@ -126,7 +126,7 @@ const RouteContent = () => {
 
 
         <Route path="/profile" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
-        <Route path="/signout" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
+        <Route path="/signout" element={<LoginForm />}  />
         <Route path="/login" element={<LoginForm />} /></Routes>
     </>
   );

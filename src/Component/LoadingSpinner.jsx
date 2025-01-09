@@ -1,5 +1,5 @@
 import React from "react";
-import { Watch } from "react-loader-spinner"; // Import the Watch loader
+import { Watch } from "react-loader-spinner"; 
 
 
 const spinnerStyle = {
