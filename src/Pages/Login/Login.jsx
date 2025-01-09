@@ -1,73 +1,67 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "axios"; // Make sure Axios is imported
+import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/Features/AuthSlice";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ EmailId: "", Password: "" });
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const validationSchema = Yup.object({
     EmailId: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
-    Password: Yup.string()
-     
-      .required("Password is required"),
+    Password: Yup.string().required("Password is required"),
   });
 
-
-
   const handleSubmit = async (values, { setSubmitting }) => {
+    dispatch(startLoading()); // Start loading spinner globally
     setFormData(values);
-    
-  
+
     try {
-      const response = await axios.post("http://localhost:49814/Authentication/Login", values);
-  
+      const response = await axios.post(
+        "http://localhost:49814/Authentication/Login",
+        values
+      );
+
       if (response.data.Code === 200) {
-        console.log(response.data)
-        let userData = response.data.AuthenticationsList[0]; 
-
-       
+        let userData = response.data.AuthenticationsList[0];
         let data = {
-          user: userData.FirstName + " " + userData.LastName, 
+          user: userData.FirstName + " " + userData.LastName,
           token: response.data.Token,
-          role: userData.DesignationName, 
+          role: userData.DesignationName,
         };
-      
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("UserId",userData.UserId);
-    
 
-        console.log(userData.DesignationId)
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("UserId", userData.UserId);
 
         dispatch(
           login({
             user: data.user,
             role: data.role,
             token: data.token,
-            UserId : userData.UserId
+            UserId: userData.UserId,
           })
         );
-  
- 
-      
-        navigate('/'); 
+
+        dispatch(stopLoading()); // Stop loading spinner globally
+        navigate("/"); // Redirect to homepage
         alert("Login Successful!");
       } else {
-        console.error("API Error:", response.statusText);
+        dispatch(stopLoading());
         alert("Login failed. Please try again.");
       }
     } catch (error) {
-      console.error("Network Error:", error);
+      dispatch(stopLoading());
       alert("An error occurred. Please check your network connection and try again.");
     }
-  
-    setSubmitting(false); 
+
+    setSubmitting(false);
   };
 
   return (
