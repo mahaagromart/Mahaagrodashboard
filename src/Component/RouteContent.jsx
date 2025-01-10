@@ -31,6 +31,7 @@ import EarningReport from "../Pages/UserManagement/SalesandTransactionRep/Earnin
 import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/InhouseSales";
 // import sellerSales from "../Pages/UserManagement/SalesandTransactionRep/sellerSales";
 import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport"
+import Register from "../Pages/Register/Register";
 
 const RouteContent = () => {
   return (
@@ -120,14 +121,16 @@ const RouteContent = () => {
        {/* user management ends */}
 
 
-
+       
 
 
 
 
         <Route path="/profile" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
         <Route path="/signout" element={<LoginForm />}  />
-        <Route path="/login" element={<LoginForm />} /></Routes>
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/Register" element={<Register />} />
+        </Routes>
     </>
   );
 };

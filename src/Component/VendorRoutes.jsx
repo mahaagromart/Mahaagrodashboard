@@ -1,7 +1,7 @@
 import { FaSignOutAlt } from "react-icons/fa";
 import {
   MdCategory,
-  MdBrandingWatermark,
+  // MdBrandingWatermark,
   MdProductionQuantityLimits,
   MdDashboard,
   MdAddCircle,
@@ -20,7 +20,7 @@ import {
 
 import {LuListOrdered} from 'react-icons/lu'
 import { GiBoxUnpacking, GiConfirmed, GiReturnArrow } from "react-icons/gi";
-import { AiOutlineBank, AiOutlineDeliveredProcedure, AiOutlineProduct, AiOutlineTransaction } from "react-icons/ai";
+import {AiOutlineDeliveredProcedure, AiOutlineProduct, AiOutlineTransaction } from "react-icons/ai";
 import { TbShoppingCartCancel } from "react-icons/tb";
 import { RiMessage2Fill, RiReactjsFill, RiRefund2Line } from "react-icons/ri";
 import { BiSolidOffer } from "react-icons/bi";

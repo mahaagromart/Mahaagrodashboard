@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import MainLayoutBox from "./Component/MainLayoutBox";
 import LoginForm from "./Pages/Login/Login";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingSpinner from "./Component/LoadingSpinner";
 import { startLoading, stopLoading } from "./redux/Features/LoadingSlice";
+import Register from "./Pages/Register/Register";
 
 const App = () => {
   const { token } = useSelector((state) => state.auth);
@@ -40,11 +41,15 @@ const App = () => {
       </div>
     );
   }
-
-  if (location.pathname === "/login") {
-    return <LoginForm />;
-  }
-
+  
+    if (location.pathname === "/login") {
+      return <LoginForm />;
+    }
+    
+    if (location.pathname === "/Register") {
+      return <Register />;
+    }
+  
   if (!storedToken) {
     return <Navigate to="/login" replace />;
   }
