@@ -1,14 +1,16 @@
-// import React, { useState } from "react";
 // import { Formik, Form, Field, ErrorMessage } from "formik";
 // import * as Yup from "yup";
 // import axios from "axios";
+// import { useState } from "react";
 // import { useDispatch } from "react-redux";
 // import { login } from "../../redux/Features/AuthSlice";
 // import { useNavigate } from "react-router-dom";
 // import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
+// import ForgotOtp from "../ForgotOtp/ForgotOtp";
 
 // const LoginForm = () => {
 //   const [formData, setFormData] = useState({ EmailId: "", Password: "" });
+//   const [ForgotOtpFeild, setForgotOtpFeild] = useState(false);  
 //   const navigate = useNavigate();
 //   const dispatch = useDispatch();
 
@@ -20,7 +22,7 @@
 //   });
 
 //   const handleSubmit = async (values, { setSubmitting }) => {
-//     dispatch(startLoading()); // Start loading spinner globally
+//     dispatch(startLoading());
 //     setFormData(values);
 
 //     try {
@@ -37,8 +39,8 @@
 //           role: userData.DesignationName,
 //         };
 
-//         localStorage.setItem("token", data.token);
-//         localStorage.setItem("UserId", userData.UserId);
+//         localStorage.setItem("email", values.EmailId);
+//         localStorage.setItem("password", values.Password);
 
 //         dispatch(
 //           login({
@@ -49,7 +51,7 @@
 //           })
 //         );
 
-//         dispatch(stopLoading()); 
+//         dispatch(stopLoading());
 //         navigate("/"); 
 //         alert("Login Successful!");
 //       } else {
@@ -58,122 +60,173 @@
 //       }
 //     } catch (error) {
 //       dispatch(stopLoading());
-//       alert("An error occurred. Please check your network connection and try again.");
+//       alert("An error occurred. Please check your network connection.", error);
 //     }
 
 //     setSubmitting(false);
 //   };
+
 //   const handleRegisterRedirect = () => {
-//     navigate("/register"); 
+//     navigate('/Register');
+//   };
+
+//   const forgotPassword = (email) => {
+//     console.log(email);
+
+//     const sendDataForgotPass = { Email: email };
+
+//     const urlForForgot = "http://localhost:49814/Authentication/ForgetPasswordOtpTrigger";
+
+//     axios.post(urlForForgot, sendDataForgotPass)
+//       .then((response) => {
+//         if (response.data.Retval === "Success") {
+//           console.log(response.data.Retval);
+//           // Setting the ForgotOtpFeild state to true
+//           setForgotOtpFeild(true);
+
+//           // Explicitly navigate to the ForgotOtp page
+//           navigate(`/ForgotOtp?email=${email}&length=4`);
+//         } else {
+//           alert("Failed to send OTP. Please try again.");
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error:", error);
+//         alert("An error occurred. Please check your network connection.");
+//       });
 //   };
 
 //   return (
-//     <div
-//       style={{
-//         maxWidth: "400px",
-//         margin: "50px auto",
-//         padding: "20px",
-//         border: "1px solid #ccc",
-//         borderRadius: "8px",
-//       }}
-//     >
-//       <h2 style={{ textAlign: "center" }}>Login</h2>
-//       <Formik
-//         initialValues={formData}
-//         validationSchema={validationSchema}
-//         onSubmit={handleSubmit}
-//       >
-//         {({ isSubmitting }) => (
-//           <Form>
-//             <div style={{ marginBottom: "15px" }}>
-//               <label htmlFor="email">Email:</label>
-//               <Field
-//                 type="email"
-//                 name="EmailId"
-//                 id="email"
-//                 placeholder="Enter your email"
-//                 style={{
-//                   width: "100%",
-//                   padding: "10px",
-//                   marginTop: "5px",
-//                   border: "1px solid #ccc",
-//                   borderRadius: "4px",
-//                 }}
-//               />
-//               <ErrorMessage
-//                 name="EmailId"
-//                 component="div"
-//                 style={{ color: "red", marginTop: "5px" }}
-//               />
-//             </div>
+//     <div>
+//       {!ForgotOtpFeild ? (
+//         <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px" }}>
+//           <h2 style={{ textAlign: "center" }}>Login</h2>
+//           <Formik
+//             initialValues={formData}
+//             validationSchema={validationSchema}
+//             onSubmit={handleSubmit}
+//           >
+//             {({ isSubmitting, values }) => (
+//               <Form>
+//                 <div style={{ marginBottom: "15px" }}>
+//                   <label htmlFor="email">Email:</label>
+//                   <Field
+//                     type="email"
+//                     name="EmailId"
+//                     id="email"
+//                     placeholder="Enter your email"
+//                     style={{
+//                       width: "100%",
+//                       padding: "10px",
+//                       marginTop: "5px",
+//                       border: "1px solid #ccc",
+//                       borderRadius: "4px",
+//                     }}
+//                   />
+//                   <ErrorMessage
+//                     name="EmailId"
+//                     component="div"
+//                     style={{ color: "red", marginTop: "5px" }}
+//                   />
+//                 </div>
 
-//             <div style={{ marginBottom: "15px" }}>
-//               <label htmlFor="password">Password:</label>
-//               <Field
-//                 type="password"
-//                 name="Password"
-//                 id="password"
-//                 placeholder="Enter your password"
-//                 style={{
-//                   width: "100%",
-//                   padding: "10px",
-//                   marginTop: "5px",
-//                   border: "1px solid #ccc",
-//                   borderRadius: "4px",
-//                 }}
-//               />
-//               <ErrorMessage
-//                 name="Password"
-//                 component="div"
-//                 style={{ color: "red", marginTop: "5px" }}
-//               />
-//             </div>
+//                 <div style={{ marginBottom: "15px" }}>
+//                   <label htmlFor="password">Password:</label>
+//                   <Field
+//                     type="password"
+//                     name="Password"
+//                     id="password"
+//                     placeholder="Enter your password"
+//                     style={{
+//                       width: "100%",
+//                       padding: "10px",
+//                       marginTop: "5px",
+//                       border: "1px solid #ccc",
+//                       borderRadius: "4px",
+//                     }}
+//                   />
+//                   <ErrorMessage
+//                     name="Password"
+//                     component="div"
+//                     style={{ color: "red", marginTop: "5px" }}
+//                   />
+//                 </div>
 
-//             <button
-//               type="submit"
-//               disabled={isSubmitting}
-//               style={{
-//                 width: "100%",
-//                 padding: "10px",
-//                 backgroundColor: "#4CAF50",
-//                 color: "white",
-//                 border: "none",
-//                 borderRadius: "4px",
-//                 cursor: "pointer",
-//               }}
-//             >
-//               {isSubmitting ? "Submitting..." : "Login"}
-//             </button>
+//                 <button
+//                   type="submit"
+//                   disabled={isSubmitting}
+//                   style={{
+//                     width: "100%",
+//                     padding: "10px",
+//                     backgroundColor: "#4CAF50",
+//                     color: "white",
+//                     border: "none",
+//                     borderRadius: "4px",
+//                     cursor: "pointer",
+//                   }}
+//                 >
+//                   {isSubmitting ? "Submitting..." : "Login"}
+//                 </button>
 
-// </button>
+//                 <div style={{ marginTop: "15px", textAlign: "center" }}>
+//                   <p>
+//                     Don’t have an account?{" "}
+//                     <button
+//                       type="button"
+//                       onClick={handleRegisterRedirect}
+//                       style={{
+//                         background: "none",
+//                         border: "none",
+//                         color: "#007BFF",
+//                         cursor: "pointer",
+//                         textDecoration: "underline",
+//                       }}
+//                     >
+//                       Register here
+//                     </button>
+//                   </p>
 
-// <div style={{ marginTop: "15px", textAlign: "center" }}>
-//   <p>
-//     Don't have an account?{" "}
-//     <button
-//       type="button"
-//       onClick={handleRegisterRedirect}
-//       style={{
-//         background: "none",
-//         border: "none",
-//         color: "#007BFF",
-//         cursor: "pointer",
-//         textDecoration: "underline",
-//       }}
-//     >
-//       Register here
-//     </button>
-//   </p>
-// </div>
-
-//           </Form>
-//         )}
-//       </Formik>
+//                   <button
+//                     style={{
+//                       backgroundColor: "blue",
+//                       height: "35px",
+//                       width: "140px",
+//                       borderRadius: "20px",
+//                       color: "white",
+//                     }}
+//                     onClick={() => forgotPassword(values.EmailId)}
+//                   >
+//                     Forgot Password
+//                   </button>
+//                 </div>
+//               </Form>
+//             )}
+//           </Formik>
+//         </div>
+//       ) : (
+//         <div style={{ position: "relative", height: "100vh" }}>
+//           <div
+//             style={{
+//               position: "absolute",
+//               top: "50%",
+//               left: "50%",
+//               transform: "translate(-50%, -50%)",
+//               display: "flex",
+//               flexDirection: "column",
+//               textAlign: "center",
+//             }}
+//           >
+//   <ForgotOtp/>
+//   </div>
+//         </div> 
+//       )}
 //     </div>
 //   );
 // };
 
 // export default LoginForm;
+
+
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -181,13 +234,14 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/Features/AuthSlice";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ EmailId: "", Password: "" });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [show,setShow]=useState(false)
 
   const validationSchema = Yup.object({
     EmailId: Yup.string()
@@ -197,7 +251,7 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    dispatch(startLoading()); // Start loading spinner globally
+    dispatch(startLoading());
     setFormData(values);
 
     try {
@@ -214,8 +268,8 @@ const LoginForm = () => {
           role: userData.DesignationName,
         };
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("UserId", userData.UserId);
+        localStorage.setItem("email", values.EmailId);
+        localStorage.setItem("password", values.Password);
 
         dispatch(
           login({
@@ -235,121 +289,154 @@ const LoginForm = () => {
       }
     } catch (error) {
       dispatch(stopLoading());
-      alert("An error occurred. Please check your network connection and try again." ,error);
+      alert("An error occurred. Please check your network connection.", error);
     }
 
     setSubmitting(false);
   };
 
   const handleRegisterRedirect = () => {
-
-    console.log("button clicked");
     navigate('/Register');
   };
 
+  const forgotPassword = (email) => {
+    console.log(email);
+
+    const sendDataForgotPass = { Email: email };
+
+    const urlForForgot = "http://localhost:49814/Authentication/ForgetPasswordOtpTrigger";
+
+    axios.post(urlForForgot, sendDataForgotPass)
+      .then((response) => {
+        if (response.data.Retval === "Success") {
+          console.log(response.data.Retval);
+          setShow(true)
+
+
+          navigate('/ForgotOtp');
+        } else {
+          alert("Failed to send OTP. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred. Please check your network connection.");
+      });
+  };
+
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "50px auto",
-        padding: "20px",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-      }}
-    >
-      <h2 style={{ textAlign: "center" }}>Login</h2>
-      <Formik
-        initialValues={formData}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <div style={{ marginBottom: "15px" }}>
-              <label htmlFor="email">Email:</label>
-              <Field
-                type="email"
-                name="EmailId"
-                id="email"
-                placeholder="Enter your email"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginTop: "5px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              />
-              <ErrorMessage
-                name="EmailId"
-                component="div"
-                style={{ color: "red", marginTop: "5px" }}
-              />
-            </div>
-
-            <div style={{ marginBottom: "15px" }}>
-              <label htmlFor="password">Password:</label>
-              <Field
-                type="password"
-                name="Password"
-                id="password"
-                placeholder="Enter your password"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginTop: "5px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              />
-              <ErrorMessage
-                name="Password"
-                component="div"
-                style={{ color: "red", marginTop: "5px" }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              style={{
-                width: "100%",
-                padding: "10px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              {isSubmitting ? "Submitting..." : "Login"}
-            </button>
-
-            <div style={{ marginTop: "15px", textAlign: "center" }}>
-              <p>
-                Don Not have an account?{" "}
-                <button
-              
-                  type="button"
-                  onClick={handleRegisterRedirect}
+    <div>
+    {!show ? (
+      <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px" }}>
+        <h2 style={{ textAlign: "center" }}>Login</h2>
+        <Formik
+          initialValues={formData}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting, values }) => (
+            <Form>
+              <div style={{ marginBottom: "15px" }}>
+                <label htmlFor="email">Email:</label>
+                <Field
+                  type="email"
+                  name="EmailId"
+                  id="email"
+                  placeholder="Enter your email"
                   style={{
-                    background: "none",
-                    border: "none",
-                    color: "#007BFF",
-                    cursor: "pointer",
-                    textDecoration: "underline",
+                    width: "100%",
+                    padding: "10px",
+                    marginTop: "5px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
                   }}
+                />
+                <ErrorMessage
+                  name="EmailId"
+                  component="div"
+                  style={{ color: "red", marginTop: "5px" }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "15px" }}>
+                <label htmlFor="password">Password:</label>
+                <Field
+                  type="password"
+                  name="Password"
+                  id="password"
+                  placeholder="Enter your password"
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    marginTop: "5px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                />
+                <ErrorMessage
+                  name="Password"
+                  component="div"
+                  style={{ color: "red", marginTop: "5px" }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {isSubmitting ? "Submitting..." : "Login"}
+              </button>
+
+              <div style={{ marginTop: "15px", textAlign: "center" }}>
+                <p>
+                  Don’t have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={handleRegisterRedirect}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#007BFF",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    Register here
+                  </button>
+                </p>
+
+                <button
+                  style={{
+                    backgroundColor: "blue",
+                    height: "35px",
+                    width: "140px",
+                    borderRadius: "20px",
+                    color: "white",
+                  }}
+                  onClick={() => forgotPassword(values.EmailId)}
                 >
-                  Register here
+                  Forgot Password
                 </button>
-              </p>
-            </div>
-          </Form>
-        )}
-      </Formik>
-    </div>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    
+        ):(<div>Hello world</div>)
+
+        }
+        </div>
   );
 };
 
 export default LoginForm;
-
