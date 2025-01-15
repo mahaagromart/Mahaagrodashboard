@@ -15,8 +15,8 @@ export const adminRoutes = [
     icon: <MdCategory />,
     children: [
       { label: 'Add Category', icon: <MdAddCircle />, key: '/addCategory' },
-      { label: 'Subcategory', icon: <MdAdd />, key: '/Subcategory' },
-      { label: 'SubSubCategory', icon: <MdAddToPhotos />, key: '/SubsubCategory' },
+      { label: 'Sub category', icon: <MdAdd />, key: '/SubCategory' },
+      { label: 'Sub Sub Category', icon: <MdAddToPhotos />, key: '/SubSubCategory' },
     ],
   },
 //   {
@@ -32,8 +32,8 @@ export const adminRoutes = [
     label: 'In-house Products',
     icon: <MdHouse />,
     children: [
-      { label: 'Add new Product', icon: <MdAddCircle />, key: '/AddnewProduct' },
       { label: 'Product List', icon: <MdListAlt />, key: '/ProductList' },
+      { label: 'Add new Product', icon: <MdAddCircle />, key: '/AddNewProduct' },
       { label: 'Bulk Insert', icon: <FaShirtsinbulk/>, key: '/BulkInsert' },
     ],
   },
