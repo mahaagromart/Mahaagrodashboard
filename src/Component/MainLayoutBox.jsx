@@ -123,7 +123,7 @@ const MainLayoutBox = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) { 
+      if (window.innerWidth < 920) { 
         setCollapsed(true);
       } else {
         setCollapsed(false);
@@ -141,7 +141,7 @@ const MainLayoutBox = () => {
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>
-        {/* Fixed Sidebar with scrollable content */}
+ 
         <Sider
           trigger={null}
           collapsible
@@ -150,12 +150,12 @@ const MainLayoutBox = () => {
           width={expandedWidth}
           style={{
             position: "fixed",
-            height: "100vh", // Set to 100vh to fill the full height of the screen
+            height: "100vh",
             left: 0,
             backgroundColor: "#fff",
             top: 0,
             transition: "width 0.2s",
-            overflowY: "auto", // Allow the sidebar to scroll
+            overflowY: "auto",
             insetInlineStart: 0,
             bottom: 0,
             scrollbarWidth: "thin",
@@ -176,7 +176,7 @@ const MainLayoutBox = () => {
 
         <Layout
           style={{
-            marginLeft: collapsed ? 80 : 270, // Adjust layout margin based on collapse state
+            marginLeft: collapsed ? 80 : 270, 
             transition: "margin-left 0.2s",
             backgroundColor: "#f4f7fe",
           }}
