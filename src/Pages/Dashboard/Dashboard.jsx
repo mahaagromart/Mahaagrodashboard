@@ -67,7 +67,7 @@ const Dashboard = () => {
           </SimpleGrid>
 
           <SimpleGrid
-            columns={{ base: 1, md: 3, lg: 4, "2xl": 7 }}
+            columns={{ base: 1, md: 3, lg: 3, "2xl": 7 }}
             gap="20px"
             mb="20px"
           >
@@ -168,29 +168,37 @@ const Dashboard = () => {
               />
             </SimpleGrid>
 
-            <Box>
-              <SimpleGrid
-                columns={{ base: 1, md: 1, lg: 2, "2xl": 3 }}
-                gap="20px"
-                mb="20px"
-                style={{ backgroundColor: "#F4F7FE" }}
-              >
-                <CardBox>
-                  <TopUser />
-                </CardBox>
+            <Box mx="auto">
+  <SimpleGrid
+    columns={{ base: 1, md: 1, lg: 2, "2xl": 3 }}
+    gap="20px"
+    mb="20px"
+    style={{ backgroundColor: "#F4F7FE" }}
+  >
+    {/* CardBox for the data table with horizontal scrolling */}
+    <CardBox>
+      <Box overflowX="auto">
+        <TopUser />
+      </Box>
+    </CardBox>
 
-                <CardBox>
-                  <CenterBox>
-                    <Piecharts />
-                  </CenterBox>
-                </CardBox>
-                <CardBox>
-                  <CenterBox>
-                   <MyCalendar/>
-                  </CenterBox>
-                </CardBox>
-              </SimpleGrid>
-            </Box>
+    {/* Other components */}
+    <CardBox>
+      <CenterBox>
+      <Box overflowX="auto">
+        <Piecharts />
+      </Box>
+      </CenterBox>
+    </CardBox>
+    <CardBox>
+      <Box overflowX="auto">
+      <CenterBox>
+        <MyCalendar />
+      </CenterBox>
+      </Box>
+    </CardBox>
+  </SimpleGrid>
+</Box>
 
             <Box>
               <SimpleGrid
@@ -200,7 +208,10 @@ const Dashboard = () => {
                 style={{ backgroundColor: "#F4F7FE" }}
               >
                 <CardBox>
+                <Box overflowX="auto">
+        
                   <TopSeller />
+      </Box>
                 </CardBox>
               </SimpleGrid>
             </Box>
