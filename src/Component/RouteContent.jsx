@@ -31,6 +31,7 @@ import EarningReport from "../Pages/UserManagement/SalesandTransactionRep/Earnin
 import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/InhouseSales";
 // import sellerSales from "../Pages/UserManagement/SalesandTransactionRep/sellerSales";
 import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport"
+import ForgotOtp from "../Pages/ForgotOtp/ForgotOtp";
 import Register from "../Pages/Register/Register";
 
 const RouteContent = () => {
@@ -130,6 +131,7 @@ const RouteContent = () => {
         <Route path="/signout" element={<LoginForm />}  />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/Register" element={<Register />} />
+        <Route path="/ForgotOtp" element={<ForgotOtp />} />
         </Routes>
     </>
   );

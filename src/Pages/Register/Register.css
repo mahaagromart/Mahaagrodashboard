@@ -1,0 +1,13 @@
+.regBtn{
+    height:40px;
+    width:145px;
+ 
+    border-radius: 20px;
+    transition: 0.5 ease-in-out;
+    background-color: grey;
+    
+}
+.regBtn:hover{
+    transform: scale(1.02);
+    border:2px solid Blue;
+}

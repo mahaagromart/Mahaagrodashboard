@@ -8,6 +8,7 @@ import { Button } from "antd";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
 import { login } from "../../redux/Features/AuthSlice";
+import './Register.css'
 
 const Register = () => {
   const [countries, setCountries] = useState([]);
@@ -16,7 +17,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [Credential, setCredential] = useState({ Email: "", Otp: "" });
   const [showOtpField, setShowOtpField] = useState(false);
-  // const [forgotOtpField, setForgotOtpField] = useState(false);  // Corrected the typo
+
   const Navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,13 +43,15 @@ const Register = () => {
     CityId: Yup.string().required("City is required"),
   });
 
-  // Fetching countries
+
   useEffect(() => {
     setLoading(true);
     axios
       .get("http://localhost:49814/FormHelper/GetAllCountry")
       .then((response) => {
         setCountries(response.data.CountryEntities);
+        console.log(response.data.CountryEntities)
+     
       })
       .catch((error) => {
         console.error("Error fetching countries", error);
@@ -61,6 +64,7 @@ const Register = () => {
   // Handle country change
   const handleCountryChange = (selectedCountry) => {
     setLoading(true);
+    console.log(selectedCountry)
     axios
       .get(`http://localhost:49814/FormHelper/GetStatesByCountry?countryId=${selectedCountry}`)
       .then((response) => {
@@ -98,7 +102,7 @@ const Register = () => {
       .get(`http://localhost:49814/Authentication/VerifyEmail?Email=${Credential.Email}&Otp=${otp}`)
       .then((response) => {
         if (response.data.Retval === "Success") {
-          LoginAfterLogin(Credential.Email, Credential.Otp); // Use state values here
+          LoginAfterLogin(Credential.Email, Credential.Otp); 
         }
       })
       .catch((error) => {
@@ -310,7 +314,7 @@ const Register = () => {
               </div>
 
               <div>
-                <button type="submit">Register</button>
+                <button className="regBtn" type="submit">Register</button>
               </div>
             </Form>
           )}
@@ -330,7 +334,7 @@ const Register = () => {
           >
             <p>Please Enter Your OTP</p>
             <ShowOtp length={4} onOtpSubmit={onOtpSubmit} style={{ width: "300px", height: "200px", margin: "auto" }} />
-            <Button onClick={sendOtp}>Resend OTP</Button>
+            <Button  onClick={sendOtp}>Resend OTP</Button>
             {/* <Button onClick={forgotPassword}>Forgot Password</Button> */}
           </div>
         </div>
