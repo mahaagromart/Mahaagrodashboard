@@ -1,12 +1,13 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { useState,useEffect} from "react";
+import { useState} from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/Features/AuthSlice";
 import { useNavigate ,  } from "react-router-dom";
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
-// import Forgot from "../ForgotPassword/Forgot";
+import Swal from "sweetalert2";
+
 
 const apiUrl = import.meta.env.VITE_API_URL; 
 const LoginForm = () => {
@@ -14,7 +15,7 @@ const LoginForm = () => {
   const [formData, setFormData] = useState({ EmailId: "", Password: "" });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const [show,setShow]=useState(false)
+
 
   const validationSchema = Yup.object({
     EmailId: Yup.string()
@@ -34,6 +35,7 @@ const LoginForm = () => {
       );
 
       if (response.data.Code === 200) {
+        console.log(response)
         let userData = response.data.AuthenticationsList[0];
         let data = {
           user: userData.FirstName + " " + userData.LastName,
@@ -54,11 +56,30 @@ const LoginForm = () => {
         );
 
         dispatch(stopLoading());
+        await Swal.fire({
+          title : "Login Successfull",
+          text : " You Have Logged In.",
+          icon : "success"
+        })
         navigate("/"); 
-        alert("Login Successful!");
-      } else {
+      
+      } else if(response.data.Message==="User Not Exists"){
+  
         dispatch(stopLoading());
-        alert("Login failed. Please try again.");
+        await Swal.fire({
+          title: "Email Already Exists",  
+          text: "The email you entered is already associated with an existing account. Please use a different email.", 
+          icon: "error",
+        });
+      
+      }else{
+        dispatch(stopLoading());
+        Swal.fire({
+          title: "Error",  
+          text: "An unexpected error occurred during registration. Please try again later.",
+          icon: "error",
+        });
+
       }
     } catch (error) {
       dispatch(stopLoading());
@@ -72,7 +93,7 @@ const LoginForm = () => {
     navigate('/Register');
   };
 
-  const forgotPassword = () => { 
+  const ForgotPassword = () => { 
    navigate('/Forgot')
   };
 
@@ -165,7 +186,7 @@ const LoginForm = () => {
                   </button>
                 </p>
 
-                <button
+                <button type="button" 
                   style={{
                     backgroundColor: "blue",
                     height: "35px",
@@ -173,7 +194,7 @@ const LoginForm = () => {
                     borderRadius: "20px",
                     color: "white",
                   }}
-                  onClick={() => forgotPassword()}
+                  onClick={() => ForgotPassword()}
                 >
                   Forgot Password
                 </button>

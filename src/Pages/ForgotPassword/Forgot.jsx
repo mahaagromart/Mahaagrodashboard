@@ -9,8 +9,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import ForgotOtp from '../ForgotOtp/ForgotOtp';
-import { border } from '@chakra-ui/react';
-import { borderRadius, borderRight } from '@mui/system';
+
 
 const apiUrl = import.meta.env.VITE_API_URL; 
 const Forgot = () => {
@@ -20,6 +19,7 @@ const Forgot = () => {
   const navigate = useNavigate(); 
 
   const ForgotSchema = Yup.object().shape({
+    
     Email: Yup.string().email('Invalid email').required('Required'),
   });
 
@@ -99,5 +99,8 @@ const Forgot = () => {
     </div>
   );
 };
+
+
+
 
 export default Forgot;

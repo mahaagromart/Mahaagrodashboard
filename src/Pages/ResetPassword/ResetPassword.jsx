@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import './ResetPassword.css'
+import Swal from "sweetalert2";
+import { useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -12,39 +14,59 @@ const ResetPassword = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [resetStatus, setResetStatus] = useState('');
   const apiUrl = import.meta.env.VITE_API_URL; 
+  const Navigate=useNavigate()
+
   const handleResetPassword = () => {
     if (newPassword !== confirmPassword) {
       setErrorMessage('Passwords do not match');
       return;
     }
-
+  
     const email = localStorage.getItem('Email');
     if (!email) return;
-
-
+  
     let url = `${apiUrl}Authentication/ForgetPasswordOtpValidate`;
     let data = { Email: email, Password: newPassword, OTP: otp };
-
-
+  
     axios
       .post(url, data)
       .then((res) => {
         if (res.data.Retval === 'Success') {
           setResetStatus('Password reset successful');
-          alert('Password reset successful');
+          Swal.fire({
+            title: "Password Reset Success",
+            text: "Your password has been successfully reset.",
+            icon: "success",
+          });
+          Navigate('/Login')
         } else {
-          setErrorMessage('Error resetting password. Please try again.');
+          Swal.fire({
+            title: "Failed To Reset Password",
+            text: "There was an error resetting your password. Please try again later.",
+            icon: "error", 
+          });
+          
         }
       })
       .catch((err) => {
-        console.log('Error occurred during password reset:', err);
+       
         setErrorMessage('Error resetting password. Please try again.');
+        Swal.fire({
+          title: "Error Occured",
+          text: `Internal Server Error ${err}`,
+          icon: "error", 
+        });
       });
   };
-
+  
   useEffect(() => {
     if (!otp) {
       setErrorMessage('OTP not found.');
+      Swal.fire({
+        title: "OTP Not Found",
+        text: `Internal Server Error`,
+        icon: "error", 
+      });
     }
   }, [otp]);
 
