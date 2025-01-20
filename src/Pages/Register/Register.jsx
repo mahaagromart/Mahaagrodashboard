@@ -9,7 +9,20 @@ import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
 import { login } from "../../redux/Features/AuthSlice";
 
+
+
+
+
 const Register = () => {
+
+
+  
+
+
+
+
+
+
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -41,12 +54,16 @@ const Register = () => {
     StateId: Yup.string().required("State is required"),
     CityId: Yup.string().required("City is required"),
   });
+  const apiUrl = import.meta.env.VITE_API_URL; 
 
-  // Fetching countries
   useEffect(() => {
+    
+
+
+ 
     setLoading(true);
     axios
-      .get("http://localhost:49814/FormHelper/GetAllCountry")
+      .get(`${apiUrl}FormHelper/GetAllCountry`)
       .then((response) => {
         setCountries(response.data.CountryEntities);
       })
@@ -62,7 +79,7 @@ const Register = () => {
   const handleCountryChange = (selectedCountry) => {
     setLoading(true);
     axios
-      .get(`http://localhost:49814/FormHelper/GetStatesByCountry?countryId=${selectedCountry}`)
+      .get(`${apiUrl}FormHelper/GetStatesByCountry?countryId=${selectedCountry}`)
       .then((response) => {
         setStates(response.data.StateEntities);
         setCities([]);
@@ -79,7 +96,7 @@ const Register = () => {
   const handleStateChange = (StateId) => {
     setLoading(true);
     axios
-      .get(`http://localhost:49814/FormHelper/GetCityByState?StateId=${StateId}`)
+      .get(`${apiUrl}FormHelper/GetCityByState?StateId=${StateId}`)
       .then((response) => {
         setCities(response.data.CityEntities);
       })
@@ -95,10 +112,10 @@ const Register = () => {
   const onOtpSubmit = (otp) => {
     setCredential({ ...Credential, Otp: otp });
     axios
-      .get(`http://localhost:49814/Authentication/VerifyEmail?Email=${Credential.Email}&Otp=${otp}`)
+      .get(`${apiUrl}Authentication/VerifyEmail?Email=${Credential.Email}&Otp=${otp}`)
       .then((response) => {
         if (response.data.Retval === "Success") {
-          LoginAfterLogin(Credential.Email, Credential.Otp); // Use state values here
+          LoginAfterLogin(Credential.Email, Credential.Otp); 
         }
       })
       .catch((error) => {
@@ -116,7 +133,7 @@ const Register = () => {
 
   // Sending OTP
   const sendOtp = () => {
-    let url = "http://localhost:49814/Authentication/SendOtpEmail";
+    let url = `${apiUrl}Authentication/SendOtpEmail`;
     let data = { Email: Credential.Email };
 
     axios
@@ -135,7 +152,7 @@ const Register = () => {
 
   // Handle user registration
   const handleSubmit = (values) => {
-    let registerUrl = "http://localhost:49814/Authentication/Register";
+    let registerUrl = `${apiUrl}Authentication/Register`;
 
     axios
       .post(registerUrl, values)
@@ -157,7 +174,7 @@ const Register = () => {
     console.log();
     dispatch(startLoading());
     try {
-      const response = await axios.post("http://localhost:49814/Authentication/Login", {
+      const response = await axios.post(`${apiUrl}Authentication/Login`, {
         EmailId: email,
         Password: localStorage.getItem('Password')
       });
@@ -310,7 +327,7 @@ const Register = () => {
               </div>
 
               <div>
-                <button type="submit">Register</button>
+                <button  style={{height:'35px',width:'150px',borderRadius:"20px",background:'grey',color:"white",margin:"15px"}} type="submit">Register</button>
               </div>
             </Form>
           )}
@@ -330,8 +347,8 @@ const Register = () => {
           >
             <p>Please Enter Your OTP</p>
             <ShowOtp length={4} onOtpSubmit={onOtpSubmit} style={{ width: "300px", height: "200px", margin: "auto" }} />
-            <Button onClick={sendOtp}>Resend OTP</Button>
-            {/* <Button onClick={forgotPassword}>Forgot Password</Button> */}
+            <Button  onClick={sendOtp}>Resend OTP</Button>
+          
           </div>
         </div>
       )}
