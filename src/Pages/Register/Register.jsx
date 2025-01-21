@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -8,6 +8,11 @@ import { Button } from "antd";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
 import { login } from "../../redux/Features/AuthSlice";
+import Swal from "sweetalert2";
+
+
+
+
 
 const Register = () => {
   const [countries, setCountries] = useState([]);
@@ -16,7 +21,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [Credential, setCredential] = useState({ Email: "", Otp: "" });
   const [showOtpField, setShowOtpField] = useState(false);
-  // const [forgotOtpField, setForgotOtpField] = useState(false);  // Corrected the typo
+
   const Navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -41,28 +46,34 @@ const Register = () => {
     StateId: Yup.string().required("State is required"),
     CityId: Yup.string().required("City is required"),
   });
+  const apiUrl = import.meta.env.VITE_API_URL; 
 
-  // Fetching countries
   useEffect(() => {
-    setLoading(true);
+    setLoading(true);  
+  
     axios
-      .get("http://localhost:49814/FormHelper/GetAllCountry")
+      .get(`${apiUrl}FormHelper/GetAllCountry`)
       .then((response) => {
-        setCountries(response.data.CountryEntities);
+        setCountries(response.data.CountryEntities);  
       })
       .catch((error) => {
-        console.error("Error fetching countries", error);
+        Swal.fire({
+          title: "Error",
+          text: `An error occurred while fetching the countries. Please try again later. ${error}`,
+          icon: "error",  
+        });
       })
       .finally(() => {
-        setLoading(false);
+        setLoading(false); 
       });
   }, []);
+
 
   // Handle country change
   const handleCountryChange = (selectedCountry) => {
     setLoading(true);
     axios
-      .get(`http://localhost:49814/FormHelper/GetStatesByCountry?countryId=${selectedCountry}`)
+      .get(`${apiUrl}FormHelper/GetStatesByCountry?countryId=${selectedCountry}`)
       .then((response) => {
         setStates(response.data.StateEntities);
         setCities([]);
@@ -79,7 +90,7 @@ const Register = () => {
   const handleStateChange = (StateId) => {
     setLoading(true);
     axios
-      .get(`http://localhost:49814/FormHelper/GetCityByState?StateId=${StateId}`)
+      .get(`${apiUrl}FormHelper/GetCityByState?StateId=${StateId}`)
       .then((response) => {
         setCities(response.data.CityEntities);
       })
@@ -95,14 +106,19 @@ const Register = () => {
   const onOtpSubmit = (otp) => {
     setCredential({ ...Credential, Otp: otp });
     axios
-      .get(`http://localhost:49814/Authentication/VerifyEmail?Email=${Credential.Email}&Otp=${otp}`)
+      .get(`${apiUrl}Authentication/VerifyEmail?Email=${Credential.Email}&Otp=${otp}`)
       .then((response) => {
         if (response.data.Retval === "Success") {
-          LoginAfterLogin(Credential.Email, Credential.Otp); // Use state values here
+          
+          LoginAfterLogin(Credential.Email, Credential.Otp); 
         }
       })
       .catch((error) => {
-        console.log(error);
+        Swal.fire({
+          title: "Error",
+          text: `An error occurred while fetching the countries. Please try again later. ${error}`,
+          icon: "error",  
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -116,7 +132,7 @@ const Register = () => {
 
   // Sending OTP
   const sendOtp = () => {
-    let url = "http://localhost:49814/Authentication/SendOtpEmail";
+    let url = `${apiUrl}Authentication/SendOtpEmail`;
     let data = { Email: Credential.Email };
 
     axios
@@ -134,30 +150,52 @@ const Register = () => {
   };
 
   // Handle user registration
-  const handleSubmit = (values) => {
-    let registerUrl = "http://localhost:49814/Authentication/Register";
-
+  const handleSubmitReg = (values) => {
+    let registerUrl = `${apiUrl}Authentication/Register`;
+  
     axios
       .post(registerUrl, values)
       .then((response) => {
-        if (response.data.Message === "Success") {
-          localStorage.setItem('Password', values.Password);
+        if (response.data.Message === "Success"){
+          Swal.fire({
+            title: "OTP Is Sent to Your Email",
+            text: "Please check your email to verify your account.",
+            icon: "success", 
+          });
+          
+
+          localStorage.setItem("Password", values.Password);
           sendOtp();
+        } else if (response.data.Retval === "Email Exists") {
+          Swal.fire({
+            title: "Email Already Exists",
+            text: "The email you entered is already associated with an existing account. Please try a different email.",
+            icon: "error", 
+          });
         } else {
-          alert("Error occurred during registration");
+    
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred during registration. Please try again later.",
+            icon: "error",  
+          });
         }
       })
       .catch((error) => {
-        console.error("Error registering user", error);
+       
+        Swal.fire({
+          title: "Registration Failed",
+          text: `An unexpected error occurred during registration. Please try again later.${error}`,
+          icon: "error",  
+        });
       });
   };
-
   // Login after registration
   const LoginAfterLogin = async (email) => {
     console.log();
     dispatch(startLoading());
     try {
-      const response = await axios.post("http://localhost:49814/Authentication/Login", {
+      const response = await axios.post(`${apiUrl}Authentication/Login`, {
         EmailId: email,
         Password: localStorage.getItem('Password')
       });
@@ -184,7 +222,12 @@ const Register = () => {
 
         dispatch(stopLoading());
         Navigate("/");
-        alert("Login Successful!");
+        Swal.fire({
+          title: "Login Successful",
+          text: "Login was successful.",
+          icon: "success",  
+        });
+        
       } else {
         dispatch(stopLoading());
         alert("Login failed. Please try again.");
@@ -203,7 +246,7 @@ const Register = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmitReg}
         >
           {({ setFieldValue }) => (
             <Form>
@@ -310,7 +353,7 @@ const Register = () => {
               </div>
 
               <div>
-                <button type="submit">Register</button>
+                <button  style={{height:'35px',width:'150px',borderRadius:"20px",background:'grey',color:"white",margin:"15px"}} type="submit">Register</button>
               </div>
             </Form>
           )}
@@ -329,9 +372,11 @@ const Register = () => {
             }}
           >
             <p>Please Enter Your OTP</p>
-            <ShowOtp length={4} onOtpSubmit={onOtpSubmit} style={{ width: "300px", height: "200px", margin: "auto" }} />
-            <Button onClick={sendOtp}>Resend OTP</Button>
-            {/* <Button onClick={forgotPassword}>Forgot Password</Button> */}
+            {/* <ShowOtp length={4} onOtpSubmit={onOtpSubmit} style={{ width: "300px", height: "200px", margin: "auto" }} /> */}
+            <ShowOtp length={4}  onOtpSubmit={onOtpSubmit} style={{ width: "300px", height: "200px", margin: "auto" }} />
+
+            <Button  onClick={sendOtp}>Resend OTP</Button>
+          
           </div>
         </div>
       )}

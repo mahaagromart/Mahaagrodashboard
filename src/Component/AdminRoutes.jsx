@@ -81,4 +81,5 @@ export const adminRoutes = [
     ],
   },
   { label: 'Signout', icon: <FaSignOutAlt />, key: '/signout' , danger : true  },
+  { label: 'ForgotOtp', icon: <FaSignOutAlt />, key: '/ForgotOtp' , danger : true  },
 ];

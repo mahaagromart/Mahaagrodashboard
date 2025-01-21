@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types"; 
 import { useRef } from "react";
 import './ShowOtp.css';
 
-
-const ShowOtp = ({ length = 4, onOtpSubmit }) => {
+const ShowOtp = ({ length, onOtpSubmit }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const [otpExpirationTime, setOtpExpirationTime] = useState(null); 
   const [isExpired, setIsExpired] = useState(false); 
@@ -26,7 +27,7 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
   }, [otpExpirationTime]);
 
   const handleOtpGenerate = ({onClick}) => {
-    const expirationTime = Date.now() + 3 * 60 * 1000; 
+    const expirationTime = Date.now() + 1 * 60 * 1000; 
     setOtpExpirationTime(expirationTime);
     setIsExpired(false); 
     setRemainingTime(3 * 60 * 1000); 
@@ -40,7 +41,6 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
 
     const value = e.target.value;
 
-   
     if (/[^0-9]/.test(value)) return;
 
     const newOtp = [...otp];
@@ -52,7 +52,6 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
       onOtpSubmit(combinedOtp); 
     }
 
-   
     if (value && index < length - 1 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
     }
@@ -60,7 +59,6 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && otp[index] === "") {
-     
       if (index > 0) {
         inputRefs.current[index - 1].focus();
       }
@@ -71,13 +69,11 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
     inputRefs.current[index].setSelectionRange(0, 1); 
   };
 
-
   const formatTime = (time) => {
     const minutes = Math.floor(time / 1000 / 60);
     const seconds = Math.floor((time / 1000) % 60);
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
-  console.log(formatTime)
 
   return (
     <div className="maindiv">
@@ -99,19 +95,16 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
       
       {isExpired && <p>OTP has expired!</p>}
 
-      {/* Countdown timer */}
       <div>
         {!isExpired && remainingTime > 0 && (
           <p>Time remaining: {formatTime(remainingTime)}</p>
         )}
       </div>
 
-      {/* Button to generate OTP */}
       <button onClick={handleOtpGenerate} disabled={isExpired}>
         Generate OTP (Valid for 3 minutes)
       </button>
 
-      {/* Resend OTP Button */}
       {isExpired && (
         <button onClick={handleOtpGenerate}>
           Resend OTP
@@ -121,4 +114,15 @@ const ShowOtp = ({ length = 4, onOtpSubmit }) => {
   );
 };
 
+
+ShowOtp.propTypes = {
+  length: PropTypes.number.isRequired,
+  onOtpSubmit: PropTypes.func.isRequired, 
+};
+
+ShowOtp.defaultProps = {
+  length: 4, 
+};
+
 export default ShowOtp;
+

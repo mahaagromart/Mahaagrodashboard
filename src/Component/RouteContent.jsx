@@ -34,6 +34,18 @@ import DeniedProduct from "../Pages/ProductManagement/SellerProduct/DeniedProduc
 import Banner from "../Pages/Promotionmanagement/Banner/Banner";
 import Coupon from "../Pages/Promotionmanagement/offersAndDeals/Coupon";
 import Flashdeals from "../Pages/Promotionmanagement/offersAndDeals/Flashdeals";
+import PushNotification from "../Pages/Promotionmanagement/Notification/PushNotification";
+import SendNotification from "../Pages/Promotionmanagement/Notification/sendNotification";
+import Testimonial from "../Pages/Promotionmanagement/Testimonial/Testimonial";
+import Message from "../Pages/HelpsandSupport/Message";
+import Service from "../Pages/HelpsandSupport/Service";
+import BusinessToBusiness from "../Pages/HelpsandSupport/BusinessToBusiness"
+import SupportTicket from "../Pages/HelpsandSupport/SupportTicket";
+import EarningReport from "../Pages/UserManagement/SalesandTransactionRep/EarningReport";
+import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/InhouseSales";
+// import sellerSales from "../Pages/UserManagement/SalesandTransactionRep/sellerSales";
+import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport"
+import Register from "../Pages/Register/Register";
 
 const RouteContent = () => {
   return (
@@ -131,7 +143,7 @@ const RouteContent = () => {
         {/* <Route path="/profile" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} /> */}
         <Route path="/signout" element={<LoginForm />}  />
         <Route path="/login" element={<LoginForm />} />
-        {/* <Route path="/Register" element={<Register />} /> */}
+        <Route path="/Register" element={<Register />} />
         </Routes>
     </>
   );
