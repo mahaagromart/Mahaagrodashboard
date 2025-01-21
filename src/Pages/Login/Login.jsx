@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import { Formik, Form, Field, ErrorMessage } from "formik";
 // import * as Yup from "yup";
 // import axios from "axios";
@@ -225,6 +226,9 @@
 // };
 
 // export default LoginForm;
+=======
+
+>>>>>>> 385c7f57bc94b546de7385950c08ca927b9ab2f9
 
 
 
@@ -234,8 +238,14 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/Features/AuthSlice";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
+=======
+import {  useNavigate } from "react-router-dom";
+>>>>>>> 385c7f57bc94b546de7385950c08ca927b9ab2f9
 import { startLoading, stopLoading } from "../../redux/Features/LoadingSlice";
+
+import Swal from "sweetalert2";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ EmailId: "", Password: "" });
@@ -251,7 +261,11 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
+<<<<<<< HEAD
     dispatch(startLoading());
+=======
+    dispatch(startLoading()); 
+>>>>>>> 385c7f57bc94b546de7385950c08ca927b9ab2f9
     setFormData(values);
 
     try {
@@ -281,8 +295,13 @@ const LoginForm = () => {
         );
 
         dispatch(stopLoading());
+        
+        await Swal.fire({
+          title : `Great Job ${userData.FirstName}`,
+          text : " You Have Logged In.",
+          icon : "success"
+        })
         navigate("/"); 
-        alert("Login Successful!");
       } else {
         dispatch(stopLoading());
         alert("Login failed. Please try again.");
@@ -291,7 +310,6 @@ const LoginForm = () => {
       dispatch(stopLoading());
       alert("An error occurred. Please check your network connection.", error);
     }
-
     setSubmitting(false);
   };
 

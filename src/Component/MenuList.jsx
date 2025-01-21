@@ -1,7 +1,7 @@
 
 import { Menu } from 'antd';
 import './Menu.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , useLocation } from 'react-router-dom';
 
 import { adminRoutes } from './AdminRoutes';
 import { useDispatch , useSelector } from 'react-redux';
@@ -16,6 +16,8 @@ const MenuList = () => {
   const [route , setRoute] = useState([]);
   const { role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const location = useLocation(); 
+
   useEffect(()=>{
       if(role === 'Admin'){
 
@@ -49,6 +51,7 @@ const MenuList = () => {
     }}
     mode="inline"
     items={route}
+    selectedKeys={[location.pathname]}
   />
 
   );

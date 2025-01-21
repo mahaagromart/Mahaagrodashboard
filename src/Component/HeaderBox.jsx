@@ -1,8 +1,33 @@
 
 import './HeaderBox.css'
 import { Button, Flex, Layout } from 'antd';
-import { ManOutlined, MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { MdNotifications } from 'react-icons/md';
+import { ManOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { MdNotifications, MdSettings } from 'react-icons/md';
+import { DownOutlined, SettingOutlined } from '@ant-design/icons';
+import { Dropdown, Space } from 'antd';
+import { FaSignOutAlt } from 'react-icons/fa';
+
+
+const items = [
+  
+  {
+    type: 'divider',
+  },
+  {
+    key: '1',
+    label: 'My Account Setting',
+    icon : <MdSettings/>
+
+  },
+  {
+    key : '3',
+    label : 'SignOut',
+    icon : <FaSignOutAlt/>,
+  }
+ 
+];
+
+
 
 const HeaderBox = ({collapsed , setCollapsed}) => {
    const { Header } = Layout;
@@ -37,12 +62,30 @@ const HeaderBox = ({collapsed , setCollapsed}) => {
         onClick={() => setCollapsed(!collapsed)}
         className="header-icon-button"
       />
+
+
+
+     
+ 
+     <Dropdown
+  menu={{
+    items,
+  }}
+>
+  <a onClick={(e) => e.preventDefault()}>
+    <Space>
       <Button
         type="text"
         icon={<UserOutlined />}
-        onClick={() => setCollapsed(!collapsed)}
-        className="header-icon-button"
+        className="header-icon-button dropdown-icon-button"
       />
+    </Space>
+  </a>
+</Dropdown>
+ 
+
+
+
     </div>
   </Header>
   

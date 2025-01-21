@@ -36,7 +36,7 @@ const App = () => {
           height: "100vh",
         }}
       >
-       <LoadingSpinner loadingMessage="Loading your data, please wait..." />
+       <LoadingSpinner />
 
       </div>
     );
@@ -58,3 +58,4 @@ const App = () => {
 };
 
 export default App;
+
