@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import ForgotOtp from '../ForgotOtp/ForgotOtp';
+import Swal from "sweetalert2";
 
 
 const apiUrl = import.meta.env.VITE_API_URL; 
@@ -37,8 +38,17 @@ const Forgot = () => {
       .then((response) => {
         if (response.data.Retval === "Success") {
           setEmailSent(true);
-        } else {
-          console.log("SendOtp Error");
+          Swal.fire({
+            title: "OTP Send To Your Email Please Verify",
+            text: `Internal Server Error`,
+            icon: "success", 
+          });
+        } else if(response.data.Retval==="Failed") {
+            Swal.fire({
+                  title: "Please Enter Valid Email",
+                  text: `Email iS Not Found In Database`,
+                  icon: "error", 
+                });
         }
       })
       .catch((error) => {
@@ -69,8 +79,12 @@ const Forgot = () => {
                   if (res.data.Retval === 'Success') {
                     setShowOtpForm(true);
                     sendOtpForgot();
-                  } else {
-                    console.log('Something went wrong!');
+                  } else if(res.data.Retval==="Failed"){
+                    Swal.fire({
+                      title: "Please Enter Valid Email",
+                      text: `Email Was Not Found In Our Database Please Enter Valid One.`,
+                      icon: "error", 
+                    });
                   }
                 })
                 .catch((err) => {
