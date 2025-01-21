@@ -46,7 +46,7 @@ const Forgot = () => {
         } else if(response.data.Retval==="Failed") {
             Swal.fire({
                   title: "Please Enter Valid Email",
-                  text: `Email iS Not Found In Database`,
+                  text: `Email Is Not Found In Database`,
                   icon: "error", 
                 });
         }
