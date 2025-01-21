@@ -52,9 +52,9 @@ export const adminRoutes = [
     icon: <BiSolidOffer />,
     children: [
       { label: 'Coupons', icon: <FaTags />, key: '/Coupon' },
+      { label: 'Flash deals', icon: <FaIdeal />, key: '/Flashdeals' },
       { label: 'Deal of the day', icon: <FaIdeal />, key: '/Dealoftheday' },
       { label: 'Featured deal', icon: <FaIdeal />, key: '/Featureddeal' },
-      { label: 'Flashdeals', icon: <FaIdeal />, key: '/Flashdeals' },
     ],
   },
   {

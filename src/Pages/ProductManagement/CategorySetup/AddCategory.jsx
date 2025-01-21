@@ -1,77 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, SimpleGrid, FormLabel, FormControl, Input, Button, Select, Image, useBreakpointValue } from "@chakra-ui/react";
 import CardBox from "../../../Component/Charts/CardBox";
-import Logo from "../../../assets/react.svg";
 import TableWithToggle from "../../../Component/Table/TableWithToggle";
 
 const AddCategory = () => {
+  const [previewImage, setPreviewImage] = useState(null);
   const logoSize = useBreakpointValue({ base: "150px", md: "200px" });
 
-  const initialData = [
-    {
-      id: "1",
-      categoryImage: "https://via.placeholder.com/50",
-      categoryName: "Fruits",
-      priority: 1,
-      status: "Active",
-    },
-    {
-      id: "2",
-      categoryImage: "https://via.placeholder.com/50",
-      categoryName: "Vegetables",
-      priority: 2,
-      status: "Inactive",
-    },
-    {
-      id: "3",
-      categoryImage: "https://via.placeholder.com/50",
-      categoryName: "Dairy",
-      priority: 3,
-      status: "Active",
-    },
-  ];
-
-  const columns = [
-    { title: "ID", dataIndex: "id", key: "id", align: "center" },
-    {
-      title: "Category Image",
-      dataIndex: "categoryImage",
-      key: "categoryImage",
-      align: "center",
-      render: (text) => (
-        <img
-          src={text}
-          alt="Category"
-          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
-        />
-      ),
-    },
-    { title: "Name", dataIndex: "categoryName", key: "categoryName", align: "center" },
-    { title: "Priority", dataIndex: "priority", key: "priority", align: "center" },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
-      render: (_, record) => (
-        <Button
-          style={{
-            background: record.status === "Active" ? "#52c41a" : "#f5222d",
-            color: "#fff",
-            border: "none",
-            padding: "5px 10px",
-          }}
-        >
-          {record.status === "Active" ? "Deactivate" : "Activate"}
-        </Button>
-      ),
-    },
-    { title: "Action", key: "action", align: "center" },
-  ];
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewImage(reader.result); 
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <>
-      <Box marginTop="1%"  >
+      <Box marginTop="1%">
         <Box mb={6}>
           <h2 className="content-title" style={{ textAlign: "center", fontWeight: "600", fontSize: "20px", color: "#4A5568" }}>
             Add New Category
@@ -106,10 +55,18 @@ const AddCategory = () => {
                   <FormLabel fontWeight="bold" color="gray.600">
                     Category Icon{" "}
                     <span style={{ color: "green", fontSize: "sm" }}>
-                      (Logo must be 1:1 ratio )
+                      (Logo must be 1:1 ratio)
                     </span>
                   </FormLabel>
-                  <Input type="file" focusBorderColor="blue.500" size="lg" borderRadius="md" p={2} />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    focusBorderColor="blue.500"
+                    size="lg"
+                    borderRadius="md"
+                    p={2}
+                  />
                 </FormControl>
 
                 <Box textAlign="center" mt={4} mb={5}>
@@ -120,14 +77,18 @@ const AddCategory = () => {
               </Box>
 
               <Box textAlign={{ base: "center", md: "right" }} display="flex" justifyContent="center" alignItems="center">
-                <Image
-                  src={Logo}
-                  alt="Category Logo"
-                  boxSize={logoSize}
-                  objectFit="cover"
-                  borderRadius="full"
-                  border="2px solid #ccc"
-                />
+                {previewImage ? (
+                  <Image
+                    src={previewImage}
+                    alt="Preview"
+                    boxSize={logoSize}
+                    objectFit="cover"
+                    borderRadius="full"
+                    border="2px solid #ccc"
+                  />
+                ) : (
+                  <p style={{ color: "#aaa" }}>No image selected</p>
+                )}
               </Box>
             </SimpleGrid>
           </CardBox>
@@ -135,7 +96,7 @@ const AddCategory = () => {
 
         <Box mt={5}>
           <CardBox>
-            <TableWithToggle columns={columns} dataList={initialData} />
+            <TableWithToggle />
           </CardBox>
         </Box>
       </Box>

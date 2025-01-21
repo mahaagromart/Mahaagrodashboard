@@ -20,6 +20,7 @@ import { MdInfo, MdSettings } from "react-icons/md";
 import Logo1 from "../../../assets/1.png"
 import Logo2 from "../../../assets/2.png"
 import CenterBox from "../../../Component/Charts/CenterBox";
+import UploadImages from "./UploadImages";
 
 
 const AddNewProduct = () => {
@@ -893,10 +894,37 @@ const AddNewProduct = () => {
           </CardBox>
         </Box>
 
+        {/* Product Varients */}
+
         {/* Product Image Uploads  */}
 
-        {/* Product Varients */}
-        <Box></Box>
+        <Box>
+          <CardBox>
+          <div style={{ paddingTop: "10px" }}>
+              <span
+                style={{
+                  marginLeft: "10px",
+                  padding: "10px",
+                  fontSize: "18px",
+                  borderBottom: "1px solid Green",
+                }}
+              >
+                {" "}
+                Image Setup{" "}
+              </span>
+            </div>
+           <SimpleGrid
+                         columns={{ base: 1, md: 2  }}
+                         spacing={6}
+                         alignItems="center"
+                         p={3}
+                         pb={10}
+                         mt={10}
+           >
+           <UploadImages/>
+           </SimpleGrid>
+          </CardBox>
+        </Box>
       </Box>
     </>
   );

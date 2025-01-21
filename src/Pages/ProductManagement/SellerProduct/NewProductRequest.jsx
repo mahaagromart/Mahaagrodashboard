@@ -1,19 +1,20 @@
-import React from "react";
+import React from 'react'
 import {
-  Box,
-  SimpleGrid,
-  FormLabel,
-  FormControl,
-  Input,
-  Button,
-  Select,
-} from "@chakra-ui/react";
-import CardBox from "../../../Component/Charts/CardBox";
-import ProductListTable from "../../../Component/Table/ProductListTable";
-
-const ProductList = () => {
+    Box,
+    SimpleGrid,
+    FormLabel,
+    FormControl,
+    Input,
+    Button,
+    Select,
+  } from "@chakra-ui/react";
+  import CardBox from "../../../Component/Charts/CardBox";
+  import ProductListTable from "../../../Component/Table/ProductListTable";
+const NewProductRequest = () => {
   return (
     <>
+
+<>
       <Box marginTop="1%" >
         <Box mb={6}>
           <h2
@@ -25,7 +26,7 @@ const ProductList = () => {
               color: "#4A5568",
             }}
           >
-            In House Product List
+            New Product Request 
           </h2>
         </Box>
 
@@ -133,7 +134,9 @@ const ProductList = () => {
         </Box>
       </Box>
     </>
-  );
-};
 
-export default ProductList;
+    </>
+  )
+}
+
+export default NewProductRequest

@@ -1,52 +1,51 @@
 import React, { useState } from "react";
 import { Button, Space, Table, Input } from "antd";
-import { MdDelete, MdEdit , MdSearch} from "react-icons/md";
+import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 
 const { Column } = Table;
 
-// Initial data
-const initialData = [
-  {
-    id: "1",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Fruits",
-    priority: 1,
-    status: "Active",
-  },
-  {
-    id: "2",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Vegetables",
-    priority: 2,
-    status: "Inactive",
-  },
-  {
-    id: "3",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Dairy",
-    priority: 3,
-    status: "Active",
-  },
-];
+const BannerTable = () => {
+  // Sample data
+  const initialData = [
+    {
+      id: "1",
+      image: "https://via.placeholder.com/50",
+      bannerType: "Fruits",
+      status: "Active",
+    },
+    {
+      id: "2",
+      image: "https://via.placeholder.com/50",
+      bannerType: "Vegetables",
+      status: "Inactive",
+    },
+    {
+      id: "3",
+      image: "https://via.placeholder.com/50",
+      bannerType: "Dairy",
+      status: "Active",
+    },
+  ];
 
-const TableWithToggle = () => {
-  const [data, setData] = useState(initialData); 
-  const [searchText, setSearchText] = useState(""); 
+  // State for data and search text
+  const [data, setData] = useState(initialData);
+  const [searchText, setSearchText] = useState("");
 
+  // Toggle the status between Active and Inactive
   const handleToggleStatus = (record) => {
     Swal.fire({
       title: "Are you sure?",
       text: `You are about to ${
         record.status === "Active" ? "deactivate" : "activate"
-      } this category.`,
+      } this banner.`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, do it!",
       cancelButtonText: "No, cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-
+        // Update the status of the row
         setData((prevData) =>
           prevData.map((item) =>
             item.id === record.id
@@ -56,7 +55,7 @@ const TableWithToggle = () => {
         );
         Swal.fire(
           "Updated!",
-          `The category is now ${
+          `The banner is now ${
             record.status === "Active" ? "Inactive" : "Active"
           }.`,
           "success"
@@ -65,46 +64,59 @@ const TableWithToggle = () => {
     });
   };
 
-
+  // Delete banner with confirmation
   const handleDelete = (record) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You will not be able to recover this category!",
+      text: "You will not be able to recover this banner!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "No, cancel!",
     }).then((result) => {
       if (result.isConfirmed) {
+        // Filter out the deleted item from the data array
         setData((prevData) => prevData.filter((item) => item.id !== record.id));
-        Swal.fire("Deleted!", "The category has been deleted.", "success");
+        Swal.fire("Deleted!", "The banner has been deleted.", "success");
       }
     });
   };
 
-  // Filtered data based on search
+  // Filter data based on the search text
   const filteredData = data.filter((item) =>
-    item.categoryName.toLowerCase().includes(searchText.toLowerCase())
+    item.bannerType.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-        {/* Category List Title */}
-        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>
-          Category List
-        </h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
+        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>Banner List</h2>
 
-        {/* Search Bar with Icon */}
         <Input
-          placeholder="Search by category name"
+          placeholder="Search by banner type"
           style={{
             width: "300px",
             paddingLeft: "30px",
           }}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          prefix={<MdSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)" }} />}
+          prefix={
+            <MdSearch
+              style={{
+                position: "absolute",
+                left: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
+          }
         />
       </div>
 
@@ -121,25 +133,23 @@ const TableWithToggle = () => {
         <Column title="ID" dataIndex="id" key="id" align="center" />
 
         <Column
-          title="Category Image"
-          dataIndex="categoryImage"
-          key="categoryImage"
+          title="Image"
+          dataIndex="image"
+          key="image"
           align="center"
           render={(text) => (
             <img
               src={text}
-              alt="Category"
+              alt="Banner"
               style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
             />
           )}
         />
 
-        <Column title="Name" dataIndex="categoryName" key="categoryName" align="center" />
-
-        <Column title="Priority" dataIndex="priority" key="priority" align="center" />
+        <Column title="Banner Type" dataIndex="bannerType" key="bannerType" align="center" />
 
         <Column
-          title="Status"
+          title="Publish"
           dataIndex="status"
           key="status"
           align="center"
@@ -168,14 +178,14 @@ const TableWithToggle = () => {
                 icon={<MdEdit />}
                 type="primary"
                 style={{ display: "flex", alignItems: "center" }}
-                onClick={() => alert(`Edit item with ID: ${record.id}`)}
+                onClick={() => alert(`Edit item with ID: ${record.id}`)} // Placeholder for edit action
               />
               <Button
                 icon={<MdDelete />}
                 type="primary"
                 danger
                 style={{ display: "flex", alignItems: "center" }}
-                onClick={() => handleDelete(record)}
+                onClick={() => handleDelete(record)} // Delete action
               />
             </Space>
           )}
@@ -185,4 +195,4 @@ const TableWithToggle = () => {
   );
 };
 
-export default TableWithToggle;
+export default BannerTable;

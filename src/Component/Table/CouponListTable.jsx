@@ -1,52 +1,54 @@
 import React, { useState } from "react";
-import { Button, Space, Table, Input } from "antd";
-import { MdDelete, MdEdit , MdSearch} from "react-icons/md";
+import { Table, Button, Space, Input } from "antd";
+import { MdDelete, MdEdit, MdRemoveRedEye, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 
 const { Column } = Table;
 
-// Initial data
+// Initial coupon data
 const initialData = [
   {
     id: "1",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Fruits",
-    priority: 1,
+    coupon: "SAVE10",
+    couponType: "Flat",
+    duration: "2025-01-01 to 2025-01-31",
+    discountBearer: "Admin",
     status: "Active",
   },
   {
     id: "2",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Vegetables",
-    priority: 2,
+    coupon: "FIRSTFREE",
+    couponType: "Free Delivery",
+    duration: "2025-02-01 to 2025-02-28",
+    discountBearer: "Seller",
     status: "Inactive",
   },
   {
     id: "3",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Dairy",
-    priority: 3,
+    coupon: "DISCOUNT15",
+    couponType: "Percentage",
+    duration: "2025-01-15 to 2025-02-15",
+    discountBearer: "Admin",
     status: "Active",
   },
 ];
 
-const TableWithToggle = () => {
-  const [data, setData] = useState(initialData); 
-  const [searchText, setSearchText] = useState(""); 
+const CouponListTable = () => {
+  const [data, setData] = useState(initialData);
+  const [searchText, setSearchText] = useState("");
 
   const handleToggleStatus = (record) => {
     Swal.fire({
       title: "Are you sure?",
       text: `You are about to ${
         record.status === "Active" ? "deactivate" : "activate"
-      } this category.`,
+      } this coupon.`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, do it!",
       cancelButtonText: "No, cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-
         setData((prevData) =>
           prevData.map((item) =>
             item.id === record.id
@@ -56,7 +58,7 @@ const TableWithToggle = () => {
         );
         Swal.fire(
           "Updated!",
-          `The category is now ${
+          `The coupon is now ${
             record.status === "Active" ? "Inactive" : "Active"
           }.`,
           "success"
@@ -65,11 +67,10 @@ const TableWithToggle = () => {
     });
   };
 
-
   const handleDelete = (record) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You will not be able to recover this category!",
+      text: "You will not be able to recover this coupon!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
@@ -77,67 +78,83 @@ const TableWithToggle = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setData((prevData) => prevData.filter((item) => item.id !== record.id));
-        Swal.fire("Deleted!", "The category has been deleted.", "success");
+        Swal.fire("Deleted!", "The coupon has been deleted.", "success");
       }
     });
   };
 
+  const handleEdit = (record) => {
+    alert(`Edit coupon with ID: ${record.id}`);
+  };
+
+  const handleView = (record) => {
+    alert(`View details of coupon with ID: ${record.id}`);
+  };
+
   // Filtered data based on search
   const filteredData = data.filter((item) =>
-    item.categoryName.toLowerCase().includes(searchText.toLowerCase())
+    item.coupon.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-        {/* Category List Title */}
-        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>
-          Category List
-        </h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
+        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>Coupon List</h2>
 
-        {/* Search Bar with Icon */}
         <Input
-          placeholder="Search by category name"
+          placeholder="Search by coupon name"
           style={{
             width: "300px",
             paddingLeft: "30px",
           }}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          prefix={<MdSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)" }} />}
+          prefix={
+            <MdSearch
+              style={{
+                position: "absolute",
+                left: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
+          }
         />
       </div>
 
-      {/* Table */}
       <Table
         dataSource={filteredData}
         rowKey="id"
         bordered={false}
         pagination={{ pageSize: 5 }}
-        style={{
-          border: "none",
-        }}
       >
-        <Column title="ID" dataIndex="id" key="id" align="center" />
-
+        <Column title="No" dataIndex="id" key="id" align="center" />
+        <Column title="Coupon" dataIndex="coupon" key="coupon" align="center" />
         <Column
-          title="Category Image"
-          dataIndex="categoryImage"
-          key="categoryImage"
+          title="Coupon Type"
+          dataIndex="couponType"
+          key="couponType"
           align="center"
-          render={(text) => (
-            <img
-              src={text}
-              alt="Category"
-              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
-            />
-          )}
         />
-
-        <Column title="Name" dataIndex="categoryName" key="categoryName" align="center" />
-
-        <Column title="Priority" dataIndex="priority" key="priority" align="center" />
-
+        <Column
+          title="Duration"
+          dataIndex="duration"
+          key="duration"
+          align="center"
+        />
+        <Column
+          title="Discount Bearer"
+          dataIndex="discountBearer"
+          key="discountBearer"
+          align="center"
+        />
         <Column
           title="Status"
           dataIndex="status"
@@ -157,7 +174,6 @@ const TableWithToggle = () => {
             </Button>
           )}
         />
-
         <Column
           title="Action"
           key="action"
@@ -165,10 +181,16 @@ const TableWithToggle = () => {
           render={(_, record) => (
             <Space size="middle">
               <Button
+                icon={<MdRemoveRedEye />}
+                type="primary"
+                style={{ display: "flex", alignItems: "center" }}
+                onClick={() => handleView(record)}
+              />
+              <Button
                 icon={<MdEdit />}
                 type="primary"
                 style={{ display: "flex", alignItems: "center" }}
-                onClick={() => alert(`Edit item with ID: ${record.id}`)}
+                onClick={() => handleEdit(record)}
               />
               <Button
                 icon={<MdDelete />}
@@ -185,4 +207,4 @@ const TableWithToggle = () => {
   );
 };
 
-export default TableWithToggle;
+export default CouponListTable;

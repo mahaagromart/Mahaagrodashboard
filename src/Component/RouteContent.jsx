@@ -28,6 +28,12 @@ import BrandList from "../Pages/ProductManagement/Brands/BrandList";
 import AddNewProduct from "../Pages/ProductManagement/InHouseProduct/AddNewProduct";
 import ProductList from "../Pages/ProductManagement/InHouseProduct/ProductList";
 import BulkInsert from "../Pages/ProductManagement/InHouseProduct/BulkInsert";
+import NewProductRequest from "../Pages/ProductManagement/SellerProduct/NewProductRequest";
+import ApprovedProducts from "../Pages/ProductManagement/SellerProduct/ApprovedProducts";
+import DeniedProduct from "../Pages/ProductManagement/SellerProduct/DeniedProduct";
+import Banner from "../Pages/Promotionmanagement/Banner/Banner";
+import Coupon from "../Pages/Promotionmanagement/offersAndDeals/Coupon";
+import Flashdeals from "../Pages/Promotionmanagement/offersAndDeals/Flashdeals";
 
 const RouteContent = () => {
   return (
@@ -68,14 +74,14 @@ const RouteContent = () => {
 
 
         {/* seller product starts */}
-        {/* <Route path="/NewProductRequest" element={<ProtectedRoutes><NewProductRequest /></ProtectedRoutes>} />
-        <Route path="/ApprovedProducts" element={<ProtectedRoutes><ApprovedProducts /></ProtectedRoutes>} />
-        <Route path="/DeniedProduct" element={<ProtectedRoutes><DeniedProduct /></ProtectedRoutes>} /> */}
+        <Route path="/NewProductRequest" element={<ProtectedRoutes> <NewProductRequest/> </ProtectedRoutes>} />
+        <Route path="/ApprovedProducts" element={<ProtectedRoutes> <ApprovedProducts/> </ProtectedRoutes>} />
+        <Route path="/DeniedProduct" element={<ProtectedRoutes> <DeniedProduct/> </ProtectedRoutes>} /> 
         {/* seller ends here */}
 
         {/* <Route path="/AddnewProduct" element={<ProtectedRoutes><AddnewProduct /></ProtectedRoutes>}
         />
-        <Route path="/ViewProduct" element={<ProtectedRoutes><ViewProduct /></ProtectedRoutes>}/> */}
+        <Route path="/ViewProduct" element={<ProtectedRoutes><ViewProduct /></ProtectedRoutes>}/>
 
 
 
@@ -84,11 +90,11 @@ const RouteContent = () => {
 
 
         {/* promotional management start here */}
+        <Route path="/Banner" element={<ProtectedRoutes><Banner/></ProtectedRoutes>} />
+        <Route path="/Coupon" element={<ProtectedRoutes> <Coupon/> </ProtectedRoutes>} />
+        <Route path="/Flashdeals" element={<ProtectedRoutes><Flashdeals /></ProtectedRoutes>} />
 {/* 
-        <Route path="/Banner" element={<ProtectedRoutes><Banner /></ProtectedRoutes>} />
-        <Route path="/Coupon" element={<ProtectedRoutes><Coupon /></ProtectedRoutes>} />
         <Route path="/Dealoftheday" element={<ProtectedRoutes><Dealoftheday /></ProtectedRoutes>} />
-        <Route path="/Featureddeal" element={<ProtectedRoutes><Featureddeal /></ProtectedRoutes>} />
         <Route path="/Flashdeals" element={<ProtectedRoutes><Flashdeals /></ProtectedRoutes>} />
         <Route path="/SendNotification" element={<ProtectedRoutes><SendNotification /></ProtectedRoutes>} />
         <Route path="/PushNotification" element={<ProtectedRoutes><PushNotification /></ProtectedRoutes>} />

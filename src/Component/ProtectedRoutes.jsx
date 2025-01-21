@@ -150,14 +150,14 @@ const ProtectedRoutes = ({ children }) => {
             })
           );
 
-          dispatch(stopLoading()); // Stop loading after successful login
+          dispatch(stopLoading());
         } else {
           dispatch(stopLoading());
           navigate("/login");
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        dispatch(stopLoading()); // Stop loading on error
+        dispatch(stopLoading()); 
         navigate("/login");
       }
     };
