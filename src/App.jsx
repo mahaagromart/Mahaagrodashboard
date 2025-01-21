@@ -46,20 +46,20 @@ const App = () => {
   }
   
     if (location.pathname === "/login") {
-      return <LoginForm />;
+      return <LoginForm  replace />;
     }
     
     if (location.pathname === "/Register") {
-      return <Register />;
+      return <Register  replace />;
     }
     if (location.pathname === "/ForgotOtp") {
-      return <ForgotOtp />;
+      return <ForgotOtp  replace />;
     }
     if (location.pathname === "/Forgot") {
-      return <Forgot />;
+      return <Forgot  replace />;
     }
-    if (location.pathname === "/ResetPassword") {
-      return <ResetPassword />;
+    if (location.pathname === "/ResetPassword" ) {
+      return <ResetPassword  replace />;
     }
   if (!storedToken) {
     return <Navigate to="/login" replace />;

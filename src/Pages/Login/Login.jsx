@@ -45,8 +45,9 @@ const LoginForm = () => {
           role: userData.DesignationName,
         };
 
-        localStorage.setItem("email", values.EmailId);
-        localStorage.setItem("password", values.Password);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("UserId", userData.UserId);
+        localStorage.removeItem("Password");
 
         dispatch(
           login({
