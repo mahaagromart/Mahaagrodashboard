@@ -25,11 +25,9 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
-<<<<<<< HEAD
+
     dispatch(startLoading());
-=======
-    dispatch(startLoading()); 
->>>>>>> 385c7f57bc94b546de7385950c08ca927b9ab2f9
+
     setFormData(values);
 
     try {
