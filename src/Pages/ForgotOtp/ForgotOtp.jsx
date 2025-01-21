@@ -14,26 +14,26 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
   let interval;
 
   const startOtpTimer = () => {
-    const expirationTime = Date.now() + 1 * 60 * 1000;  // 1 minute
-    setRemainingTime(1 * 60 * 1000);  // Set initial time to 1 minute
-    setIsExpired(false);  // Reset expired state to false
+    const expirationTime = Date.now() + 1 * 60 * 1000; 
+    setRemainingTime(1 * 60 * 1000);  
+    setIsExpired(false);  
 
     interval = setInterval(() => {
       const timeLeft = expirationTime - Date.now();
       setRemainingTime(timeLeft);
 
       if (timeLeft <= 0) {
-        setIsExpired(true);  // Mark as expired when time is up
-        clearInterval(interval);  // Stop the interval once expired
+        setIsExpired(true);  
+        clearInterval(interval);  
       }
     }, 1000);
   };
 
   useEffect(() => {
-    startOtpTimer();  // Start the OTP timer when the component mounts
+    startOtpTimer(); 
 
     return () => {
-      clearInterval(interval);  // Clean up the interval on unmount
+      clearInterval(interval);  
     };
   }, []);
 
@@ -61,7 +61,7 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && otp[index] === "") {
       if (index > 0) {
-        inputRefs.current[index - 1].focus();  // Move focus to previous input on backspace
+        inputRefs.current[index - 1].focus(); 
       }
     }
   };
@@ -82,12 +82,12 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
 
   // Handle OTP expiration and resend OTP
   const handleResendOtp = () => {
-    setIsExpired(false);  // Reset expired state
-    sendOtpForgot();  // Call the function to resend OTP
-    startOtpTimer();  // Restart the OTP timer
+    setIsExpired(false);  
+    sendOtpForgot();  
+    startOtpTimer();
   };
 
-  // The local function to send OTP
+
   const sendOtpForgot = () => {
     const email = localStorage.getItem('Email');
     if (!email) {
@@ -126,14 +126,14 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
             onClick={() => handleClick(index)}
             maxLength={1}
             className="otp-input"
-            disabled={isExpired}  // Disable input when OTP is expired
+            disabled={isExpired}  
           />
         ))}
       </div>
 
       <div>
         {isExpired ? (
-          // Show the "Resend OTP" button and text only when OTP expires
+
           <div>
             <p className="otp-expired">
               OTP expired. Click to resend OTP.
@@ -143,7 +143,7 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
             </button>
           </div>
         ) : (
-          // Display remaining time if OTP has not expired
+        
           <p>Time remaining: {formatTime(remainingTime)}</p>
         )}
       </div>
@@ -153,7 +153,7 @@ const ForgotOtp = ({ length = 4, onOtpSubmit }) => {
 
 ForgotOtp.propTypes = {
   length: PropTypes.number,
-  onOtpSubmit: PropTypes.func.isRequired, // Function to handle OTP submission
+  onOtpSubmit: PropTypes.func.isRequired,
 };
 
 export default ForgotOtp;

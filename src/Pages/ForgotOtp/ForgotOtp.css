@@ -78,3 +78,11 @@
  .buttonContainer button.resend-button:hover {
   background-color: #218838;
 }
+
+.otp-expired .resend-btn{
+ height:35px;
+ width: 300px;
+ background-color:bluel;
+ color: white;
+ border:2px  solid white;
+}

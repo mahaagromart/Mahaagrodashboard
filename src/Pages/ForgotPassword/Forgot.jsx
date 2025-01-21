@@ -92,7 +92,7 @@ const Forgot = () => {
           <div>
             <p>Please Enter Your OTP</p>
             <ForgotOtp length={4} onOtpSubmit={handleOtpSubmit} style={{ width: "500px", height: "200px", margin: "auto" }} />
-            <button className='resendBtn' onClick={sendOtpForgot}>Resend OTP</button>
+       
           </div>
         </div>
       ) : null}
