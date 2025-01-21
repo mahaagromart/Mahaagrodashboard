@@ -94,7 +94,7 @@ import { startLoading, stopLoading } from "../redux/Features/LoadingSlice";
 const ProtectedRoutes = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading } = useSelector((state) => state.loading);
+ 
   const { user, role, token, isLogged } = useSelector((state) => state.auth);
 
   const storedToken = token || localStorage.getItem("token");
