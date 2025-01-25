@@ -187,7 +187,7 @@ const MainLayoutBox = () => {
             style={{
               padding: "24px",
               backgroundColor: "#f4f7fe",
-              minHeight: "200vh",
+              minHeight: "100vh",
               marginLeft: "20px",
             }}
           >

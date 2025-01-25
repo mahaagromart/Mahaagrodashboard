@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import CardBox from "../../../Component/Charts/CardBox";
-import CustomTable from "../../../Component/Table/CustomTable";
+
 
 
 
@@ -161,7 +161,7 @@ const AddSubSubCagtegory = () => {
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-          <CustomTable columns={columns} data={data} />
+
           </CardBox>
         </Box>
       </Box>

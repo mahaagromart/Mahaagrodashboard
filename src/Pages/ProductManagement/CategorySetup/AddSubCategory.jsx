@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   SimpleGrid,
@@ -7,40 +8,123 @@ import {
   Input,
   Button,
   Select,
+  Text,
 } from "@chakra-ui/react";
-import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from "yup";
 import CardBox from "../../../Component/Charts/CardBox";
-import CustomTable from "../../../Component/Table/CustomTable";
 
-const data = [
-    {
-      id: "1",
-      SubCategoryName: "Fruits",
-      priority: 1,
-    },
-    {
-      id: "2",
-      SubCategoryName: "Vegetables",
-      priority: 2,
-    },
-    {
-      id: "3",
-      SubCategoryName: "Dairy",
-      priority: 3,
-    },
-  ];
+import axios from "axios";
+import Swal from "sweetalert2";
+import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../redux/Features/LoadingSlice";
+import SubCategoryTable from "../../../Component/Table/SubCategoryTable";
 
 
 
-const columns = [
-    { title: "ID", dataIndex: "id", key: "id" },
-    { title: "Sub-Category Name", dataIndex: "SubCategoryName", key: "SubCategoryName" },
-    { title: "Priority", dataIndex: "priority", key: "priority" },
-  ];
 
 
+
+const validationSchema = yup.object().shape({
+  Subcategory_Name: yup
+    .string()
+    .required("Sub Category Name is required")
+    .min(3, "Must be at least 3 characters"),
+  priority: yup
+    .number()
+    .required("Priority is required")
+    .typeError("Priority must be a number"),
+  category_id: yup.string().required("Main Category is required"),
+});
 
 const AddSubCategory = () => {
+
+  const [subCategorydata ,setSubCategoryData] = useState([]); 
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const storedToken = token || localStorage.getItem("token");
+  const [categoryList, setCategoryList] = useState([]);
+
+
+
+
+
+
+  const getCategory = async () => {
+    try {
+      const res = await axios.post(
+        `${apiUrl}/EcommerceCategory/GetAllCategory`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      if (res.data.Message === "success") {
+        setCategoryList(res.data.CategoryList);
+
+      } else {
+        await Swal.fire({
+          title: "Error in Getting Category List",
+          text: "Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: "Error",
+        text: "Failed to fetch the category list. Please try again later.",
+        icon: "error",
+      });
+    }
+  };
+
+  const handleSubmit = async (values, { resetForm }) => {
+    dispatch(startLoading());
+    try {
+      const res = await axios.post(
+        `${apiUrl}/EcommerceSubcategory/InsertSubCategory`,
+        values,
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+
+      if (res.data.Message.toLowerCase() === "success") {
+        await Swal.fire({
+          title: "Success",
+          text: "Sub-category added successfully!",
+          icon: "success",
+        });
+
+        resetForm();
+      } else {
+        await Swal.fire({
+          title: "Error",
+          text: res.data.Message || "Failed to add sub-category.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding sub-category:", error);
+      await Swal.fire({
+        title: "Error",
+        text: "Something went wrong. Please try again later.",
+        icon: "error",
+      });
+    } finally {
+      dispatch(stopLoading());
+    }
+  };
+
+
+
+
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
   return (
     <>
       <Box marginTop="1%" className="box">
@@ -58,93 +142,135 @@ const AddSubCategory = () => {
           </h2>
         </Box>
 
-        <Box mx="auto" mt={5}>
+        <Box mx="auto">
           <CardBox>
-            <SimpleGrid
-              columns={{ base: 1,  md: 2, lg: 3 }}
-              spacing={6}
-              alignItems="center"
-              gap={10}
-              p={5}
+            <Formik
+              initialValues={{
+                Category_Name: "",
+                Subcategory_Name: "",
+                priority: "",
+                category_id: "",
+              }}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
             >
-              {/* Category Name Form Control */}
-              <CardBox>
-                <FormControl mb={4}>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Category Name
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Enter category name"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                    borderRadius="md"
-                  />
-                </FormControl>
-                </CardBox>
+              {({ resetForm, setFieldValue }) => (
+                <Form>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} p={5}>
+                    <CardBox>
+                      <FormControl>
+                        <FormLabel fontWeight="bold" color="gray.600">
+                          Sub Category Name
+                        </FormLabel>
+                        <Field
+                          as={Input}
+                          name="Subcategory_Name"
+                          type="text"
+                          placeholder="Enter Sub category name"
+                          focusBorderColor="blue.500"
+                          size="md"
+                          borderRadius="md"
+                        />
+                        <Text color="red.500" fontSize="sm" minHeight="20px">
+                          <ErrorMessage name="Subcategory_Name" />
+                        </Text>
+                      </FormControl>
+                    </CardBox>
 
-              {/* Priority Form Control */}
-              <CardBox >
-                <FormControl mb={4}>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Priority
-                  </FormLabel>
-                  <Select
-                    placeholder="Select priority"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                  >
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <option key={i} value={i}>
-                        {i}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-              </CardBox>
+                    <CardBox>
+                      <FormControl>
+                        <FormLabel fontWeight="bold" color="gray.600">
+                          Priority
+                        </FormLabel>
+                        <Field
+                          as={Select}
+                          name="priority"
+                          placeholder="Select priority"
+                          focusBorderColor="blue.500"
+                          size="md"
+                        >
+                          {Array.from({ length: 10 }, (_, i) => (
+                            <option key={i} value={i}>
+                              {i}
+                            </option>
+                          ))}
+                        </Field>
+                        <Text color="red.500" fontSize="sm" minHeight="20px">
+                          <ErrorMessage name="priority" />
+                        </Text>
+                      </FormControl>
+                    </CardBox>
 
-              {/* Select Main Category Form Control */}
-              <CardBox >
-                <FormControl mb={4}>
-                  <FormLabel>Select Main Category</FormLabel>
-                  <Select
-                    placeholder="Select Category"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                  >
-                    {/* Add options for categories here */}
-                  </Select>
-                </FormControl>
-              </CardBox>
+                    <CardBox>
+                      <FormControl>
+                        <FormLabel fontWeight="bold" color="gray.600">
+                          Select Main Category
+                        </FormLabel>
+                        <Field
+                          as={Select}
+                          name="category_id"
+                          placeholder="Select Category"
+                          focusBorderColor="blue.500"
+                          size="md"
+                          onChange={(e) => {
+                            const selectedCategory = categoryList.find(
+                              (category) =>
+                                category.Category_id ===
+                                parseInt(e.target.value)
+                            );
+                            setFieldValue("category_id", e.target.value);
+                            setFieldValue(
+                              "Category_Name",
+                              selectedCategory?.Category_Name
+                            );
+                          }}
+                        >
+                          {categoryList.map((category) => (
+                            <option
+                              key={category.Category_id}
+                              value={category.Category_id}
+                            >
+                              {category.Category_Name}
+                            </option>
+                          ))}
+                        </Field>
+                        <Text color="red.500" fontSize="sm" minHeight="20px">
+                          <ErrorMessage name="category_id" />
+                        </Text>
+                      </FormControl>
+                    </CardBox>
 
-              {/* Submit Button */}
-              <GridItem
-                colSpan={{ base: 1, md: 2 }}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={4}
-                mb={5}
-              >
-                <Button
-                  bg="blue.500"
-                  color="white"
-                  _hover={{ bg: "blue.600" }}
-                  size="lg"
-                  borderRadius="md"
-                  width="auto"
-                >
-                  Submit
-                </Button>
-              </GridItem>
-            </SimpleGrid>
+                    <GridItem
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      mt={4}
+                      mb={5}
+                    >
+                      <Box display="flex" gap={5} mr={5} mt={6}>
+                        <Button
+                          colorScheme="gray"
+                          onClick={() => resetForm()}
+                          type="button"
+                        >
+                          Reset
+                        </Button>
+                        <Button colorScheme="blue" type="submit">
+                          Submit
+                        </Button>
+                      </Box>
+                    </GridItem>
+                  </SimpleGrid>
+                </Form>
+              )}
+            </Formik>
           </CardBox>
         </Box>
 
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-          <CustomTable columns={columns} data={data} />
+           <SubCategoryTable/>
           </CardBox>
         </Box>
       </Box>
