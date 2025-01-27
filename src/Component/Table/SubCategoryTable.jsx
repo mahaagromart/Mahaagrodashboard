@@ -22,6 +22,7 @@ import {
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
+import { CloudFilled } from "@ant-design/icons";
 
 const { Column } = Table;
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -35,9 +36,6 @@ const SubCategoryTable = () => {
   const [searchText, setSearchText] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [updatedSubcategoryName, setUpdatedSubcategoryName] = useState("");
-  const [updatedPriority, setUpdatedPriority] = useState("");
-  const [updatedCategoryId, setUpdatedCategoryId] = useState("");
   const [categoryList, setCategoryList] = useState([]);
 
   const validationSchema = Yup.object({
@@ -87,6 +85,7 @@ const SubCategoryTable = () => {
       );
       if (res.data.Message.toLowerCase() === "success") {
         setSubCategoryData(res.data.SubCategoryList);
+        console.log(res.data.SubCategoryList)
       } else {
         alert("Error fetching Sub-category List");
       }
@@ -95,37 +94,30 @@ const SubCategoryTable = () => {
     }
   };
 
-  // Handle edit modal opening
-  // const handleEdit = (subcategory) => {
-  //   setUpdatedSubcategoryName(subcategory.Subcategory_Name);
-  //   setUpdatedPriority(subcategory.Priority);
-  //   setUpdatedCategoryId(subcategory.Category_id);
-  //   setEditData(subcategory); 
-  //   setIsEditOpen(true);
-  // };
 
-   const handleEdit = (subcategory) => {
-    setEditData(subcategory); // Set editData for future reference
-    setIsEditOpen(true); // Open modal
-  }
+  const handleEdit = (subcategory) => {
+
+    setEditData(subcategory);
+    setIsEditOpen(true);
+  };
 
   const handleSubmit = async (values) => {
-    const { subcategoryName, priority, categoryId } = values;
 
+  
     try {
+
+      const selectCategory = categoryList.find((category) => String(category.Category_id) === String(values.categoryId));  
       dispatch(startLoading());
-      const res = await axios.put(
-        `${apiUrl}/EcommerceSubcategory/UpdateSubCategory`,
-        {
-          id: editData.id,
-          Subcategory_Name: subcategoryName,
-          Priority: priority,
-          CategoryId: categoryId,
-        },
+  
+ 
+      const res = await axios.post(
+        `${apiUrl}EcommerceSubcategory/UpdateSubCategory?id=${values.id}&Category_Name=${selectCategory.Category_Name}&Subcategory_Name=${values.subcategoryName}&Priority=${values.priority}&category_id=${values.categoryId}`,
+        {},
         { headers: { Authorization: `Bearer ${storedToken}` } }
       );
+  
       dispatch(stopLoading());
-
+  
       if (res.data.Message.toLowerCase() === "success") {
         await getSubCategory();
         await Swal.fire({
@@ -134,6 +126,7 @@ const SubCategoryTable = () => {
           icon: "success",
         });
         setIsEditOpen(false);
+        getSubCategory();
       } else {
         await Swal.fire({
           title: "Update Failed",
@@ -150,7 +143,7 @@ const SubCategoryTable = () => {
       dispatch(stopLoading());
     }
   };
-
+  
 
 
   // Handle delete
@@ -200,6 +193,7 @@ const SubCategoryTable = () => {
   useEffect(() => {
     getSubCategory();
     getCategory();
+   
   }, []);
 
   const filteredData =
@@ -279,73 +273,87 @@ const SubCategoryTable = () => {
 
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Sub-Category</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Formik
-              initialValues={{
-                subcategoryName: editData ? editData.Subcategory_Name : "",
-                priority: editData ? editData.Priority : "",
-                categoryId: editData ? editData.Category_id : "",
-              }}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmit}
-            >
-              {({ errors, touched }) => (
-                <Form>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                    <FormControl isInvalid={touched.subcategoryName && errors.subcategoryName}>
-                      <FormLabel htmlFor="subcategoryName">Sub-Category Name</FormLabel>
-                      <Field
-                        as={ChakraInput}
-                        id="subcategoryName"
-                        name="subcategoryName"
-                        placeholder="Enter Sub-category Name"
-                      />
-                      <FormErrorMessage>{errors.subcategoryName}</FormErrorMessage>
-                    </FormControl>
+  <ModalOverlay />
+  <ModalContent>
+    <ModalHeader>Edit Sub-Category</ModalHeader>
+    <ModalCloseButton />
+    <ModalBody>
+      <Formik
+        initialValues={{
+          id: editData ? editData.id : "",
+          subcategoryName: editData ? editData.Subcategory_Name : "",
+          priority: editData ? editData.Priority : "",
+          categoryId: editData ? editData.Category_id : "",
+        }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched, values, setFieldValue }) => (
+          <Form>
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              {/* Sub-category Name Field */}
+              <FormControl isInvalid={touched.subcategoryName && errors.subcategoryName}>
+                <FormLabel htmlFor="subcategoryName">Sub-Category Name</FormLabel>
+                <Field
+                  as={ChakraInput}
+                  id="subcategoryName"
+                  name="subcategoryName"
+                  placeholder="Enter Sub-category Name"
+                />
+                <FormErrorMessage>{errors.subcategoryName}</FormErrorMessage>
+              </FormControl>
 
-                    <FormControl isInvalid={touched.priority && errors.priority}>
-                      <FormLabel htmlFor="priority">Priority</FormLabel>
-                      <Field as={Select} id="priority" name="priority" placeholder="Select Priority">
-                        {[...Array(10).keys()].map((i) => (
-                          <option key={i} value={i}>
-                            {i}
-                          </option>
-                        ))}
-                      </Field>
-                      <FormErrorMessage>{errors.priority}</FormErrorMessage>
-                    </FormControl>
+              {/* Priority Field */}
+              <FormControl isInvalid={touched.priority && errors.priority}>
+                <FormLabel htmlFor="priority">Priority</FormLabel>
+                <Field as={Select} id="priority" name="priority" placeholder="Select Priority">
+                  {[...Array(10).keys()].map((i) => (
+                    <option key={i} value={i}>
+                      {i}
+                    </option>
+                  ))}
+                </Field>
+                <FormErrorMessage>{errors.priority}</FormErrorMessage>
+              </FormControl>
 
-                    <FormControl isInvalid={touched.categoryId && errors.categoryId}>
-                      <FormLabel htmlFor="categoryId">Please Select Category</FormLabel>
-                      <Field as={Select} id="categoryId" name="categoryId" placeholder="Select Category">
-                        {categoryList.map((category) => (
-                          <option key={category.Category_id} value={category.Category_id}>
-                            {category.Category_Name}
-                          </option>
-                        ))}
-                      </Field>
-                      <FormErrorMessage>{errors.categoryId}</FormErrorMessage>
-                    </FormControl>
-                  </div>
+              {/* Category Field */}
+              <FormControl isInvalid={touched.categoryId && errors.categoryId}>
+                <FormLabel htmlFor="categoryId">Please Select Category</FormLabel>
+                <Field
+                  as={Select}
+                  id="categoryId"
+                  name="categoryId"
+                  placeholder="Select Category"
+                >
+                  <option value="" disabled>
+                    Select Category
+                  </option>
+                  {categoryList.map((category) => (
+                    <option key={category.Category_id} value={category.Category_id}>
+                      {category.Category_Name}
+                    </option>
+                  ))}
+                </Field>
+                <FormErrorMessage>{errors.categoryId}</FormErrorMessage>
+              </FormControl>
+            </div>
 
-                  <ModalFooter>
-                    <ChakraButton colorScheme="blue" mr={3} type="submit">
-                      Update
-                    </ChakraButton>
-                    <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
-                      Cancel
-                    </ChakraButton>
-                  </ModalFooter>
-                </Form>
-              )}
-            </Formik>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+            {/* Modal Footer */}
+            <ModalFooter>
+              <ChakraButton colorScheme="blue" mr={3} type="submit">
+                Update
+              </ChakraButton>
+              <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </ChakraButton>
+            </ModalFooter>
+          </Form>
+        )}
+      </Formik>
+    </ModalBody>
+  </ModalContent>
+</Modal>
+
     </div>
   );
 };

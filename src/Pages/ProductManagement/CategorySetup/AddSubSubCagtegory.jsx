@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import CardBox from "../../../Component/Charts/CardBox";
+import { Table } from "antd";
 
 
 
@@ -161,7 +162,11 @@ const AddSubSubCagtegory = () => {
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-
+                 <Table
+                  // filterdata =>for serarch
+                  // column
+                  
+                 />                   
           </CardBox>
         </Box>
       </Box>
