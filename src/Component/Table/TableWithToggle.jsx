@@ -1,39 +1,42 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Space, Table, Input } from "antd";
-import { MdDelete, MdEdit , MdSearch} from "react-icons/md";
+import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
+import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const { Column } = Table;
 
-// Initial data
-const initialData = [
-  {
-    id: "1",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Fruits",
-    priority: 1,
-    status: "Active",
-  },
-  {
-    id: "2",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Vegetables",
-    priority: 2,
-    status: "Inactive",
-  },
-  {
-    id: "3",
-    categoryImage: "https://via.placeholder.com/50",
-    categoryName: "Dairy",
-    priority: 3,
-    status: "Active",
-  },
-];
-
 const TableWithToggle = () => {
-  const [data, setData] = useState(initialData); 
-  const [searchText, setSearchText] = useState(""); 
+  const [categoryData, setCategoryData] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const { token } = useSelector((state) => state.auth);
+  const storedToken = token || localStorage.getItem("token");
 
+  // Fetch category data
+  const getCategoryData = async () => {
+    try {
+      const url = "http://localhost:49814/EcommerceCategory/GetAllCategory";
+      const response = await axios.post(
+        `${url}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        }
+      );
+
+      if (response.data.CategoryList) {
+        // Properly set category data
+        setCategoryData(response.data.CategoryList);
+      }
+    } catch (error) {
+      console.log("Error occurred", error);
+    }
+  };
+
+  // Handle toggle status of category
   const handleToggleStatus = (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -46,10 +49,9 @@ const TableWithToggle = () => {
       cancelButtonText: "No, cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-
-        setData((prevData) =>
+        setCategoryData((prevData) =>
           prevData.map((item) =>
-            item.id === record.id
+            item.id === categoryData.Category_id
               ? { ...item, status: record.status === "Active" ? "Inactive" : "Active" }
               : item
           )
@@ -65,7 +67,7 @@ const TableWithToggle = () => {
     });
   };
 
-
+  // Handle delete category
   const handleDelete = (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -76,24 +78,27 @@ const TableWithToggle = () => {
       cancelButtonText: "No, cancel!",
     }).then((result) => {
       if (result.isConfirmed) {
-        setData((prevData) => prevData.filter((item) => item.id !== record.id));
+        setCategoryData((prevData) => prevData.filter((item) => item.id !== record.id));
         Swal.fire("Deleted!", "The category has been deleted.", "success");
       }
     });
   };
 
   // Filtered data based on search
-  const filteredData = data.filter((item) =>
-    item.categoryName.toLowerCase().includes(searchText.toLowerCase())
+  const filteredData = categoryData.filter((item) =>
+    item.Category_Name.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  // Fetch data on mount
+  useEffect(() => {
+    getCategoryData();
+  }, []);
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
         {/* Category List Title */}
-        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>
-          Category List
-        </h2>
+        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>Category List</h2>
 
         {/* Search Bar with Icon */}
         <Input
@@ -111,14 +116,14 @@ const TableWithToggle = () => {
       {/* Table */}
       <Table
         dataSource={filteredData}
-        rowKey="id"
+        rowKey="Category_id"  
         bordered={false}
         pagination={{ pageSize: 5 }}
         style={{
           border: "none",
         }}
       >
-        <Column title="ID" dataIndex="id" key="id" align="center" />
+        <Column title="Id" dataIndex="Category_id" key="Category_id" align="center" />
 
         <Column
           title="Category Image"
@@ -129,14 +134,14 @@ const TableWithToggle = () => {
             <img
               src={text}
               alt="Category"
-              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
+              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" , marginLeft :  "150px" }}
             />
           )}
         />
 
-        <Column title="Name" dataIndex="categoryName" key="categoryName" align="center" />
+        <Column title="Category" dataIndex="Category_Name" key="categoryName" align="center" />
 
-        <Column title="Priority" dataIndex="priority" key="priority" align="center" />
+        <Column title="Priority" dataIndex="Priority" key="priority" align="center" />
 
         <Column
           title="Status"
@@ -168,7 +173,7 @@ const TableWithToggle = () => {
                 icon={<MdEdit />}
                 type="primary"
                 style={{ display: "flex", alignItems: "center" }}
-                onClick={() => alert(`Edit item with ID: ${record.id}`)}
+                onClick={() => alert(`Edit item with ID: ${record.Category_id}`)}
               />
               <Button
                 icon={<MdDelete />}

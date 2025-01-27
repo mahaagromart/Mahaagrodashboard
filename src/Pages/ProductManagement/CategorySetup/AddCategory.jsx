@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, SimpleGrid, FormLabel, FormControl, Input, Button, Select, Image, useBreakpointValue } from "@chakra-ui/react";
 import CardBox from "../../../Component/Charts/CardBox";
 import TableWithToggle from "../../../Component/Table/TableWithToggle";

@@ -1,101 +1,17 @@
-
-
-// import  { useEffect } from "react";
-// import axios from "axios";
-// import { useSelector, useDispatch } from "react-redux";
-// import { login } from "../redux/Features/AuthSlice";
-// import { useNavigate } from "react-router-dom";
-// import { startLoading, stopLoading } from "../redux/Features/LoadingSlice";
-
-// const ProtectedRoutes = ({ children }) => {
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//    const { isLoading } = useSelector((state) => state.loading);
-//   const { user, role, token, isLogged } = useSelector((state) => state.auth);
-
-//   const storedToken = token || localStorage.getItem("token");
-//   const UserId = localStorage.getItem("UserId");
-
-//   const getRole = (id) => {
-//     switch (id) {
-//       case "1":
-//         return "Admin";
-//       case "2":
-//         return "Vendor";
-//       default:
-//         return null;
-//     }
-//   };
-
-//   useEffect(() => {
-//     dispatch(startLoading);
-//     const fetchUser = async () => {
-//       if (!storedToken || !UserId) {
-        
-//         navigate("/login");
-//         return;
-//       }
-
-//       try {
-//         const url = "http://localhost:49814/Authentication/GetUserProfile";
-       
-//         const response = await axios.post(
-//           `${url}?UserId=${UserId}`,
-//           {},
-//           {
-//             headers: {
-//               Authorization: `Bearer ${storedToken}`,
-//             },
-//           }
-//         );
-
-//         if (response.data.Code === 200) {
-//           const UserId = response.data.UserProfilesEntity[0].DesignationId;
-           
-//           const userRole = getRole(UserId);
-
-//           dispatch(
-//             login({
-//               user : response.data.UserProfilesEntity[0].FirstName + " " +response.data.UserProfilesEntity[0].LastName,
-//               role: userRole,
-//               token: storedToken,
-//               UserId: UserId,
-//             })
-//           );
-
-//           dispatch(stopLoading);
-
-//         } else {
-//           dispatch(stopLoading)
-//           navigate("/login");
-//         }
-//       } catch (error) {
-//         dispatch(stopLoading)
-//         navigate("/login");
-//       }
-//     };
-
-//     if (!user || !role || !isLogged) {
-//       fetchUser();
-//     }
-//   }, [user, role, isLogged, storedToken, UserId, dispatch, navigate]);
-
-//   return storedToken && UserId && isLogged ? children : null;
-// };
-
-// export default ProtectedRoutes;
 import { useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../redux/Features/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { startLoading, stopLoading } from "../redux/Features/LoadingSlice";
+// import { PiCornersOutLight } from "react-icons/pi";
 
 const ProtectedRoutes = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
- 
-  const { user, role, token, isLogged } = useSelector((state) => state.auth);
+
+
+  const { user, token, isLogged } = useSelector((state) => state.auth);
 
   const storedToken = token || localStorage.getItem("token");
   const UserId = localStorage.getItem("UserId");
@@ -113,17 +29,16 @@ const ProtectedRoutes = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      dispatch(startLoading()); // Call startLoading as a function
-
+      // If no token or userId, navigate to login
       if (!storedToken || !UserId) {
         navigate("/login");
-        dispatch(stopLoading()); // Stop loading if no token or user ID
         return;
       }
 
+      dispatch(startLoading()); // Start loading
+
       try {
         const url = "http://localhost:49814/Authentication/GetUserProfile";
-
         const response = await axios.post(
           `${url}?UserId=${UserId}`,
           {},
@@ -134,9 +49,12 @@ const ProtectedRoutes = ({ children }) => {
           }
         );
 
+     
+
         if (response.data.Code === 200) {
-          const designationId = response.data.UserProfilesEntity[0].DesignationId;
-          const userRole = getRole(designationId);
+          const roleId = response.data.UserProfilesEntity[0].DesignationName;
+      
+          
 
           dispatch(
             login({
@@ -144,28 +62,27 @@ const ProtectedRoutes = ({ children }) => {
                 response.data.UserProfilesEntity[0].FirstName +
                 " " +
                 response.data.UserProfilesEntity[0].LastName,
-              role: userRole,
+              role: roleId,
               token: storedToken,
               UserId: UserId,
             })
           );
-
-          dispatch(stopLoading());
         } else {
-          dispatch(stopLoading());
           navigate("/login");
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        dispatch(stopLoading()); 
         navigate("/login");
+      } finally {
+        dispatch(stopLoading()); 
       }
     };
 
-    if (!user || !role || !isLogged) {
+    // Only fetch user data if we don't have it and have valid token and UserId
+    if (!user && storedToken && UserId) {
       fetchUser();
     }
-  }, [user, role, isLogged, storedToken, UserId, dispatch, navigate]);
+  }, [storedToken, UserId, user, dispatch , navigate]);
 
   return storedToken && UserId && isLogged ? children : null;
 };
