@@ -12,6 +12,7 @@ import {
 import React from "react";
 import CardBox from "../../../Component/Charts/CardBox";
 import { Table } from "antd";
+import SubSubCategoryTable from "./SubSubCategoryTable";
 
 
 
@@ -162,11 +163,7 @@ const AddSubSubCagtegory = () => {
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-                 <Table
-                  // filterdata =>for serarch
-                  // column
-                  
-                 />                   
+                 <SubSubCategoryTable/>                  
           </CardBox>
         </Box>
       </Box>
