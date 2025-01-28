@@ -39,7 +39,6 @@ const validationSchema = yup.object().shape({
 
 const AddSubCategory = () => {
 
-  const [subCategorydata ,setSubCategoryData] = useState([]); 
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -123,6 +122,7 @@ const AddSubCategory = () => {
 
   useEffect(() => {
     getCategory();
+    
   }, []);
 
   return (
