@@ -1,12 +1,25 @@
-import { Box, SimpleGrid, FormLabel, FormControl, Input, Button, Select, GridItem } from "@chakra-ui/react";
-import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import {
+  Box,
+  SimpleGrid,
+  FormLabel,
+  FormControl,
+  Input,
+  Button,
+  Select,
+  GridItem,
+  Text,
+} from "@chakra-ui/react";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import CardBox from "../../../Component/Charts/CardBox";
 import SubSubCategoryTable from "./SubSubCategoryTable";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { startLoading, stopLoading } from "../../../redux/Features/LoadingSlice";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../redux/Features/LoadingSlice";
 import Swal from "sweetalert2";
 
 // Form validation schema using Yup
@@ -16,7 +29,10 @@ const validationSchema = Yup.object({
     .min(3, "Sub Sub Category Name must be at least 3 characters"),
   CATEGORY_NAME: Yup.string().required("Main Category is required"),
   SUBCATEGORY_NAME: Yup.string().required("Sub Category is required"),
-  PRIORITY: Yup.number().required("Priority is required").min(1, "Priority must be between 1 and 10").max(10, "Priority must be between 1 and 10"),
+  PRIORITY: Yup.number()
+    .required("Priority is required")
+    .min(1, "Priority must be between 1 and 10")
+    .max(10, "Priority must be between 1 and 10"),
 });
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -39,7 +55,7 @@ const AddSubSubCategory = () => {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
- 
+
       if (res.data.Message === "success") {
         setCategoryList(res.data.CategoryList);
       } else {
@@ -74,23 +90,21 @@ const AddSubSubCategory = () => {
     } catch (error) {
       await Swal.fire({
         title: "Error In Fetching SubCategory",
-        text: "Failed to fetch the category list. Please try again later." + error,
+        text:
+          "Failed to fetch the category list. Please try again later." + error,
         icon: "error",
       });
     }
   };
 
-
   // Fetch data when component mounts
   useEffect(() => {
-
     getCategory();
     getAllSubCategory();
   }, []);
 
   // Handle form submission
   const handleSubmit = async (values, { resetForm }) => {
-    console.log(values)
     dispatch(startLoading());
     try {
       const res = await axios.post(
@@ -100,7 +114,7 @@ const AddSubSubCategory = () => {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
-      console.log(res)
+
       if (res.data.Message === "SUCCESS") {
         await Swal.fire({
           title: "Success",
@@ -116,7 +130,6 @@ const AddSubSubCategory = () => {
         });
       }
     } catch (error) {
-      console.error("Error adding sub-category:", error);
       await Swal.fire({
         title: "Error",
         text: "Something went wrong. Please try again later.",
@@ -147,10 +160,10 @@ const AddSubSubCategory = () => {
         <CardBox>
           <Formik
             initialValues={{
-              SUBSUBCATEGORY_NAME: '',
-              CATEGORY_NAME: '',
-              SUBCATEGORY_NAME: '',
-              PRIORITY: '',
+              SUBSUBCATEGORY_NAME: "",
+              CATEGORY_NAME: "",
+              SUBCATEGORY_NAME: "",
+              PRIORITY: "",
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -166,7 +179,13 @@ const AddSubSubCategory = () => {
                 >
                   {/* Sub Sub Category Name Form Control */}
                   <GridItem colSpan={{ base: 1, md: 1 }}>
-                    <FormControl mb={4} isInvalid={touched.SUBSUBCATEGORY_NAME && !!errors.SUBSUBCATEGORY_NAME}>
+                    <FormControl
+                      mb={4}
+                      isInvalid={
+                        touched.SUBSUBCATEGORY_NAME &&
+                        !!errors.SUBSUBCATEGORY_NAME
+                      }
+                    >
                       <FormLabel fontWeight="bold" color="gray.600">
                         Sub Sub Category Name
                       </FormLabel>
@@ -179,13 +198,20 @@ const AddSubSubCategory = () => {
                         size="md"
                         borderRadius="md"
                       />
-                      <ErrorMessage name="SUBSUBCATEGORY_NAME" component="div" style={{ color: 'red' }} />
+                      <Text color="red.500" fontSize="sm" minHeight="20px">
+                        <ErrorMessage name="SUBSUBCATEGORY_NAME" />
+                      </Text>
                     </FormControl>
                   </GridItem>
 
                   {/* Main Category Form Control */}
                   <GridItem colSpan={{ base: 1, md: 1 }}>
-                    <FormControl mb={4} isInvalid={touched.CATEGORY_NAME && !!errors.CATEGORY_NAME}>
+                    <FormControl
+                      mb={4}
+                      isInvalid={
+                        touched.CATEGORY_NAME && !!errors.CATEGORY_NAME
+                      }
+                    >
                       <FormLabel fontWeight="bold" color="gray.600">
                         Main Category *
                       </FormLabel>
@@ -195,21 +221,34 @@ const AddSubSubCategory = () => {
                         placeholder="Select Main Category"
                         focusBorderColor="blue.500"
                         size="md"
-                        onChange={(e) => setFieldValue("CATEGORY_NAME", e.target.value)}
+                        onChange={(e) =>
+                          setFieldValue("CATEGORY_NAME", e.target.value)
+                        }
                       >
                         {categoryList.map((category) => (
-                          <option key={category.Category_id} value={category.Category_Name}>
+                          <option
+                            key={category.Category_id}
+                            value={category.Category_Name}
+                          >
                             {category.Category_Name}
                           </option>
                         ))}
                       </Field>
-                      <ErrorMessage name="CATEGORY_NAME" component="div" style={{ color: 'red' }} />
+
+                      <Text color="red.500" fontSize="sm" minHeight="20px">
+                        <ErrorMessage name="CATEGORY_NAME" />
+                      </Text>
                     </FormControl>
                   </GridItem>
 
                   {/* Sub Category Form Control */}
                   <GridItem colSpan={{ base: 1, md: 1 }}>
-                    <FormControl mb={4} isInvalid={touched.SUBCATEGORY_NAME && !!errors.SUBCATEGORY_NAME}>
+                    <FormControl
+                      mb={4}
+                      isInvalid={
+                        touched.SUBCATEGORY_NAME && !!errors.SUBCATEGORY_NAME
+                      }
+                    >
                       <FormLabel>Select Sub Category</FormLabel>
                       <Field
                         name="SUBCATEGORY_NAME"
@@ -217,21 +256,35 @@ const AddSubSubCategory = () => {
                         placeholder="Select Sub Category"
                         focusBorderColor="blue.500"
                         size="md"
-                        onChange={(e) => setFieldValue("SUBCATEGORY_NAME", e.target.value)}
+                        onChange={(e) =>
+                          setFieldValue("SUBCATEGORY_NAME", e.target.value)
+                        }
                       >
                         {subCategoryList.map((category) => (
-                          <option key={category.id} value={category.Subcategory_Name}>
+                          <option
+                            key={category.id}
+                            value={category.Subcategory_Name}
+                          >
                             {category.Subcategory_Name}
                           </option>
                         ))}
                       </Field>
-                      <ErrorMessage name="SUBCATEGORY_NAME" component="div" style={{ color: 'red' }} />
+                      <Text color="red.500" fontSize="sm" minHeight="20px">
+
+                      <ErrorMessage
+                        name="SUBCATEGORY_NAME"
+                      />
+                      </Text>
+
                     </FormControl>
                   </GridItem>
 
                   {/* Priority Form Control */}
                   <GridItem colSpan={{ base: 1, md: 1 }}>
-                    <FormControl mb={4} isInvalid={touched.PRIORITY && !!errors.PRIORITY}>
+                    <FormControl
+                      mb={4}
+                      isInvalid={touched.PRIORITY && !!errors.PRIORITY}
+                    >
                       <FormLabel fontWeight="bold" color="gray.600">
                         Priority
                       </FormLabel>
@@ -240,7 +293,7 @@ const AddSubSubCategory = () => {
                         as={Select}
                         placeholder="Select priority"
                         focusBorderColor="blue.500"
-                        size="lg"
+                        size="md"
                       >
                         {Array.from({ length: 10 }, (_, i) => (
                           <option key={i} value={i + 1}>
@@ -248,7 +301,10 @@ const AddSubSubCategory = () => {
                           </option>
                         ))}
                       </Field>
-                      <ErrorMessage name="PRIORITY" component="div" style={{ color: 'red' }} />
+
+                      <Text color="red.500" fontSize="sm" minHeight="20px">
+                        <ErrorMessage name="PRIORITY" />
+                      </Text>
                     </FormControl>
                   </GridItem>
 
@@ -260,7 +316,7 @@ const AddSubSubCategory = () => {
                     alignItems="center"
                     mt={4}
                     mb={5}
-                    mr= {5}
+                    mr={5}
                   >
                     <Button
                       colorScheme="gray"

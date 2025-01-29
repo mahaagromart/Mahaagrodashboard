@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../redux/Features/AuthSlice";
@@ -10,12 +10,14 @@ const ProtectedRoutes = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+
   const { user, token, isLogged } = useSelector((state) => state.auth);
+
 
   const storedToken = token || localStorage.getItem("token");
   const UserId = localStorage.getItem("UserId");
-
-
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,11 +26,11 @@ const ProtectedRoutes = ({ children }) => {
         navigate("/login");
         return;
       }
-      debugger
+
       dispatch(startLoading()); // Start loading
 
       try {
-        const url = "http://localhost:49814/Authentication/GetUserProfile";
+        const url = `${apiUrl}/Authentication/GetUserProfile`;
         const response = await axios.post(
           `${url}?UserId=${UserId}`,
           {},
@@ -43,8 +45,6 @@ const ProtectedRoutes = ({ children }) => {
 
         if (response.data.Code === 200) {
           const roleId = response.data.UserProfilesEntity[0].DesignationName;
-      
-          
 
           dispatch(
             login({
@@ -61,7 +61,7 @@ const ProtectedRoutes = ({ children }) => {
           navigate("/login");
         }
       } catch (error) {
-
+        console.error("Error fetching user profile:", error);
         navigate("/login");
       } finally {
         dispatch(stopLoading()); 

@@ -111,6 +111,7 @@ import "../App.css";
 import HeaderBox from "./HeaderBox";
 import RouteContent from "./RouteContent";
 import MenuList from './MenuList';
+import ProtectedRoutes from "./ProtectedRoutes";
 
 const MainLayoutBox = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -171,7 +172,11 @@ const MainLayoutBox = () => {
             </h3>
           </div>
 
+          <ProtectedRoutes>
+
           <MenuList navigate={navigate} collapsed={collapsed} />
+
+          </ProtectedRoutes>
         </Sider>
 
         <Layout

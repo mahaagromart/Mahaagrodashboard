@@ -5,19 +5,9 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../../redux/Features/LoadingSlice";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button as ChakraButton,
-  Input as ChakraInput,
-  Select,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
+  ModalBody, ModalCloseButton, Button as ChakraButton, Select,
+  FormControl, FormLabel, FormErrorMessage , Input as ChakraInput
 } from "@chakra-ui/react";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
@@ -43,7 +33,7 @@ const SubSubCategoryTable = () => {
     CATEGORY_NAME: Yup.string().required("Category Name is required"),
     PRIORITY: Yup.number().required("Priority is required").min(0, "Priority must be 0 or greater"),
   });
-  // Fetch categories
+
   const getCategory = async () => {
     try {
       const res = await axios.post(
@@ -56,22 +46,25 @@ const SubSubCategoryTable = () => {
       if (res.data.Message === "success") {
         setCategoryList(res.data.CategoryList);
       } else {
-        throw new Error("Error in getting Category List");
+        await Swal.fire({
+          title: "Error in Getting Category List",
+          text: "Please try again.",
+          icon: "error",
+        });
       }
     } catch (error) {
-      Swal.fire({
+      await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later."+error,
+        text: "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
 
-  // Fetch subcategories
   const getSubCategory = async () => {
     try {
       const res = await axios.post(
-        `${apiUrl}EcommerceSubcategory/GetAllSubCategory`,
+        `${apiUrl}/EcommerceSubcategory/GetAllSubCategory`,
         {},
         {
           headers: { Authorization: `Bearer ${storedToken}` },
@@ -80,19 +73,22 @@ const SubSubCategoryTable = () => {
       if (res.data.Message.toLowerCase() === "success") {
         setSubCategoryData(res.data.SubCategoryList);
       } else {
-        throw new Error("Error fetching Sub-category List");
+        await Swal.fire({
+          title: "Error in Getting Sub-Category List",
+          text: "Please try again.",
+          icon: "error",
+        });
       }
     } catch (error) {
-      Swal.fire({
+      await Swal.fire({
         title: "Error",
-        text: "Failed to fetch Sub-category List"+error,
+        text: "Failed to fetch the sub-category list. Please try again later.",
         icon: "error",
       });
     }
   };
 
-  // Fetch subsubcategories
-  const getAllSubSubCategory = async () => {
+  const getSubSubCategory = async () => {
     try {
       const res = await axios.post(
         `${apiUrl}/EcommerceSubSubsubCategory/GetAllSubsubCategory`,
@@ -101,72 +97,36 @@ const SubSubCategoryTable = () => {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
-      if (res.data.Message === "success") {
+      if (res.data.Message.toLowerCase() === "success") {
         setSubSubCategory(res.data.SubsubCategoryList);
       } else {
-        throw new Error("Error fetching Sub-Subcategory List");
+        await Swal.fire({
+          title: "Error in Getting Sub-Subcategory List",
+          text: "Please try again.",
+          icon: "error",
+        });
       }
     } catch (error) {
-      Swal.fire({
+      await Swal.fire({
         title: "Error",
-        text: "Failed to fetch Sub-Subcategory list. Please try again later."+error,
+        text: "Failed to fetch the sub-subcategory list. Please try again later.",
         icon: "error",
       });
     }
   };
 
+  useEffect(() => {
+    getCategory();
+    getSubCategory();
+    getSubSubCategory();
+  }, []);
+
   const handleEdit = (record) => {
-    console.log(record);
-    console.log(subsubCategory)
     setEditData(record);
     setIsEditOpen(true);
-  
   };
 
-
-
-//Insert subsubCategory
-const handleSubmit = async (values) => {
-try {
-    dispatch(startLoading());
-
-    const res = await axios.post(
-      `${apiUrl}EcommerceSubSubsubCategory/UpdateSubsubCategory?id=${values.Id}&SUBSUBCATEGORY_NAME=${values.SUBSUBCATEGORY_NAME}&SUBCATEGORY_NAME=${values.SUBCATEGORY_NAME}&CATEGORY_NAME=${values.CATEGORY_NAME}&Priority=${values.PRIORITY}`,
-      {},
-      { headers: { Authorization: `Bearer ${storedToken}` } }
-    );
-
-    dispatch(stopLoading());
-
-    if (res.data.Message.toLowerCase() === "success") {
-      await getSubCategory();
-      Swal.fire({
-        title: "Success",
-        text: "Subcategory updated successfully!",
-        icon: "success",
-      });
-      setIsEditOpen(false); 
-    } else {
-      throw new Error("Update Failed");
-    }
-  } catch (error) {
-    Swal.fire({
-      title: "Error",
-      text: "Error updating subcategory. Please try again." + error,
-      icon: "error",
-    });
-    dispatch(stopLoading());
-  }
-};
-
-
-
-
-
-
-//Delete subsubCategory 
   const handleDelete = async (record) => {
-
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to recover this!",
@@ -175,258 +135,220 @@ try {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           dispatch(startLoading());
-
-          const deleteResponse = await axios.post(
-            `${apiUrl}/EcommerceSubSubsubCategory/DeleteSubsubCategory?id=${record.Id}`,
-            {},
-            {
-              headers: { Authorization: `Bearer ${storedToken}` },
-            }
-          );
+          const res = await axios.post(`${apiUrl}/EcommerceSubSubsubCategory/DeleteSubsubCategory`, null, {
+            headers: { Authorization: `Bearer ${storedToken}` },
+            params: { id: record.Id },
+          });
           dispatch(stopLoading());
-          console.log(deleteResponse.data.Message==="success")
 
-          if (deleteResponse.data.Message.toLowerCase() === "success") {
-            setSubCategoryData(subCategoryData.filter((item) => item.id !== record.Id));
+          if (res.data.Message.toLowerCase() === "success") {
+            setSubSubCategory(subsubCategory.filter((item) => item.Id !== record.Id));
             Swal.fire("Deleted!", "Record has been deleted.", "success");
           } else {
             Swal.fire("Error", "Failed to delete the record.", "error");
           }
         } catch (error) {
-          Swal.fire("Error", "Failed to delete the record. Please try again later.", + error);
+          Swal.fire("Error", `Failed to delete the record: ${error}`, "error");
+          dispatch(stopLoading());
         }
       }
     });
   };
 
+  const handleUpdate = async (values) => {
+    try {
+      dispatch(startLoading());
+      const res = await axios.post(
+        `${apiUrl}/EcommerceSubSubsubCategory/UpdateSubsubCategory`,
+        {
+          Id: values.Id,
+          SUBSUBCATEGORY_NAME: values.SUBSUBCATEGORY_NAME,
+          SUBCATEGORY_NAME: values.SUBCATEGORY_NAME,
+          CATEGORY_NAME: values.CATEGORY_NAME,
+          PRIORITY: values.PRIORITY,
+        },
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      dispatch(stopLoading());
 
+      if (res.data.Message.toLowerCase() === "success") {
+        setSubSubCategory(
+          subsubCategory.map((item) =>
+            item.Id === values.Id ? { ...item, ...values } : item
+          )
+        );
+        Swal.fire("Updated!", "The sub-subcategory has been updated.", "success");
+        setIsEditOpen(false); // Close the modal
+      } else {
+        Swal.fire("Error", "Failed to update the sub-subcategory.", "error");
+      }
+    } catch (error) {
+      dispatch(stopLoading());
+      Swal.fire("Error", `Failed to update: ${error}`, "error");
+    }
+  };
 
-  useEffect(() => {
-
-  
-    getAllSubSubCategory();
-    getSubCategory();
-    getCategory();
-  }, []);
-  
-//Fiteration of Data on search Text
   const filteredData = subsubCategory.filter((item) =>
-    (item.SUBSUBCATEGORY_NAME.toLowerCase().includes(searchText.toLowerCase()) || 
-    item.CATEGORY_NAME.toLowerCase().includes(searchText.toLowerCase()))
+    item.SUBSUBCATEGORY_NAME.toLowerCase().includes(searchText.toLowerCase())
   );
-  
-  return (
-    <div>
-      <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "20px",
-          }}
-        >
-          <h2 style={{ fontWeight: "600", marginBottom: "0" }}>Sub Category List</h2>
-          <Input
-            placeholder="Search by sub category name"
-            style={{ width: "300px" }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            prefix={<MdSearch />}
-          />
-        </div>
-    
 
-
-        <Table
-  dataSource={filteredData.map((subcategory) => {
-    const subSubCategory = subsubCategory.find(
-      (subsub) => subsub.SUBCATEGORY_ID === subcategory.id
-    );
-
-    // Ensure each item has a unique key (using `subcategory.id` for the row)
-    return {
-      key: subcategory.id, // Unique key for the row
-      ...subcategory,
-      SubSubCategory_Name: subSubCategory ? subSubCategory.SUBSUBCATEGORY_NAME : "N/A", // If no sub-subcategory is found, display "N/A"
-    };
-  })}
-  columns={[
-    { title: "ID", dataIndex: "Id", key: "Id", align: "center" },
+  const columns = [
     {
-      title: "Sub-Subcategory Name", 
+      title: "Sub-Subcategory Name",
       dataIndex: "SUBSUBCATEGORY_NAME",
       key: "SUBSUBCATEGORY_NAME",
-      align: "center",
     },
     {
       title: "Sub-Category Name",
       dataIndex: "SUBCATEGORY_NAME",
       key: "SUBCATEGORY_NAME",
-      align: "center",
     },
     {
       title: "Category Name",
       dataIndex: "CATEGORY_NAME",
       key: "CATEGORY_NAME",
-      align: "center",
     },
     {
       title: "Priority",
       dataIndex: "PRIORITY",
       key: "PRIORITY",
-      align: "center",
     },
     {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            onClick={() => handleEdit(record)}
-            key={`edit-${record.Id}`} // Unique key for edit button
-          >
-            <MdEdit />
-          </Button>
-          <Button
-            type="primary"
-            danger
-            onClick={() => handleDelete(record)}
-            key={`delete-${record.Id}`} // Unique key for delete button
-          >
-            <MdDelete />
-          </Button>
+          <Button onClick={() => handleEdit(record)} icon={<MdEdit />} />
+          <Button danger onClick={() => handleDelete(record)} icon={<MdDelete />} />
         </Space>
       ),
-      align: "center",
     },
-  ]}
-  rowKey="id" // Ensuring each row has a unique ID for row selection or key management.
-  pagination={{ pageSize: 10 }}
-/>
+  ];
 
+  return (
+    <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+        <h2 style={{ fontWeight: "600", marginBottom: "0" }}>Sub-Subcategory List</h2>
+        <Input
+          placeholder="Search by sub-subcategory name"
+          style={{ width: "300px" }}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          prefix={<MdSearch />}
+        />
+      </div>
 
+      <Table dataSource={filteredData} columns={columns} rowKey="Id" pagination={{ pageSize: 10 }} />
 
-<Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} isCentered>
-  <ModalOverlay />
-  <ModalContent>
-    <ModalHeader>Edit Sub-Category</ModalHeader>
-    <ModalCloseButton />
-    <ModalBody>
-      <Formik
-        initialValues={{
-          Id: editData ? editData.Id : "",
-          SUBSUBCATEGORY_NAME: editData ? editData.SUBSUBCATEGORY_NAME : "",
-          SUBCATEGORY_NAME: editData ? editData.SUBCATEGORY_NAME : "", 
-          CATEGORY_NAME: editData ? editData.CATEGORY_NAME : "",
-          PRIORITY: editData ? editData.PRIORITY : "",
-        }}
-  
-        validationSchema={Yup.object({
-          SUBSUBCATEGORY_NAME: Yup.string().required("Sub-Subcategory Name is required"),
-          SUBCATEGORY_NAME: Yup.string().required("Sub-Category Name is required"),
-          CATEGORY_NAME: Yup.string().required("Category Name is required"),
-          PRIORITY: Yup.number().required("Priority is required").min(0, "Priority must be 0 or greater"),
-        })}
-        onSubmit={handleSubmit}
-      >
-        {({ errors, touched, values, setFieldValue }) => (
-          <Form>
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              {/* Sub-Subcategory Name Field */}
-              <FormControl isInvalid={touched.SUBSUBCATEGORY_NAME && errors.SUBSUBCATEGORY_NAME}>
-                <FormLabel htmlFor="SUBSUBCATEGORY_NAME">Sub-Subcategory Name</FormLabel>
-                <Field
-                  as={ChakraInput}
-                  id="SUBSUBCATEGORY_NAME"
-                  name="SUBSUBCATEGORY_NAME"
-                  placeholder="Enter Sub-Subcategory Name"
-                />
-                <FormErrorMessage>{errors.SUBSUBCATEGORY_NAME}</FormErrorMessage>
-              </FormControl>
+      {/* Edit Modal */}
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Sub-Category</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Formik
+              initialValues={{
+                Id: editData ? editData.Id : "",
+                SUBSUBCATEGORY_NAME: editData ? editData.SUBSUBCATEGORY_NAME : "",
+                SUBCATEGORY_NAME: editData ? editData.SUBCATEGORY_NAME : "",
+                CATEGORY_NAME: editData ? editData.CATEGORY_NAME : "",
+                PRIORITY: editData ? editData.PRIORITY : "",
+              }}
+              validationSchema={validationSchema}
+              onSubmit={handleUpdate}
+            >
+              {({ errors, touched, values }) => (
+                <Form>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                    {/* Sub-Subcategory Name */}
+                    <FormControl isInvalid={touched.SUBSUBCATEGORY_NAME && errors.SUBSUBCATEGORY_NAME}>
+                      <FormLabel htmlFor="SUBSUBCATEGORY_NAME">Sub-Subcategory Name</FormLabel>
+                      <Field
+                        as={ChakraInput}
+                        id="SUBSUBCATEGORY_NAME"
+                        name="SUBSUBCATEGORY_NAME"
+                        placeholder="Enter Sub-Subcategory Name"
+                      />
+                      <FormErrorMessage>{errors.SUBSUBCATEGORY_NAME}</FormErrorMessage>
+                    </FormControl>
 
-              {/* Sub-category Name Field */}
-              <FormControl isInvalid={touched.SUBCATEGORY_NAME && errors.SUBCATEGORY_NAME}>
-                              <FormLabel htmlFor="categoryId">Please Select Category</FormLabel>
-                              <Field
-                                as={Select}
-                                id="SUBCATEGORY_NAME"
-                                name="SUBCATEGORY_NAME"
-                                placeholder="Select Sub Category"
-                              >
-                                <option value="" disabled>
-                                  Select Category
-                                </option>
-                                {subCategoryData.map((category) => (
-                                  <option key={category.id} value={category.Subcategory_Name}>
-                                    {category.Subcategory_Name}
-                                  </option>
-                                ))}
-                              </Field>
-                              <FormErrorMessage>{errors.categoryId}</FormErrorMessage>
-                            </FormControl>
+                    {/* Sub-category Name */}
+                    <FormControl isInvalid={touched.SUBCATEGORY_NAME && errors.SUBCATEGORY_NAME}>
+                      <FormLabel htmlFor="SUBCATEGORY_NAME">Sub-Category Name</FormLabel>
+                      <Field
+                        as={Select}
+                        id="SUBCATEGORY_NAME"
+                        name="SUBCATEGORY_NAME"
+                        placeholder="Select Sub Category"
+                      >
+                        <option value="" disabled>
+                          Select Sub Category
+                        </option>
+                        {subCategoryData.map((category) => (
+                          <option key={category.id} value={category.Subcategory_Name}>
+                            {category.Subcategory_Name}
+                          </option>
+                        ))}
+                      </Field>
+                      <FormErrorMessage>{errors.SUBCATEGORY_NAME}</FormErrorMessage>
+                    </FormControl>
 
-              {/* Category Name Field */}
-        
+                    {/* Category Name */}
+                    <FormControl isInvalid={touched.CATEGORY_NAME && errors.CATEGORY_NAME}>
+                      <FormLabel htmlFor="CATEGORY_NAME">Category Name</FormLabel>
+                      <Field
+                        as={Select}
+                        id="CATEGORY_NAME"
+                        name="CATEGORY_NAME"
+                        placeholder="Select Category"
+                      >
+                        <option value="" disabled>
+                          Select Category
+                        </option>
+                        {categoryList.map((category) => (
+                          <option key={category.Category_id} value={category.Category_Name}>
+                            {category.Category_Name}
+                          </option>
+                        ))}
+                      </Field>
+                      <FormErrorMessage>{errors.CATEGORY_NAME}</FormErrorMessage>
+                    </FormControl>
 
-                <FormControl isInvalid={touched.CATEGORY_NAME && errors.CATEGORY_NAME}>
-                              <FormLabel htmlFor="categoryId">Please Select Category</FormLabel>
-                              <Field
-                                as={Select}
-                                id="CATEGORY_NAME"
-                                name="CATEGORY_NAME"
-                                placeholder="Select Category Name"
-                              >
-                                <option value="" disabled>
-                                  Select Category
-                                </option>
-                                {categoryList.map((category) => (
-                                  <option key={category.Category_id} value={category.Category_Name}>
-                                    {category.Category_Name}
-                                  </option>
-                                ))}
-                              </Field>
-                              <FormErrorMessage>{errors.categoryId}</FormErrorMessage>
-                            </FormControl>
+                    {/* Priority */}
+                    <FormControl isInvalid={touched.PRIORITY && errors.PRIORITY}>
+                      <FormLabel htmlFor="PRIORITY">Priority</FormLabel>
+                      <Field as={Select} id="PRIORITY" name="PRIORITY" placeholder="Select Priority">
+                        {[...Array(10).keys()].map((i) => (
+                          <option key={i} value={i}>
+                            {i}
+                          </option>
+                        ))}
+                      </Field>
+                      <FormErrorMessage>{errors.PRIORITY}</FormErrorMessage>
+                    </FormControl>
+                  </div>
 
-
-              {/* Priority Field */}
-              <FormControl isInvalid={touched.PRIORITY && errors.PRIORITY}>
-                <FormLabel htmlFor="PRIORITY">Priority</FormLabel>
-                <Field as={Select} id="PRIORITY" name="PRIORITY" placeholder="Select Priority">
-                  {[...Array(10).keys()].map((i) => (
-                    <option key={i} value={i}>
-                      {i}
-                    </option>
-                  ))}
-                </Field>
-                <FormErrorMessage>{errors.PRIORITY}</FormErrorMessage>
-              </FormControl>
-            </div>
-
-            {/* Modal Footer */}
-            <ModalFooter>
-              <ChakraButton colorScheme="blue" mr={3} type="submit">
-                Update
-              </ChakraButton>
-              <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
-                Cancel
-              </ChakraButton>
-            </ModalFooter>
-          </Form>
-        )}
-      </Formik>
-    </ModalBody>
-  </ModalContent>
-</Modal>
-
-    </div>
+                  <ModalFooter>
+                    <ChakraButton colorScheme="blue" mr={3} type="submit">
+                      Update
+                    </ChakraButton>
+                    <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
+                      Cancel
+                    </ChakraButton>
+                  </ModalFooter>
+                </Form>
+              )}
+            </Formik>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
