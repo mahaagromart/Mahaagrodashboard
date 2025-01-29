@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 // import  { useEffect } from "react";
@@ -172,19 +173,30 @@
 
 // export default ProtectedRoutes;
 import { useEffect, useState } from "react";
+=======
+import { useEffect } from "react";
+>>>>>>> h1
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../redux/Features/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { startLoading, stopLoading } from "../redux/Features/LoadingSlice";
+<<<<<<< HEAD
 import { PiCornersOutLight } from "react-icons/pi";
+=======
+// import { PiCornersOutLight } from "react-icons/pi";
+>>>>>>> h1
 
 const ProtectedRoutes = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
 
+<<<<<<< HEAD
   const { user, role, token, isLogged } = useSelector((state) => state.auth);
+=======
+  const { user, token, isLogged } = useSelector((state) => state.auth);
+>>>>>>> h1
 
   const storedToken = token || localStorage.getItem("token");
   const UserId = localStorage.getItem("UserId");
