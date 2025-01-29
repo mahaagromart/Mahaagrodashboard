@@ -292,8 +292,9 @@ const AddNewProduct = () => {
                       aria-label="Info Tooltip"
                       hasArrow
                       placement="top"
+                      style={{marginLeft : "10% !important" }}
                     >
-                      <span style={{ marginLeft: "10px", cursor: "pointer" }}>
+                      <span style={{  cursor: "pointer" }}>
                         <MdInfo />
                       </span>
                     </Tooltip>
@@ -301,7 +302,7 @@ const AddNewProduct = () => {
                       size="sm"
                       colorScheme="blue"
                       onClick={generateCode}
-                      style={{ marginLeft: "50%" }}
+                      style={{ marginLeft: "10%" }}
                     >
                       Generate Code
                     </Button>

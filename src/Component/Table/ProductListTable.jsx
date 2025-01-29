@@ -4,7 +4,7 @@ import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 import { FaEye } from "react-icons/fa";
 import { IoBarcode } from "react-icons/io5";
-
+import { useNavigate } from "react-router-dom";
 const { Column } = Table;
 
 const initialData = [
@@ -40,7 +40,7 @@ const initialData = [
 const ProductListTable = () => {
   const [data, setData] = useState(initialData);
   const [searchText, setSearchText] = useState("");
-
+  const navigate = useNavigate();
   const handleToggleStatus = (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -100,6 +100,18 @@ const ProductListTable = () => {
       }
     });
   };
+
+  const handleGenerateCode = (record)=>{
+
+
+    
+  navigate("/GenerateBarCode", {
+    state: {
+      productSku: 398434, 
+      productPrice: record.sellingPrice,
+    },
+  });
+  }
 
   const handleDelete = (record) => {
     Swal.fire({
@@ -207,7 +219,11 @@ const ProductListTable = () => {
           render={(_, record) => (
             <Space size="middle">
               <Tooltip title="Generate Barcode">
-                <Button icon={<IoBarcode />} type="primary" />
+                <Button icon={<IoBarcode />} 
+                type="primary"
+                onClick={()=> handleGenerateCode(record)}
+                />
+                
               </Tooltip>
               <Tooltip title="View">
                 <Button icon={<FaEye />} type="primary" />

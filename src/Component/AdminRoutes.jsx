@@ -1,7 +1,7 @@
 import { DashboardOutlined, LogoutOutlined, NotificationFilled, NotificationOutlined, SettingFilled } from '@ant-design/icons';
 import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags } from 'react-icons/fa6';
 import { GiCheckMark, GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
-import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard } from 'react-icons/md';
+import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard, MdBarcodeReader } from 'react-icons/md';
 import { BiSend, BiSolidOffer } from "react-icons/bi";
 import { IoDocumentTextSharp } from "react-icons/io5";
 import { BsTicketPerforated } from "react-icons/bs";
@@ -33,6 +33,7 @@ export const adminRoutes = [
     icon: <MdHouse />,
     children: [
       { label: 'Product List', icon: <MdListAlt />, key: '/ProductList' },
+      // { label: 'Generate BarCode', icon: <MdBarcodeReader />, key: '/GenerateBarCode' },
       { label: 'Add new Product', icon: <MdAddCircle />, key: '/AddNewProduct' },
       { label: 'Bulk Insert', icon: <FaShirtsinbulk/>, key: '/BulkInsert' },
     ],

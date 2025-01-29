@@ -46,6 +46,7 @@ import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/Inhouse
 // import sellerSales from "../Pages/UserManagement/SalesandTransactionRep/sellerSales";
 import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport"
 import Register from "../Pages/Register/Register";
+import GenerateBarCode from "../Pages/ProductManagement/InHouseProduct/GenerateBarCode";
 
 const RouteContent = () => {
   return (
@@ -75,9 +76,9 @@ const RouteContent = () => {
 
         {/* inhouse product starts */}
         <Route path="/ProductList" element={<ProtectedRoutes><ProductList/></ProtectedRoutes>} />
-
-
         <Route path="/AddNewProduct" element={<ProtectedRoutes><AddNewProduct /></ProtectedRoutes>} />
+        <Route path="/GenerateBarCode" element={<ProtectedRoutes><GenerateBarCode/></ProtectedRoutes>} />
+
 
 
         <Route path="/BulkInsert" element={<ProtectedRoutes><BulkInsert/></ProtectedRoutes>} />
