@@ -37,7 +37,7 @@ const LoginForm = () => {
       );
 
       if (response.data.Code === 200) {
-        console.log(response)
+      
         let userData = response.data.AuthenticationsList[0];
         let data = {
           user: userData.FirstName + " " + userData.LastName,

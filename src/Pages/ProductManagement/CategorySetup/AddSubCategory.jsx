@@ -38,11 +38,6 @@ const validationSchema = yup.object().shape({
 });
 
 const AddSubCategory = () => {
-
-<<<<<<< HEAD
-  // const [subCategorydata ,setSubCategoryData] = useState([]); 
-=======
->>>>>>> a0a5b0eb06396ac66f2fe522981604c9d0208714
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();

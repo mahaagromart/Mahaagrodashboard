@@ -22,8 +22,10 @@ const MenuList = () => {
       if(role === 'Admin'){
 
         setRoute(adminRoutes);
-      }else{
+      }else if(role === 'Vendor'){
         setRoute(vendorRoutes)
+      }else{
+        navigate("/login")
       }
   },[role,navigate]);
 
