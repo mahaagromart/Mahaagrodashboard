@@ -1,175 +1,303 @@
-
-import { 
-  Box, 
-  SimpleGrid, 
-  FormLabel, 
-  FormControl, 
-  Input, 
-  Button, 
-  Select, 
-  GridItem 
-} from "@chakra-ui/react";
-import React from "react";
+import { Box, SimpleGrid, FormLabel, FormControl, Input, Button, Select, GridItem } from "@chakra-ui/react";
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import CardBox from "../../../Component/Charts/CardBox";
-import { Table } from "antd";
 import SubSubCategoryTable from "./SubSubCategoryTable";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { startLoading, stopLoading } from "../../../redux/Features/LoadingSlice";
+import Swal from "sweetalert2";
+
+// Form validation schema using Yup
+const validationSchema = Yup.object({
+  SUBSUBCATEGORY_NAME: Yup.string()
+    .required("Sub Sub Category Name is required")
+    .min(3, "Sub Sub Category Name must be at least 3 characters"),
+  CATEGORY_NAME: Yup.string().required("Main Category is required"),
+  SUBCATEGORY_NAME: Yup.string().required("Sub Category is required"),
+  PRIORITY: Yup.number().required("Priority is required").min(1, "Priority must be between 1 and 10").max(10, "Priority must be between 1 and 10"),
+});
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
+const AddSubSubCategory = () => {
+  const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubcategory] = useState([]);
+
+  const { token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const storedToken = token || localStorage.getItem("token");
+
+  // Fetch categories
+  const getCategory = async () => {
+    try {
+      const res = await axios.post(
+        `${apiUrl}/EcommerceCategory/GetAllCategory`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+ 
+      if (res.data.Message === "success") {
+        setCategoryList(res.data.CategoryList);
+      } else {
+        await Swal.fire({
+          title: "Error in Getting Category List",
+          text: "Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: "Error",
+        text: `Failed to fetch the category list. Please try again later. ${error}`,
+        icon: "error",
+      });
+    }
+  };
+
+  // Fetch subcategories
+  const getAllSubCategory = async () => {
+    try {
+      const res = await axios.post(
+        `${apiUrl}/EcommerceSubcategory/GetAllSubCategory`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      if (res.data.Message.toLowerCase() === "success") {
+        setSubcategory(res.data.SubCategoryList);
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: "Error In Fetching SubCategory",
+        text: "Failed to fetch the category list. Please try again later." + error,
+        icon: "error",
+      });
+    }
+  };
 
 
+  // Fetch data when component mounts
+  useEffect(() => {
 
+    getCategory();
+    getAllSubCategory();
+  }, []);
 
+  // Handle form submission
+  const handleSubmit = async (values, { resetForm }) => {
+    console.log(values)
+    dispatch(startLoading());
+    try {
+      const res = await axios.post(
+        `${apiUrl}EcommerceSubSubsubCategory/InsertSubsubCategory`,
+        values,
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      console.log(res)
+      if (res.data.Message === "SUCCESS") {
+        await Swal.fire({
+          title: "Success",
+          text: "Sub-category added successfully!",
+          icon: "success",
+        });
+        resetForm();
+      } else {
+        await Swal.fire({
+          title: "Error",
+          text: res.data.Message || "Failed to add sub-category.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding sub-category:", error);
+      await Swal.fire({
+        title: "Error",
+        text: "Something went wrong. Please try again later.",
+        icon: "error",
+      });
+    } finally {
+      dispatch(stopLoading());
+    }
+  };
 
-
-const data = [
-  {
-    id: "1",
-    SubCategoryName: "Fruits",
-    priority: 1,
-  },
-  {
-    id: "2",
-    SubCategoryName: "Vegetables",
-    priority: 2,
-  },
-  {
-    id: "3",
-    SubCategoryName: "Dairy",
-    priority: 3,
-  },
-];
-
-const columns = [
-  { title: "ID", dataIndex: "id", key: "id" },
-  { title: "Sub-Category Name", dataIndex: "SubCategoryName", key: "SubCategoryName" },
-  { title: "Priority", dataIndex: "priority", key: "priority" },
-];
-
-
-
-const AddSubSubCagtegory = () => {
   return (
-   <>
-      <Box marginTop="1%" className="box">
-        <Box mb={6}>
-          <h2
-            className="content-title"
-            style={{
-              textAlign: "center",
-              fontWeight: "600",
-              fontSize: "20px",
-              color: "#4A5568",
-            }}
-          >
-            Add New Sub Sub Category
-          </h2>
-        </Box>
-
-        <Box mx="auto" mt={5}>
-          <CardBox>
-            <SimpleGrid
-              columns={{ base: 1, sm: 1, md: 1, lg: 2 }}
-              spacing={6}
-              alignItems="center"
-              gap={7}
-              p={5}
-            >
-              {/* Category Name Form Control */}
-              <GridItem colSpan={{ base: 1, md: 1 }}>
-                <FormControl mb={4}>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Sub Sub Category Name 
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Enter category name"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                    borderRadius="md"
-                  />
-                </FormControl>
-              </GridItem>
-
-              {/* Priority Form Control */}
-              <GridItem colSpan={{ base: 1, md: 1 }}>
-                <FormControl mb={4}>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Main Category * 
-                  </FormLabel>
-                  <Select
-                    placeholder="Select Main Category"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                  >
-                   
-                  </Select>
-                </FormControl>
-              </GridItem>
-
-              {/* Select Main Category Form Control */}
-              <GridItem colSpan={{ base: 1, md: 1 }}>
-                <FormControl mb={4}>
-                  <FormLabel>Select Sub Category</FormLabel>
-                  <Select
-                    placeholder="Select Category"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                  >
-                    {/* Add options for categories here */}
-                  </Select>
-                </FormControl>
-              </GridItem>
-
-                            <FormControl mb={4}>
-                              <FormLabel fontWeight="bold" color="gray.600">
-                                Priority
-                              </FormLabel>
-                              <Select
-                                placeholder="Select priority"
-                                focusBorderColor="blue.500"
-                                size="lg"
-                              >
-                                {Array.from({ length: 10 }, (_, i) => (
-                                  <option key={i} value={i}>
-                                    {i}
-                                  </option>
-                                ))}
-                              </Select>
-                            </FormControl>
-
-
-              {/* Submit Button */}
-              <GridItem
-                colSpan={{ base: 1, md: 2 }}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={4}
-                mb={5}
-              >
-                <Button
-                  bg="blue.500"
-                  color="white"
-                  _hover={{ bg: "blue.600" }}
-                  size="lg"
-                  borderRadius="md"
-                  width="auto"
-                >
-                  Submit
-                </Button>
-              </GridItem>
-            </SimpleGrid>
-          </CardBox>
-        </Box>
-
-        {/* Table Section */}
-        <Box mt={5}>
-          <CardBox>
-                 <SubSubCategoryTable/>                  
-          </CardBox>
-        </Box>
+    <Box marginTop="1%" className="box">
+      <Box mb={6}>
+        <h2
+          className="content-title"
+          style={{
+            textAlign: "center",
+            fontWeight: "600",
+            fontSize: "20px",
+            color: "#4A5568",
+          }}
+        >
+          Add New Sub Sub Category
+        </h2>
       </Box>
 
-   </>
-  )
-}
+      <Box mx="auto" mt={5}>
+        <CardBox>
+          <Formik
+            initialValues={{
+              SUBSUBCATEGORY_NAME: '',
+              CATEGORY_NAME: '',
+              SUBCATEGORY_NAME: '',
+              PRIORITY: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ resetForm, setFieldValue, errors, touched }) => (
+              <Form>
+                <SimpleGrid
+                  columns={{ base: 1, sm: 1, md: 1, lg: 2 }}
+                  spacing={6}
+                  alignItems="center"
+                  gap={7}
+                  p={5}
+                >
+                  {/* Sub Sub Category Name Form Control */}
+                  <GridItem colSpan={{ base: 1, md: 1 }}>
+                    <FormControl mb={4} isInvalid={touched.SUBSUBCATEGORY_NAME && !!errors.SUBSUBCATEGORY_NAME}>
+                      <FormLabel fontWeight="bold" color="gray.600">
+                        Sub Sub Category Name
+                      </FormLabel>
+                      <Field
+                        name="SUBSUBCATEGORY_NAME"
+                        as={Input}
+                        type="text"
+                        placeholder="Enter Subsub Category"
+                        focusBorderColor="blue.500"
+                        size="md"
+                        borderRadius="md"
+                      />
+                      <ErrorMessage name="SUBSUBCATEGORY_NAME" component="div" style={{ color: 'red' }} />
+                    </FormControl>
+                  </GridItem>
 
-export default AddSubSubCagtegory
+                  {/* Main Category Form Control */}
+                  <GridItem colSpan={{ base: 1, md: 1 }}>
+                    <FormControl mb={4} isInvalid={touched.CATEGORY_NAME && !!errors.CATEGORY_NAME}>
+                      <FormLabel fontWeight="bold" color="gray.600">
+                        Main Category *
+                      </FormLabel>
+                      <Field
+                        name="CATEGORY_NAME"
+                        as={Select}
+                        placeholder="Select Main Category"
+                        focusBorderColor="blue.500"
+                        size="md"
+                        onChange={(e) => setFieldValue("CATEGORY_NAME", e.target.value)}
+                      >
+                        {categoryList.map((category) => (
+                          <option key={category.Category_id} value={category.Category_Name}>
+                            {category.Category_Name}
+                          </option>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="CATEGORY_NAME" component="div" style={{ color: 'red' }} />
+                    </FormControl>
+                  </GridItem>
+
+                  {/* Sub Category Form Control */}
+                  <GridItem colSpan={{ base: 1, md: 1 }}>
+                    <FormControl mb={4} isInvalid={touched.SUBCATEGORY_NAME && !!errors.SUBCATEGORY_NAME}>
+                      <FormLabel>Select Sub Category</FormLabel>
+                      <Field
+                        name="SUBCATEGORY_NAME"
+                        as={Select}
+                        placeholder="Select Sub Category"
+                        focusBorderColor="blue.500"
+                        size="md"
+                        onChange={(e) => setFieldValue("SUBCATEGORY_NAME", e.target.value)}
+                      >
+                        {subCategoryList.map((category) => (
+                          <option key={category.id} value={category.Subcategory_Name}>
+                            {category.Subcategory_Name}
+                          </option>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="SUBCATEGORY_NAME" component="div" style={{ color: 'red' }} />
+                    </FormControl>
+                  </GridItem>
+
+                  {/* Priority Form Control */}
+                  <GridItem colSpan={{ base: 1, md: 1 }}>
+                    <FormControl mb={4} isInvalid={touched.PRIORITY && !!errors.PRIORITY}>
+                      <FormLabel fontWeight="bold" color="gray.600">
+                        Priority
+                      </FormLabel>
+                      <Field
+                        name="PRIORITY"
+                        as={Select}
+                        placeholder="Select priority"
+                        focusBorderColor="blue.500"
+                        size="lg"
+                      >
+                        {Array.from({ length: 10 }, (_, i) => (
+                          <option key={i} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="PRIORITY" component="div" style={{ color: 'red' }} />
+                    </FormControl>
+                  </GridItem>
+
+                  {/* Submit Button */}
+                  <SimpleGrid
+                    colSpan={{ base: 1, md: 2 }}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    mt={4}
+                    mb={5}
+                    mr= {5}
+                  >
+                    <Button
+                      colorScheme="gray"
+                      mr={5}
+                      size="lg"
+                      onClick={() => resetForm()}
+                      type="button"
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      type="submit" // Ensure the type is "submit"
+                      bg="blue.500"
+                      color="white"
+                      _hover={{ bg: "blue.600" }}
+                      size="lg"
+                      borderRadius="md"
+                      width="auto"
+                    >
+                      Submit
+                    </Button>
+                  </SimpleGrid>
+                </SimpleGrid>
+              </Form>
+            )}
+          </Formik>
+        </CardBox>
+      </Box>
+
+      {/* Table Section */}
+      <Box mt={5}>
+        <CardBox>
+          <SubSubCategoryTable />
+        </CardBox>
+      </Box>
+    </Box>
+  );
+};
+
+export default AddSubSubCategory;

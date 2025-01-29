@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import {
   Box,
   SimpleGrid,
@@ -39,7 +39,7 @@ const validationSchema = yup.object().shape({
 
 const AddSubCategory = () => {
 
-  const [subCategorydata ,setSubCategoryData] = useState([]); 
+  // const [subCategorydata ,setSubCategoryData] = useState([]); 
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -73,7 +73,7 @@ const AddSubCategory = () => {
     } catch (error) {
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later.",
+        text: "Failed to fetch the category list. Please try again later.",error,
         icon: "error",
       });
     }

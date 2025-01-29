@@ -67,7 +67,7 @@ const SubCategoryTable = () => {
     } catch (error) {
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later.",
+        text: "Failed to fetch the category list. Please try again later."+error,
         icon: "error",
       });
     }
@@ -90,7 +90,7 @@ const SubCategoryTable = () => {
         alert("Error fetching Sub-category List");
       }
     } catch (error) {
-      alert("Failed to fetch Sub-category List");
+      alert("Failed to fetch Sub-category List"+error);
     }
   };
 
@@ -137,7 +137,7 @@ const SubCategoryTable = () => {
     } catch (error) {
       await Swal.fire({
         title: "Error",
-        text: "Error updating subcategory. Please try again.",
+        text: "Error updating subcategory. Please try again."+error,
         icon: "error",
       });
       dispatch(stopLoading());
@@ -182,7 +182,7 @@ const SubCategoryTable = () => {
         } catch (error) {
           Swal.fire(
             "Error",
-            "Failed to delete the record. Please try again later.",
+            "Failed to delete the record. Please try again later."+error,
             "error"
           );
         }
