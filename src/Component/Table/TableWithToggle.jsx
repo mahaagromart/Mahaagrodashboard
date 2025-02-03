@@ -7,16 +7,17 @@ import axios from "axios";
 
 const { Column } = Table;
 
-const TableWithToggle = () => {
+const CategoryTable = () => {
   const [categoryData, setCategoryData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const { token } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
+  const apiUrl = import.meta.env.VITE_API_URL; 
 
   // Fetch category data
   const getCategoryData = async () => {
     try {
-      const url = "http://localhost:49814/EcommerceCategory/GetAllCategory";
+      const url = `${apiUrl}EcommerceCategory/GetAllCategory`;
       const response = await axios.post(
         `${url}`,
         {},
@@ -26,9 +27,11 @@ const TableWithToggle = () => {
           },
         }
       );
+      console.log(response)
 
       if (response.data.CategoryList) {
-        // Properly set category data
+        console.log(response.data.CategoryList)
+
         setCategoryData(response.data.CategoryList);
       }
     } catch (error) {
@@ -190,4 +193,4 @@ const TableWithToggle = () => {
   );
 };
 
-export default TableWithToggle;
+export default CategoryTable;

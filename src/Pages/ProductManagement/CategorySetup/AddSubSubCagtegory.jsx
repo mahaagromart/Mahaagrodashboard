@@ -74,16 +74,18 @@ const AddSubSubCategory = () => {
     }
   };
 
-  // Fetch subcategories
-  const getAllSubCategory = async () => {
+  // Fetch subcategories based on selected category id
+  const getAllSubCategory = async (Category_id) => {
+    console.log(Category_id)
     try {
       const res = await axios.post(
-        `${apiUrl}/EcommerceSubcategory/GetAllSubCategory`,
+        `${apiUrl}/EcommerceSubcategory/GetSubCategoryThroughCategoryId?Category_Id=${Category_id}`,
         {},
         {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
+
       if (res.data.Message.toLowerCase() === "success") {
         setSubcategory(res.data.SubCategoryList);
       }
@@ -99,22 +101,23 @@ const AddSubSubCategory = () => {
 
   // Fetch data when component mounts
   useEffect(() => {
+
     getCategory();
-    getAllSubCategory();
   }, []);
 
   // Handle form submission
   const handleSubmit = async (values, { resetForm }) => {
+    console.log("Form values:", values); // Log the values to make sure they are correct
     dispatch(startLoading());
     try {
       const res = await axios.post(
-        `${apiUrl}EcommerceSubSubsubCategory/InsertSubsubCategory`,
+        `${apiUrl}/EcommerceSubSubsubCategory/InsertSubsubCategory`,
         values,
         {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
-
+      console.log(res.data); // Check the response
       if (res.data.Message === "SUCCESS") {
         await Swal.fire({
           title: "Success",
@@ -130,6 +133,7 @@ const AddSubSubCategory = () => {
         });
       }
     } catch (error) {
+      console.error("Error in API call:", error); // Log the error
       await Swal.fire({
         title: "Error",
         text: "Something went wrong. Please try again later.",
@@ -137,6 +141,23 @@ const AddSubSubCategory = () => {
       });
     } finally {
       dispatch(stopLoading());
+    }
+  };
+  
+
+  // Handle category selection and fetch related subcategories
+  const handleCategoryChange = async (e, setFieldValue) => {
+    const selectedCategory = e.target.value; // Get the selected category name
+    setFieldValue("CATEGORY_NAME", selectedCategory);
+
+    // Find the category id based on the selected category name
+    const selectedCategoryId = categoryList.find(
+      (category) => category.Category_Name === selectedCategory
+    )?.Category_id;
+
+    // If a valid category id is found, fetch subcategories
+    if (selectedCategoryId) {
+      getAllSubCategory(selectedCategoryId); // Fetch subcategories based on category id
     }
   };
 
@@ -208,9 +229,7 @@ const AddSubSubCategory = () => {
                   <GridItem colSpan={{ base: 1, md: 1 }}>
                     <FormControl
                       mb={4}
-                      isInvalid={
-                        touched.CATEGORY_NAME && !!errors.CATEGORY_NAME
-                      }
+                      isInvalid={touched.CATEGORY_NAME && !!errors.CATEGORY_NAME}
                     >
                       <FormLabel fontWeight="bold" color="gray.600">
                         Main Category *
@@ -221,9 +240,7 @@ const AddSubSubCategory = () => {
                         placeholder="Select Main Category"
                         focusBorderColor="blue.500"
                         size="md"
-                        onChange={(e) =>
-                          setFieldValue("CATEGORY_NAME", e.target.value)
-                        }
+                        onChange={(e) => handleCategoryChange(e, setFieldValue)} // Update category selection
                       >
                         {categoryList.map((category) => (
                           <option
@@ -261,30 +278,20 @@ const AddSubSubCategory = () => {
                         }
                       >
                         {subCategoryList.map((category) => (
-                          <option
-                            key={category.id}
-                            value={category.Subcategory_Name}
-                          >
+                          <option key={category.id} value={category.Subcategory_Name}>
                             {category.Subcategory_Name}
                           </option>
                         ))}
                       </Field>
                       <Text color="red.500" fontSize="sm" minHeight="20px">
-
-                      <ErrorMessage
-                        name="SUBCATEGORY_NAME"
-                      />
+                        <ErrorMessage name="SUBCATEGORY_NAME" />
                       </Text>
-
                     </FormControl>
                   </GridItem>
 
                   {/* Priority Form Control */}
                   <GridItem colSpan={{ base: 1, md: 1 }}>
-                    <FormControl
-                      mb={4}
-                      isInvalid={touched.PRIORITY && !!errors.PRIORITY}
-                    >
+                    <FormControl mb={4} isInvalid={touched.PRIORITY && !!errors.PRIORITY}>
                       <FormLabel fontWeight="bold" color="gray.600">
                         Priority
                       </FormLabel>
@@ -328,7 +335,7 @@ const AddSubSubCategory = () => {
                       Reset
                     </Button>
                     <Button
-                      type="submit" // Ensure the type is "submit"
+                      type="submit"
                       bg="blue.500"
                       color="white"
                       _hover={{ bg: "blue.600" }}

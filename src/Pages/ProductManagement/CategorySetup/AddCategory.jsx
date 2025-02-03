@@ -6,6 +6,7 @@ import TableWithToggle from "../../../Component/Table/TableWithToggle";
 const AddCategory = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const logoSize = useBreakpointValue({ base: "150px", md: "200px" });
+  const [category,setCategory]=useState([]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -17,6 +18,18 @@ const AddCategory = () => {
       reader.readAsDataURL(file);
     }
   };
+
+const getAllCategory=()=>{
+
+}
+
+
+
+
+
+
+
+
 
   return (
     <>
