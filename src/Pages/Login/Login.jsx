@@ -32,8 +32,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        `${apiUrl}Authentication/Login`,
-        values
+        `${apiUrl}Authentication/Login?EmailId=${values.EmailId}&Password=${values.Password}`,
       );
 
       if (response.data.Code === 200) {

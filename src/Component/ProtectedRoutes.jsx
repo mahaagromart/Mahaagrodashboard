@@ -1,36 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from "../redux/Features/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { startLoading, stopLoading } from "../redux/Features/LoadingSlice";
 
-
 const ProtectedRoutes = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const apiUrl = import.meta.env.VITE_API_URL;
 
-
   const { user, token, isLogged } = useSelector((state) => state.auth);
-
-
   const storedToken = token || localStorage.getItem("token");
   const UserId = localStorage.getItem("UserId");
 
+  const hasFetched = useRef(false); // Prevent multiple API calls
+
   useEffect(() => {
     const fetchUser = async () => {
-      // If no token or userId, navigate to login
       if (!storedToken || !UserId) {
         navigate("/login");
         return;
       }
 
-      dispatch(startLoading()); // Start loading
+      dispatch(startLoading());
 
       try {
-        const url = `${apiUrl}/Authentication/GetUserProfile`;
+        const url = `${apiUrl}Authentication/GetUserProfile`;
         const response = await axios.post(
           `${url}?UserId=${UserId}`,
           {},
@@ -40,8 +36,6 @@ const ProtectedRoutes = ({ children }) => {
             },
           }
         );
-
-     
 
         if (response.data.Code === 200) {
           const roleId = response.data.UserProfilesEntity[0].DesignationName;
@@ -64,15 +58,16 @@ const ProtectedRoutes = ({ children }) => {
         console.error("Error fetching user profile:", error);
         navigate("/login");
       } finally {
-        dispatch(stopLoading()); 
+        dispatch(stopLoading());
       }
     };
 
-    // Only fetch user data if we don't have it and have valid token and UserId
-    if (!user && storedToken && UserId) {
+    // Ensure fetchUser is called only once
+    if (!user && storedToken && UserId && !hasFetched.current) {
+      hasFetched.current = true;
       fetchUser();
     }
-  }, [storedToken, UserId, user, dispatch , navigate]);
+  }, [storedToken, UserId, dispatch, navigate, user, apiUrl]);
 
   return storedToken && UserId && isLogged ? children : null;
 };

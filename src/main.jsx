@@ -12,7 +12,7 @@ import store from "./redux/store.js";
 
 createRoot(document.getElementById("root")).render(
 
-  <StrictMode>
+  
     <Provider store={store}>
       <ChakraProvider>
    
@@ -22,5 +22,5 @@ createRoot(document.getElementById("root")).render(
 
       </ChakraProvider>
     </Provider>
-  </StrictMode>
+ 
 );
