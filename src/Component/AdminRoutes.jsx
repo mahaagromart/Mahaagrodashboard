@@ -8,6 +8,8 @@ import { BsTicketPerforated } from "react-icons/bs";
 import { GrServicePlay } from "react-icons/gr";
 import { RiBankLine } from "react-icons/ri";
 import { FaSignOutAlt } from "react-icons/fa";
+import { FaGlobeAsia } from "react-icons/fa";
+
 export const adminRoutes = [
   { label: 'Dashboard', icon: <MdDashboard />, key: '/' },
   {
@@ -55,15 +57,15 @@ export const adminRoutes = [
       { label: 'Coupons', icon: <FaTags />, key: '/Coupon' },
       { label: 'Flash deals', icon: <FaIdeal />, key: '/Flashdeals' },
       { label: 'Deal of the day', icon: <FaIdeal />, key: '/Dealoftheday' },
-      { label: 'Featured deal', icon: <FaIdeal />, key: '/Featureddeal' },
+      { label: 'Featured deal', icon: <FaIdeal />, key: '/Featuredeal' },
     ],
   },
   {
     label: 'Notifications',
     icon: <FaBell />,
     children: [
-      { label: 'SendNotification', icon: <BiSend />, key: '/SendNotification' },
-      { label: 'PushNotification', icon: <BiSend />, key: '/PushNotification' },
+      { label: 'Send Notification', icon: <BiSend />, key: '/SendNotification' },
+      { label: 'Broadcast Notification', icon: <FaGlobeAsia />, key: '/BroadcastNotification' },
     ],
   },
   { label: 'Testimonial', icon: <IoDocumentTextSharp />, key: '/Testimonial' },
