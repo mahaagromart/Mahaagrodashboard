@@ -57,15 +57,15 @@ export const adminRoutes = [
       { label: 'Coupons', icon: <FaTags />, key: '/Coupon' },
       { label: 'Flash deals', icon: <FaIdeal />, key: '/Flashdeals' },
       { label: 'Deal of the day', icon: <FaIdeal />, key: '/Dealoftheday' },
-      { label: 'Featured deal', icon: <FaIdeal />, key: '/Featuredeal' },
+      { label: 'Featured deal', icon: <FaIdeal />, key: '/FeatureDeal' },
     ],
   },
   {
     label: 'Notifications',
     icon: <FaBell />,
     children: [
-      { label: 'Send Notification', icon: <BiSend />, key: '/SendNotification' },
       { label: 'Broadcast Notification', icon: <FaGlobeAsia />, key: '/BroadcastNotification' },
+      { label: 'Send Notification', icon: <BiSend />, key: '/SendNotification' },
     ],
   },
   { label: 'Testimonial', icon: <IoDocumentTextSharp />, key: '/Testimonial' },
