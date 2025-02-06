@@ -1,47 +1,63 @@
-import React, { useState } from "react";
-import { Button, Space, Table, Input ,Tooltip } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Space, Table, Input, Tooltip, Modal } from "antd";
 import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 import { FaEye } from "react-icons/fa";
 import { IoBarcode } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
 const { Column } = Table;
 
-const initialData = [
-  {
-    id: "1",
-    productImage: "https://via.placeholder.com/50",
-    productName: "Apple",
-    purchasePrice: "100",
-    sellingPrice: "120",
-    status: "Active",
-    verified: "Active",
-  },
-  {
-    id: "2",
-    productImage: "https://via.placeholder.com/50",
-    productName: "Banana",
-    purchasePrice: "50",
-    sellingPrice: "65",
-    status: "Inactive",
-    verified: "Active",
-  },
-  {
-    id: "3",
-    productImage: "https://via.placeholder.com/50",
-    productName: "Milk",
-    purchasePrice: "40",
-    sellingPrice: "50",
-    status: "Active",
-    verified: "Inactive",
-  },
-];
-
 const ProductListTable = () => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
-  const handleToggleStatus = (record) => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
+  const storedToken = token || localStorage.getItem("token");
+
+  useEffect(() => {
+    getInHouseProduct();
+  }, []);
+
+  const getInHouseProduct = async () => {
+    try {
+      const res = await axios.post(
+        `${apiUrl}EcommerceProduct/GetAllProducts`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+
+      if (res.data.Message === "SUCCESS") {
+        // Remove duplicates by using a Set and converting it back to an array
+        const uniqueProducts = Array.from(new Set(res.data.ProductList.map(p => p.Product_id)))
+          .map(id => {
+            return res.data.ProductList.find(p => p.Product_id === id);
+          });
+        setData(uniqueProducts);
+      } else {
+        await Swal.fire({
+          title: "Error in Getting Product List",
+          text: "Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      await Swal.fire({
+        title: "Error",
+        text: "Failed to fetch the product list. Please try again later. " + error,
+        icon: "error",
+      });
+    }
+  };
+
+  const handleToggleStatus = async (record) => {
     Swal.fire({
       title: "Are you sure?",
       text: `You are about to ${
@@ -51,27 +67,49 @@ const ProductListTable = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, do it!",
       cancelButtonText: "No, cancel",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.id === record.id
-              ? { ...item, status: record.status === "Active" ? "Inactive" : "Active" }
-              : item
-          )
-        );
-        Swal.fire(
-          "Updated!",
-          `The product is now ${
-            record.status === "Active" ? "Inactive" : "Active"
-          }.`,
-          "success"
-        );
+        try {
+          const res = await axios.post(
+            `${apiUrl}EcommerceProduct/ProductToggleStatus`,
+            { Product_id: record.Product_id },
+            {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            }
+          );
+
+          if (res.data.Message === "Success") {
+            Swal.fire({
+              title: "Status Updated",
+              text: "Product status updated successfully",
+              icon: "success",
+            });
+            setData((prevData) =>
+              prevData.map((item) =>
+                item.Product_id === record.Product_id
+                  ? { ...item, status: record.status === "Active" ? "Inactive" : "Active" }
+                  : item
+              )
+            );
+          } else {
+            await Swal.fire({
+              title: "Error Occurred",
+              text: "Please try again.",
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          await Swal.fire({
+            title: "Error",
+            text: "Failed to update product status. Please try again later. " + error,
+            icon: "error",
+          });
+        }
       }
     });
   };
 
-  const handleToggleVerified = (record) => {
+  const handleToggleVerified = async (record) => {
     Swal.fire({
       title: "Are you sure?",
       text: `You are about to ${
@@ -81,39 +119,58 @@ const ProductListTable = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, do it!",
       cancelButtonText: "No, cancel",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.id === record.id
-              ? { ...item, verified: record.verified === "Active" ? "Inactive" : "Active" }
-              : item
-          )
-        );
-        Swal.fire(
-          "Updated!",
-          `The certification status is now ${
-            record.verified === "Active" ? "Inactive" : "Active"
-          }.`,
-          "success"
-        );
+        try {
+          const res = await axios.post(
+            `${apiUrl}EcommerceProduct/ProductToggleCertified`,
+            { Product_id: record.Product_id },
+            {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            }
+          );
+
+          if (res.data.Message === "Success") {
+            Swal.fire({
+              title: "Certification Status Updated",
+              text: "Certification status updated successfully",
+              icon: "success",
+            });
+            setData((prevData) =>
+              prevData.map((item) =>
+                item.Product_id === record.Product_id
+                  ? { ...item, verified: record.verified === "Active" ? "Inactive" : "Active" }
+                  : item
+              )
+            );
+          } else {
+            await Swal.fire({
+              title: "Error Occurred",
+              text: "Please try again.",
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          await Swal.fire({
+            title: "Error",
+            text: "Failed to update certification status. Please try again later. " + error,
+            icon: "error",
+          });
+        }
       }
     });
   };
 
-  const handleGenerateCode = (record)=>{
+  const handleGenerateCode = (record) => {
+    navigate("/GenerateBarCode", {
+      state: {
+        productSku: record.Product_id,
+        productPrice: record.Price,
+      },
+    });
+  };
 
-
-    
-  navigate("/GenerateBarCode", {
-    state: {
-      productSku: 398434, 
-      productPrice: record.sellingPrice,
-    },
-  });
-  }
-
-  const handleDelete = (record) => {
+  const handleDelete = async (record) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You will not be able to recover this product!",
@@ -121,16 +178,56 @@ const ProductListTable = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "No, cancel!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setData((prevData) => prevData.filter((item) => item.id !== record.id));
-        Swal.fire("Deleted!", "The product has been deleted.", "success");
+        try {
+          const res = await axios.post(
+            `${apiUrl}EcommerceProduct/DeleteProduct`,
+            { Product_id: record.Product_id },
+            {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            }
+          );
+
+          if (res.data.Message === "Success") {
+            Swal.fire({
+              title: "Deleted",
+              text: "Data deleted successfully",
+              icon: "success",
+            });
+            setData((prevData) =>
+              prevData.filter((item) => item.Product_id !== record.Product_id)
+            );
+          } else {
+            await Swal.fire({
+              title: "Error While Deleting",
+              text: "Please try again.",
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          await Swal.fire({
+            title: "Error",
+            text: "Failed to delete data. Please try again later. " + error,
+            icon: "error",
+          });
+        }
       }
     });
   };
 
+  const handleView = (record) => {
+    setSelectedProduct(record);
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedProduct(null);
+  };
+
   const filteredData = data.filter((item) =>
-    item.productName.toLowerCase().includes(searchText.toLowerCase())
+    item.Product_Name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
@@ -153,12 +250,12 @@ const ProductListTable = () => {
         />
       </div>
 
-      <Table dataSource={filteredData} rowKey="id" pagination={{ pageSize: 5 }}>
-        <Column title="ID" dataIndex="id" key="id" align="center" />
+      <Table dataSource={filteredData} rowKey="Product_id" pagination={{ pageSize: 5 }}>
+        <Column title="ID" dataIndex="Product_id" key="Product_id" align="center" />
         <Column
           title="Product Image"
-          dataIndex="productImage"
-          key="productImage"
+          dataIndex="Image"
+          key="Image"
           align="center"
           render={(text) => (
             <img
@@ -173,9 +270,11 @@ const ProductListTable = () => {
             />
           )}
         />
-        <Column title="Product Name" dataIndex="productName" key="productName" align="center" />
-        <Column title="Purchase Price" dataIndex="purchasePrice" key="purchasePrice" align="center" />
-        <Column title="Selling Price" dataIndex="sellingPrice" key="sellingPrice" align="center" />
+        <Column title="Product Name" dataIndex="Product_Name" key="Product_Name" align="center" />
+        <Column title="Description" dataIndex="Description" key="Description" align="center" />
+        <Column title="Price" dataIndex="Price" key="Price" align="center" />
+        <Column title="Quantity" dataIndex="Quantity" key="Quantity" align="center" />
+        <Column title="Rating" dataIndex="Rating" key="Rating" align="center" />
         <Column
           title="Certification"
           dataIndex="verified"
@@ -212,21 +311,21 @@ const ProductListTable = () => {
             </Button>
           )}
         />
-         <Column
+        <Column
           title="Action"
           key="action"
           align="center"
           render={(_, record) => (
             <Space size="middle">
               <Tooltip title="Generate Barcode">
-                <Button icon={<IoBarcode />} 
-                type="primary"
-                onClick={()=> handleGenerateCode(record)}
+                <Button
+                  icon={<IoBarcode />}
+                  type="primary"
+                  onClick={() => handleGenerateCode(record)}
                 />
-                
               </Tooltip>
               <Tooltip title="View">
-                <Button icon={<FaEye />} type="primary" />
+                <Button icon={<FaEye />} type="primary" onClick={() => handleView(record)} />
               </Tooltip>
               <Tooltip title="Edit">
                 <Button icon={<MdEdit />} type="primary" />
@@ -243,6 +342,30 @@ const ProductListTable = () => {
           )}
         />
       </Table>
+
+      <Modal
+        title="Product Details"
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={[
+          <Button key="close" onClick={handleModalClose}>
+            Close
+          </Button>,
+        ]}
+      >
+        {selectedProduct && (
+          <div>
+            <p><strong>ID:</strong> {selectedProduct.Product_id}</p>
+            <p><strong>Name:</strong> {selectedProduct.Product_Name}</p>
+            <p><strong>Description:</strong> {selectedProduct.Description}</p>
+            <p><strong>Price:</strong> {selectedProduct.Price}</p>
+            <p><strong>Quantity:</strong> {selectedProduct.Quantity}</p>
+            <p><strong>Rating:</strong> {selectedProduct.Rating}</p>
+            <p><strong>Certification:</strong> {selectedProduct.Certified==="0" ? "Certified":"Uncertified"}</p>
+            <p><strong>Status:</strong> {selectedProduct.status==="0" ? "Activated" : "Deactivated"}</p>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

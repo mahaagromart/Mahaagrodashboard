@@ -116,7 +116,7 @@ const ProductList = () => {
   return (
     <>
       <Box marginTop="1%">
-        <Box mb={6}>
+      <Box mb={6}>
           <h2
             className="content-title"
             style={{
@@ -129,10 +129,10 @@ const ProductList = () => {
             In House Product List
           </h2>
         </Box>
-
-        <Box mx="auto" mt={5}>
+        <Box>
           <CardBox>
-            <SimpleGrid
+
+          <SimpleGrid
               p={10}
               columns={{ base: 1, md: 1, lg: 2, "2xl": 4 }}
               gap="20px"
