@@ -6,12 +6,17 @@ import {
   SimpleGrid,
   Tooltip,
   Button,
+  Select
 } from "@chakra-ui/react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Upload, message, Modal } from "antd";
 import CardBox from "../../../Component/Charts/CardBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdInfo } from "react-icons/md";
+import FlashdealsTable from "../../../Component/Table/FlashdealsTable";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { useDispatch, useSelector } from "react-redux";
 
 const Flashdeals = () => {
   const [startDate, setStartDate] = useState("");
@@ -20,6 +25,11 @@ const Flashdeals = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const { token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const storedToken = token || localStorage.getItem("token");
+  const [categoryList, setCategoryList] = useState([]);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -77,6 +87,44 @@ const Flashdeals = () => {
     </Box>
   );
 
+  
+  const getCategory = async () => {
+    try {
+      const res = await axios.post(
+        `${apiUrl}/EcommerceCategory/GetAllCategory`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      if (res.data.Message === "success") {
+        setCategoryList(res.data.CategoryList);
+
+      } else {
+        await Swal.fire({
+          title: "Error in Getting Category List",
+          text: "Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: "Error",
+        text: "Failed to fetch the category list. Please try again later.",error,
+        icon: "error",
+      });
+    }
+  };
+
+
+
+  useEffect(()=>{
+    getCategory();
+  },[])
+
+
+
+
   return (
     <>
       <Box marginTop="1%">
@@ -109,6 +157,53 @@ const Flashdeals = () => {
                   borderRadius="md"
                 />
               </FormControl>
+
+
+              <FormControl>
+                <FormLabel fontWeight="bold" color="gray.600">
+                  Select Category
+                </FormLabel>
+                <Select>
+                {categoryList.map((category) => (
+                            <option
+                              key={category.Category_id}
+                              value={category.Category_id}
+                            >
+                              {category.Category_Name}
+                            </option>
+                          ))}
+
+                </Select>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontWeight="bold" color="gray.600">
+                  Select Product
+                </FormLabel>
+                <Select>
+                {categoryList.map((category) => (
+                            <option
+                              key={category.Category_id}
+                              value={category.Category_id}
+                            >
+                              {category.Category_Name}
+                            </option>
+                          ))}
+
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontWeight="bold" color="gray.600">
+                  Discount %
+                </FormLabel>
+                
+                <Input
+                  type="number"
+                />
+                
+              </FormControl>
+
+
 
               <FormControl>
                 <FormLabel display="flex" alignItems="center">
@@ -180,7 +275,18 @@ const Flashdeals = () => {
                 </CardBox>
               </Box>
             </SimpleGrid>
+
+            <Box mt={6} display="flex" justifyContent="flex-start" gap={4} p={3} paddingRight={5}>
+              <Button colorScheme="gray">
+                Reset
+              </Button>
+              <Button colorScheme="blue" >
+                Submit
+              </Button>
+            </Box>
+
           </CardBox>
+
         </Box>
 
         {/* Preview Modal */}
@@ -196,6 +302,14 @@ const Flashdeals = () => {
             src={previewImage}
           />
         </Modal>
+
+
+            <Box mt={4}>
+                <CardBox>
+                      <FlashdealsTable/>
+                </CardBox>          
+             </Box>                            
+
       </Box>
     </>
   );

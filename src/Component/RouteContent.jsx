@@ -34,7 +34,7 @@ import DeniedProduct from "../Pages/ProductManagement/SellerProduct/DeniedProduc
 import Banner from "../Pages/Promotionmanagement/Banner/Banner";
 import Coupon from "../Pages/Promotionmanagement/offersAndDeals/Coupon";
 import Flashdeals from "../Pages/Promotionmanagement/offersAndDeals/Flashdeals";
-import PushNotification from "../Pages/Promotionmanagement/Notification/PushNotification";
+import PushNotification from "../Pages/Promotionmanagement/Notification/BroadcastNotification";
 import SendNotification from "../Pages/Promotionmanagement/Notification/sendNotification";
 import Testimonial from "../Pages/Promotionmanagement/Testimonial/Testimonial";
 import Message from "../Pages/HelpsandSupport/Message";
@@ -47,6 +47,10 @@ import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/Inhouse
 import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport"
 import Register from "../Pages/Register/Register";
 import GenerateBarCode from "../Pages/ProductManagement/InHouseProduct/GenerateBarCode";
+import Dealoftheday from "../Pages/Promotionmanagement/offersAndDeals/Dealoftheday";
+import Featureddeal from "../Pages/Promotionmanagement/offersAndDeals/Featureddeal";
+import BroadcastNotification from "../Pages/Promotionmanagement/Notification/BroadcastNotification";
+import MessageView from "../Pages/HelpsandSupport/MessageView";
 
 const RouteContent = () => {
   return (
@@ -106,11 +110,16 @@ const RouteContent = () => {
         <Route path="/Banner" element={<ProtectedRoutes><Banner/></ProtectedRoutes>} />
         <Route path="/Coupon" element={<ProtectedRoutes> <Coupon/> </ProtectedRoutes>} />
         <Route path="/Flashdeals" element={<ProtectedRoutes><Flashdeals /></ProtectedRoutes>} />
+        <Route path="/Dealoftheday" element={<ProtectedRoutes>  <Dealoftheday/>  </ProtectedRoutes>} />
+        <Route path="/FeatureDeal" element={<ProtectedRoutes> <Featureddeal/></ProtectedRoutes>} />
+
+
+
+          {/* Notification */}
+
+          <Route path="/BroadcastNotification" element={<ProtectedRoutes> <BroadcastNotification/>  </ProtectedRoutes>} />
+          <Route path="/SendNotification" element={<ProtectedRoutes>< SendNotification /></ProtectedRoutes>} />
 {/* 
-        <Route path="/Dealoftheday" element={<ProtectedRoutes><Dealoftheday /></ProtectedRoutes>} />
-        <Route path="/Flashdeals" element={<ProtectedRoutes><Flashdeals /></ProtectedRoutes>} />
-        <Route path="/SendNotification" element={<ProtectedRoutes><SendNotification /></ProtectedRoutes>} />
-        <Route path="/PushNotification" element={<ProtectedRoutes><PushNotification /></ProtectedRoutes>} />
         <Route path="/Testimonial" element={<ProtectedRoutes><Testimonial /></ProtectedRoutes>} /> */}
 
 
@@ -118,8 +127,11 @@ const RouteContent = () => {
 
 
         {/* help and support starts */}
+        <Route path="/Message" element={<ProtectedRoutes><Message /></ProtectedRoutes>} />
+        <Route path="/MessageView" element={<ProtectedRoutes><MessageView/></ProtectedRoutes>} />
 
-        {/* <Route path="/Message" element={<ProtectedRoutes><Message /></ProtectedRoutes>} />
+        {
+        /* 
         <Route path="/SupportTicket" element={<ProtectedRoutes><SupportTicket /></ProtectedRoutes>} />
         <Route path="/Service" element={<ProtectedRoutes><Service /></ProtectedRoutes>} />
         <Route path="/BusinessToBusiness" element={<ProtectedRoutes><BusinessToBusiness /></ProtectedRoutes>} /> */}
