@@ -50,6 +50,7 @@ import GenerateBarCode from "../Pages/ProductManagement/InHouseProduct/GenerateB
 import Dealoftheday from "../Pages/Promotionmanagement/offersAndDeals/Dealoftheday";
 import Featureddeal from "../Pages/Promotionmanagement/offersAndDeals/Featureddeal";
 import BroadcastNotification from "../Pages/Promotionmanagement/Notification/BroadcastNotification";
+import MessageView from "../Pages/HelpsandSupport/MessageView";
 
 const RouteContent = () => {
   return (
@@ -126,8 +127,11 @@ const RouteContent = () => {
 
 
         {/* help and support starts */}
+        <Route path="/Message" element={<ProtectedRoutes><Message /></ProtectedRoutes>} />
+        <Route path="/MessageView" element={<ProtectedRoutes><MessageView/></ProtectedRoutes>} />
 
-        {/* <Route path="/Message" element={<ProtectedRoutes><Message /></ProtectedRoutes>} />
+        {
+        /* 
         <Route path="/SupportTicket" element={<ProtectedRoutes><SupportTicket /></ProtectedRoutes>} />
         <Route path="/Service" element={<ProtectedRoutes><Service /></ProtectedRoutes>} />
         <Route path="/BusinessToBusiness" element={<ProtectedRoutes><BusinessToBusiness /></ProtectedRoutes>} /> */}

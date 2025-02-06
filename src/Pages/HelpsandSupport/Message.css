@@ -1,0 +1,12 @@
+.unchecked-row {
+    background-color: lightbrown;
+  }
+  
+  .checked-row {
+    background-color: white;
+  }
+  
+  .ant-table-cell {
+    color: brown;
+  }
+  

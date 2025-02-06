@@ -68,11 +68,28 @@ export const adminRoutes = [
       { label: 'Send Notification', icon: <BiSend />, key: '/SendNotification' },
     ],
   },
+
+
   { label: 'Testimonial', icon: <IoDocumentTextSharp />, key: '/Testimonial' },
-  { label: 'Message', icon: <MdMessage />, key: '/Message' },
-  { label: 'SupportTicket', icon: <BsTicketPerforated />, key: '/SupportTicket' },
-  { label: 'Service', icon: <GrServicePlay />, key: '/Service' },
-  { label: 'BusinessToBusiness', icon: <FaBusinessTime />, key: '/BusinessToBusiness' },
+
+  // help and support 
+  {
+    label: 'Help & Support',
+    icon: <FaBell />,
+    children: [
+      { label: 'Message', icon: <MdMessage />, key: '/Message' },
+      { label: 'B2B Messages', icon: <FaBusinessTime />, key: '/BtoBMessages' },
+      { label: 'SupportTicket', icon: <BsTicketPerforated />, key: '/SupportTicket' },
+      { label: 'Service', icon: <GrServicePlay />, key: '/Service' },
+      { label: 'Service Enquiry', icon: <GrServicePlay />, key: '/ServiceEnquiry' },
+      { label: 'B2B', icon: <GrServicePlay />, key: '/BtoB' },
+    ],
+  },
+
+
+ 
+
+
   {
     label: 'Sales & Transaction Rep',
     icon: <RiBankLine />,
