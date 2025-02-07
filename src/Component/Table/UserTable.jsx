@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Button, Space, Table, Input ,Tooltip } from "antd";
+import { Button, Space, Table, Input, Tooltip, Modal, Form } from "antd";
 import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 import { FaEye } from "react-icons/fa";
 import { IoBarcode } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { BiSend } from "react-icons/bi";
+import axios from "axios";
+
 const { Column } = Table;
 
 const initialData = [
@@ -13,31 +15,33 @@ const initialData = [
     id: "1",
     userImage: "https://via.placeholder.com/51",
     name: "Sanjeev",
-    mobile : "7633920927",
+    mobile: "7633920927",
     email: "sanjeevkrpd11@gmail.com",
   },
   {
     id: "2",
     userImage: "https://via.placeholder.com/523",
-    name: "pavan",
-    mobile : "239847237",
+    name: "Pavan",
+    mobile: "239847237",
     email: "pavan01@gmail.com",
   },
   {
     id: "3",
     userImage: "https://via.placeholder.com/5023",
     name: "Himanshu",
-    mobile : "3403409823",
+    mobile: "3403409823",
     email: "himanshu@gmail.com",
   },
-  
-
 ];
 
 const UserTable = () => {
   const [data, setData] = useState(initialData);
   const [searchText, setSearchText] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [form] = Form.useForm();
   const navigate = useNavigate();
+
   const handleToggleStatus = (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -98,17 +102,34 @@ const UserTable = () => {
     });
   };
 
-  const handleGenerateCode = (record)=>{
+  const handleSendNotification = (record) => {
+    setSelectedUser(record);
+    setIsModalVisible(true);
+  };
 
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
+  };
 
-    
-  navigate("/GenerateBarCode", {
-    state: {
-      productSku: 398434, 
-      productPrice: record.sellingPrice,
-    },
-  });
-  }
+  const handleOk = () => {
+    form.validateFields().then((values) => {
+      axios
+        .post("/api/send-notification", {
+          user: selectedUser,
+          title: values.title,
+          message: values.message,
+        })
+        .then((response) => {
+          Swal.fire("Success!", "Notification sent successfully.", "success");
+          setIsModalVisible(false);
+          form.resetFields();
+        })
+        .catch((error) => {
+          Swal.fire("Error!", "Failed to send notification.", "error");
+        });
+    });
+  };
 
   const handleDelete = (record) => {
     Swal.fire({
@@ -166,7 +187,7 @@ const UserTable = () => {
                 height: "50px",
                 objectFit: "cover",
                 borderRadius: "8px",
-                marginLeft : "10px"
+                marginLeft: "10px",
               }}
             />
           )}
@@ -174,25 +195,22 @@ const UserTable = () => {
         <Column title="Name" dataIndex="name" key="name" align="center" />
         <Column title="Mobile" dataIndex="mobile" key="mobile" align="center" />
         <Column title="Email" dataIndex="email" key="email" align="center" />
-       
 
-         <Column
+        <Column
           title="Action"
           key="action"
           align="center"
           render={(_, record) => (
             <Space size="middle">
               <Tooltip title="Send Notification">
-                <Button icon={<BiSend />} 
-                type="primary"
-                onClick={()=> handleGenerateCode(record)}
-                />  
+                <Button
+                  icon={<BiSend />}
+                  type="primary"
+                  onClick={() => handleSendNotification(record)}
+                />
               </Tooltip>
               <Tooltip title="View Details">
-                <Button icon={<FaEye />} 
-                type="primary"
-                onClick={()=> handleGenerateCode(record)}
-                />  
+                <Button icon={<FaEye />} type="primary" />
               </Tooltip>
 
               <Tooltip title="Delete">
@@ -207,6 +225,30 @@ const UserTable = () => {
           )}
         />
       </Table>
+
+      <Modal
+        title="Send Notification"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        onOk={handleOk}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="title"
+            label="Title"
+            rules={[{ required: true, message: "Please enter a title" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="message"
+            label="Message"
+            rules={[{ required: true, message: "Please enter a message" }]}
+          >
+            <Input.TextArea rows={4} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

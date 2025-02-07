@@ -15,7 +15,7 @@ const initialData = [
     title: "Sale Sale Sale",
     message: "Message",
     duration: "2025-01-01 to 2025-01-31",
-
+    
   },
   {
     id: "2",
