@@ -52,7 +52,7 @@ const SupportTicket = () => {
   const storedToken = token || localStorage.getItem("token");
 
   useEffect(() => {
-    // getInHouseProduct();
+
   }, []);
 
   // const getInHouseProduct = async () => {
@@ -98,6 +98,11 @@ const SupportTicket = () => {
     //     productPrice: record.Price,
     //   },
     // });
+
+    navigate("/SupportTicketChatRoom",{
+
+      state : {name : "sanjeev kumar"},
+    })
   };
 
   const handleDelete = async (record) => {
@@ -146,10 +151,10 @@ const SupportTicket = () => {
     });
   };
 
-  const handleView = (record) => {
-    setSelectedProduct(record);
-    setIsModalVisible(true);
-  };
+  // const handleView = (record) => {
+  //   setSelectedProduct(record);
+  //   setIsModalVisible(true);
+  // };
 
   const handleModalClose = () => {
     setIsModalVisible(false);
@@ -212,7 +217,7 @@ const SupportTicket = () => {
           render={(_, record) => (
             <Space size="middle">
               <Tooltip title="View">
-                <Button icon={<FaEye />} type="primary" onClick={() => handleView(record)} />
+                <Button icon={<FaEye />} type="primary" onClick={() => handleViewSupprot(record)} />
               </Tooltip>
 
             </Space>

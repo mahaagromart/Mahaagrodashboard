@@ -70,16 +70,6 @@ const HeaderBox = ({collapsed , setCollapsed, onSearchTextChange }) => {
 
 
 
-    {/* <Button
-  type="text"
-  icon={<SearchOutlined />}
-  onClick={() => setCollapsed(!collapsed)}
-  className="header-icon-button"
-  style={{
-    width: '100px',
-  }}
-/> */}
-
       <Button
         type="text"
         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -89,10 +79,6 @@ const HeaderBox = ({collapsed , setCollapsed, onSearchTextChange }) => {
       <Button
         type="text"
         icon={<MdNotifications />}
-
-
-
-        
         onClick={() => setCollapsed(!collapsed)}
         className="header-icon-button"
       />

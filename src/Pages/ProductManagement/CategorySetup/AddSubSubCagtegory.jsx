@@ -156,7 +156,7 @@ const AddSubSubCategory = () => {
         </h2>
       </Box>
 
-      <Box mx="auto" mt={5}>
+      <Box  mt={5}>
         <CardBox>
           <Formik
             initialValues={{

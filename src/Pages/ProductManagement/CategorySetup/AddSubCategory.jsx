@@ -126,7 +126,7 @@ const AddSubCategory = () => {
 
   return (
     <>
-      <Box marginTop="1%" className="box">
+      <Box marginTop="1%" >
         <Box mb={6}>
           <h2
             className="content-title"

@@ -1,4 +1,4 @@
-import { DashboardOutlined, LogoutOutlined, NotificationFilled, NotificationOutlined, SettingFilled } from '@ant-design/icons';
+import { SettingFilled } from '@ant-design/icons';
 import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags } from 'react-icons/fa6';
 import { GiCheckMark, GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
 import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard, MdBarcodeReader } from 'react-icons/md';
@@ -21,14 +21,7 @@ export const adminRoutes = [
       { label: 'Sub Sub Category', icon: <MdAddToPhotos />, key: '/SubSubCategory' },
     ],
   },
-//   {
-//     label: 'Brands',
-//     icon: <MdBrandingWatermark />,
-//     children: [
-//       { label: 'Add new', icon: <MdCategory />, key: '/AddnewBrand' },
-//       { label: 'BrandList', icon: <MdCategory />, key: '/BrandList' },
-//     ],
-//   },
+  
   { label: 'ProductAttribute', icon: <SettingFilled />, key: '/ProductAttribute' },
   {
     label: 'In-house Products',
