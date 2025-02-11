@@ -23,9 +23,8 @@ import Message from "../Pages/HelpsandSupport/Message";
 
 import BusinessToBusiness from "../Pages/HelpsandSupport/BusinessToBusiness";
 import SupportTicket from "../Pages/HelpsandSupport/SupportTicket";
-import EarningReport from "../Pages/UserManagement/SalesandTransactionRep/EarningReport";
-import InhouseSales from "../Pages/UserManagement/SalesandTransactionRep/InhouseSales";
-import TransactionReport from "../Pages/UserManagement/SalesandTransactionRep/TransactionReport";
+
+
 import Register from "../Pages/Register/Register";
 import GenerateBarCode from "../Pages/ProductManagement/InHouseProduct/GenerateBarCode";
 import Dealoftheday from "../Pages/Promotionmanagement/offersAndDeals/Dealoftheday";
@@ -36,6 +35,9 @@ import SupportTicketChatRoom from "../Pages/HelpsandSupport/SupportTicketChatRoo
 import Service from "../Pages/HelpsandSupport/Service";
 import ServiceEnquiry from "../Pages/HelpsandSupport/ServiceEnquiry";
 import AdminEarningReport from "../Pages/SalesAndTransactionReport/EarningReport/AdminEarningReport";
+import TotalEarningTable from "./Table/TotalEarningTable";
+import EarningReport from "../Pages/SalesAndTransactionReport/EarningReport/EarningReport";
+import ProductAttribute from "../Pages/ProductManagement/ProductAttribute/ProductAttribute";
 const RouteContent = () => {
   return (
     <>
@@ -47,7 +49,8 @@ const RouteContent = () => {
         <Route path="/SubCategory" element={<ProtectedRoutes><AddSubCategory /></ProtectedRoutes>} />
         <Route path="/SubSubCategory" element={<ProtectedRoutes><AddSubSubCagtegory /></ProtectedRoutes>} />
 
-      
+        <Route path="/ProductAttribute" element={<ProtectedRoutes> <ProductAttribute/>  </ProtectedRoutes>} />
+
 
         {/* inhouse product starts */}
         <Route path="/ProductList" element={<ProtectedRoutes><ProductList /></ProtectedRoutes>} />
@@ -79,9 +82,9 @@ const RouteContent = () => {
         <Route path="/ServiceEnquiry" element={<ProtectedRoutes> <ServiceEnquiry/>  </ProtectedRoutes>} />
 
         {/* user management starts */}
-        <Route path="/EarningReport" element={<ProtectedRoutes> <AdminEarningReport/> </ProtectedRoutes>} />
-        <Route path="/InhouseSales" element={<ProtectedRoutes><InhouseSales /></ProtectedRoutes>} />
-        <Route path="/TransactionReport" element={<ProtectedRoutes><TransactionReport /></ProtectedRoutes>} />
+        <Route path="/EarningReport" element={<ProtectedRoutes> <EarningReport/> </ProtectedRoutes>} />
+        {/* <Route path="/InhouseSales" element={<ProtectedRoutes><InhouseSales /></ProtectedRoutes>} />
+        <Route path="/TransactionReport" element={<ProtectedRoutes><TransactionReport /></ProtectedRoutes>} /> */}
 
         {/* authentication routes */}
         <Route path="/signout" element={<LoginForm />} />

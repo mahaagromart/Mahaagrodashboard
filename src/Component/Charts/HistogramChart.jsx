@@ -11,7 +11,7 @@ const HistogramChart = () => {
     ],
     options: {
       chart: {
-        height: 350,
+        height: 380,
         type: "bar",
       },
       plotOptions: {
@@ -89,7 +89,7 @@ const HistogramChart = () => {
       title: {
         text: "Monthly Inflation in Argentina, 2002",
         floating: true,
-        offsetY: 330,
+        offsetY: 340,
         align: "center",
         style: {
           color: "#444",
@@ -100,7 +100,7 @@ const HistogramChart = () => {
 
   return (
     <div id="chart">
-      <ReactApexChart options={state.options} series={state.series} type="bar" height={350} />
+      <ReactApexChart options={state.options} series={state.series} type="bar" height={360} />
     </div>
   );
 };

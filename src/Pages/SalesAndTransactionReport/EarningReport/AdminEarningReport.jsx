@@ -1,43 +1,34 @@
 import { useState } from "react";
-import { Box, Button, FormControl, FormLabel, Select, SimpleGrid, Input } from "@chakra-ui/react";
-import { Tabs } from 'antd';
-import CardBox from "../../../Component/Charts/CardBox";
+import { Box, Button, FormControl, FormLabel, Select, SimpleGrid, Input, GridItem } from "@chakra-ui/react";
 
-const items = [
-  { key: '1', label: 'Admin Panel' },
-  { key: '2', label: 'Seller Panel' },
-];
+import CardBox from "../../../Component/Charts/CardBox";
+import Card from "../../../Component/Card";
+import { MdBarChart } from "react-icons/md";
+import { LiaStoreSolid } from "react-icons/lia";
+import { AiFillProduct } from "react-icons/ai";
+import HistogramChart from "../../../Component/Charts/HistogramChart";
+import Piecharts from "../../../Component/Charts/Piecharts";
+import CenterBox from "../../../Component/Charts/CenterBox";
+import TotalEarningTable from "../../../Component/Table/TotalEarningTable";
+
+
+
 
 const AdminEarningReport = () => {
-  const [filterType, setFilterType] = useState("This Year"); // ✅ State for filter type
-  const [startDate, setStartDate] = useState(""); // ✅ State for Start Date
-  const [endDate, setEndDate] = useState(""); // ✅ State for End Date
+  const [filterType, setFilterType] = useState("This Year");
+  const [startDate, setStartDate] = useState(""); 
+  const [endDate, setEndDate] = useState("");
 
   return (
     <>
       <Box marginTop="1%">
-        <Box mb={6}>
-          <h2
-            className="content-title"
-            style={{
-              textAlign: "center",
-              fontWeight: "600",
-              fontSize: "20px",
-              color: "#4A5568",
-            }}
-          >
-            Earning Reports
-          </h2>
-        </Box>
 
-        <Box>
-          <Tabs defaultActiveKey="1" items={items} />
-        </Box>
+
 
         <Box>
           <CardBox>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} padding="10px">
-              {/* ✅ Filter Selection */}
+           
               <FormControl>
                 <FormLabel>Filter Data</FormLabel>
                 <Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
@@ -48,7 +39,7 @@ const AdminEarningReport = () => {
                 </Select>
               </FormControl>
 
-              {/* ✅ Show Start Date & End Date if "Custom Date" is selected */}
+         
               {filterType === "Custom Date" && (
                 <>
                   <FormControl>
@@ -75,6 +66,84 @@ const AdminEarningReport = () => {
             <Button margin="10px">Filter</Button>
           </CardBox>
         </Box>
+
+          <Box marginTop="1%">
+
+
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} padding="10px">
+
+                  
+             <GridItem>
+                 <SimpleGrid columns={{ base: 1 }} spacing={6} padding="10px">
+
+                  <CardBox>
+                  <Card
+                        icon={<MdBarChart />}
+                        heading={"Total Sales"}
+                        money={"642"}
+                        ht={"100px"}
+                      />
+                  </CardBox>
+
+                  
+                  <CardBox>
+                      <Card
+                      icon={<LiaStoreSolid />}
+                      heading={"Total Stores"}
+                      money={"654"}
+                      ht={"100px"}
+                      />
+
+                  </CardBox>
+                  
+                  <CardBox>
+                  <Card
+                      icon={<AiFillProduct />}
+                      heading={"Total Products"}
+                      money={"642"}
+                      ht={"100px"}
+                    />
+                  </CardBox>
+
+                </SimpleGrid>
+             </GridItem>
+
+
+
+                <GridItem>
+
+                <CardBox>
+
+                  <HistogramChart/>
+
+                </CardBox>
+                </GridItem>
+
+                
+                <GridItem>
+                <CardBox>
+
+                      <CenterBox>
+
+                          <Piecharts/>
+                      </CenterBox>
+                </CardBox>
+
+                </GridItem>
+
+
+              </SimpleGrid>   
+                
+          </Box>
+
+
+          <Box>
+           <CardBox>
+           <TotalEarningTable/>
+           </CardBox>
+          </Box>      
+
+
       </Box>
     </>
   );
