@@ -34,10 +34,12 @@ import MessageView from "../Pages/HelpsandSupport/MessageView";
 import SupportTicketChatRoom from "../Pages/HelpsandSupport/SupportTicketChatRoom";
 import Service from "../Pages/HelpsandSupport/Service";
 import ServiceEnquiry from "../Pages/HelpsandSupport/ServiceEnquiry";
+import InHouseSales from "../Pages/SalesAndTransactionReport/InHouseSales";
 import AdminEarningReport from "../Pages/SalesAndTransactionReport/EarningReport/AdminEarningReport";
 import TotalEarningTable from "./Table/TotalEarningTable";
 import EarningReport from "../Pages/SalesAndTransactionReport/EarningReport/EarningReport";
 import ProductAttribute from "../Pages/ProductManagement/ProductAttribute/ProductAttribute";
+import SellerSales from "../Pages/SalesAndTransactionReport/SellerSales";
 const RouteContent = () => {
   return (
     <>
@@ -83,8 +85,11 @@ const RouteContent = () => {
 
         {/* user management starts */}
         <Route path="/EarningReport" element={<ProtectedRoutes> <EarningReport/> </ProtectedRoutes>} />
-        {/* <Route path="/InhouseSales" element={<ProtectedRoutes><InhouseSales /></ProtectedRoutes>} />
-        <Route path="/TransactionReport" element={<ProtectedRoutes><TransactionReport /></ProtectedRoutes>} /> */}
+        <Route path="/InhouseSales" element={<ProtectedRoutes> <InHouseSales/> </ProtectedRoutes>} />
+        <Route path="/SellerSale" element={<ProtectedRoutes> <SellerSales/>  </ProtectedRoutes>} />
+
+
+        {/* <Route path="/TransactionReport" element={<ProtectedRoutes><TransactionReport /></ProtectedRoutes>} />  */}
 
         {/* authentication routes */}
         <Route path="/signout" element={<LoginForm />} />

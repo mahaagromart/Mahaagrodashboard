@@ -89,7 +89,7 @@ export const adminRoutes = [
     children: [
       { label: 'Earning Report', icon: <GiTakeMyMoney />, key: '/EarningReport' },
       { label: 'Inhouse Sales', icon: <MdHouse />, key: '/InhouseSales' },
-      { label: 'seller Sales', icon: <FaShop />, key: '/sellerSales' },
+      { label: 'seller Sales', icon: <FaShop />, key: '/SellerSale' },
       { label: 'Transaction Report', icon: <FaMoneyBillTrendUp />, key: '/TransactionReport' },
     ],
   },

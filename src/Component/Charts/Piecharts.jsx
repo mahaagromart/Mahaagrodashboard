@@ -89,7 +89,7 @@ const Piecharts = () => {
             options={chartState.options}
             series={chartState.series}
             type="pie"
-            width="100%"
+            width="93%"
           />
         </Box>
       </Box>
