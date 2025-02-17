@@ -40,6 +40,9 @@ import TotalEarningTable from "./Table/TotalEarningTable";
 import EarningReport from "../Pages/SalesAndTransactionReport/EarningReport/EarningReport";
 import ProductAttribute from "../Pages/ProductManagement/ProductAttribute/ProductAttribute";
 import SellerSales from "../Pages/SalesAndTransactionReport/SellerSales";
+import TransactionReport from "../Pages/SalesAndTransactionReport/TransactionReport";
+import CustomerList from "../Pages/UserManagement/Customers/CustomerList";
+import CustomerReviews from "../Pages/UserManagement/Customers/CustomerReviews";
 const RouteContent = () => {
   return (
     <>
@@ -87,9 +90,13 @@ const RouteContent = () => {
         <Route path="/EarningReport" element={<ProtectedRoutes> <EarningReport/> </ProtectedRoutes>} />
         <Route path="/InhouseSales" element={<ProtectedRoutes> <InHouseSales/> </ProtectedRoutes>} />
         <Route path="/SellerSale" element={<ProtectedRoutes> <SellerSales/>  </ProtectedRoutes>} />
+        <Route path="/TransactionReport" element={<ProtectedRoutes> <TransactionReport/>  </ProtectedRoutes>} /> 
 
+      {/* user Management */}
 
-        {/* <Route path="/TransactionReport" element={<ProtectedRoutes><TransactionReport /></ProtectedRoutes>} />  */}
+          <Route path="/CustomerList" element={<ProtectedRoutes> <CustomerList/>  </ProtectedRoutes>} /> 
+          <Route path="/CustomerReviews" element={<ProtectedRoutes> <CustomerReviews/>  </ProtectedRoutes>} /> 
+
 
         {/* authentication routes */}
         <Route path="/signout" element={<LoginForm />} />

@@ -58,9 +58,11 @@ const AddSubCategory = () => {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
+      console.log(res)
       if (res.data.Message === "success") {
         setCategoryList(res.data.CategoryList);
 
+        
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
@@ -121,6 +123,7 @@ const AddSubCategory = () => {
 
   useEffect(() => {
     getCategory();
+
     
   }, []);
 
