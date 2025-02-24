@@ -43,6 +43,7 @@ import SellerSales from "../Pages/SalesAndTransactionReport/SellerSales";
 import TransactionReport from "../Pages/SalesAndTransactionReport/TransactionReport";
 import CustomerList from "../Pages/UserManagement/Customers/CustomerList";
 import CustomerReviews from "../Pages/UserManagement/Customers/CustomerReviews";
+import AddNewSeller from "../Pages/UserManagement/Sellers/AddNewSeller";
 const RouteContent = () => {
   return (
     <>
@@ -96,6 +97,7 @@ const RouteContent = () => {
 
           <Route path="/CustomerList" element={<ProtectedRoutes> <CustomerList/>  </ProtectedRoutes>} /> 
           <Route path="/CustomerReviews" element={<ProtectedRoutes> <CustomerReviews/>  </ProtectedRoutes>} /> 
+          <Route path="/AddNewSeller" element={<ProtectedRoutes><AddNewSeller/></ProtectedRoutes>} /> 
 
 
         {/* authentication routes */}

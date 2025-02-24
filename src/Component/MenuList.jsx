@@ -42,7 +42,7 @@ const MenuList = ({ searchText  }) => {
   };
 
   const keys = adminRoutes.map((route) => route.key);
-  console.log("Menu Keys:", keys);
+
   const filteredRoutes = route.filter((item) =>
     item.label.toLowerCase().includes(searchText.toLowerCase())
   );

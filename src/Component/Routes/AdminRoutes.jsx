@@ -95,25 +95,6 @@ export const adminRoutes = [
           { label: 'Wallet', icon: <FaWallet />, key: '/CustomerWallet' },
           { label: 'Wallet Bonus Setup', icon: <MdOutlineSettingsInputComponent />, key: '/WalletBonusSetup' },
         ] },
-        { label: 'Sellers', icon: <TbMan />, 
-          children : [
-          { label: 'Add New Seller', icon: <MdAdd />, key: '/AddNewSeller' },
-          { label: 'Seller List', icon: <FaList/>, key: '/SellerList' },
-          { label: 'Seller Category', icon: <TbCategory2 />, key: '/SellerCategory' },
-          { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/SellerWithdraws' },
-          { label: 'Withdraws Methods', icon: < PiHandWithdrawFill/>, key: '/WithdrawsMethods' },
-          ]
-          },
-
-          { label: 'Delivery-Man', icon: <CiDeliveryTruck /> ,
-            children : [
-            { label: 'Add New', icon: <MdAdd />, key: '/AddNewDelivery-man' },
-            { label: 'List', icon: <FaList/>, key: '/Deliver-manList' },
-            { label: 'Chat', icon: <TbCategory2 />, key: '/Delivery-manChat' },
-            { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/Delivery-manWithdraws' },
-            { label: 'Emergency Contact', icon: < MdContactEmergency/>, key: '/Delivery-manEmergencyContact' },
-            ]
-          },
           { label: 'Employee', icon: < FaUserFriends/>,  
             children : [
             { label: 'Employee Role Setup', icon: <CiSettings />, key: '/EmployeeRoleSetup' },
@@ -123,7 +104,25 @@ export const adminRoutes = [
 
       ],
     },
- 
+    { label: 'Sellers', icon: <TbMan />, 
+      children : [
+      { label: 'Add New Seller', icon: <MdAdd />, key: '/AddNewSeller' },
+      { label: 'Seller List', icon: <FaList/>, key: '/SellerList' },
+      { label: 'Seller Category', icon: <TbCategory2 />, key: '/SellerCategory' },
+      { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/SellerWithdraws' },
+      { label: 'Withdraws Methods', icon: < PiHandWithdrawFill/>, key: '/WithdrawsMethods' },
+      ]
+    },
+    { label: 'Delivery-Man', icon: <CiDeliveryTruck /> ,
+      children : [
+      { label: 'Add New', icon: <MdAdd />, key: '/AddNewDelivery-man' },
+      { label: 'List', icon: <FaList/>, key: '/Deliver-manList' },
+      { label: 'Chat', icon: <TbCategory2 />, key: '/Delivery-manChat' },
+      { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/Delivery-manWithdraws' },
+      { label: 'Emergency Contact', icon: < MdContactEmergency/>, key: '/Delivery-manEmergencyContact' },
+      ]
+    },
+
 
 
   {
@@ -139,6 +138,9 @@ export const adminRoutes = [
   { label: 'Signout', icon: <FaSignOutAlt />, key: '/signout' , danger : true  },
 
 ];
+
+
+
 // import { SettingFilled } from '@ant-design/icons';
 // import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags } from 'react-icons/fa6';
 // import { GiCheckMark, GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
@@ -213,4 +215,19 @@ export const adminRoutes = [
 //   // Signout
 //   { label: 'Signout', icon: <FaSignOutAlt />, key: '/signout', danger: true },
 // ];
+
+// import React, { useState } from 'react';
+// import { Menu } from 'antd';
+// import { 
+//   SettingFilled, FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, 
+//   FaList, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags, FaUser, 
+//   FaWallet, GiCheckMark, GiCrossMark, GiKnightBanner, GiTakeMyMoney, 
+//   MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, 
+//   MdMessage, MdDashboard, MdBarcodeReader, MdReviews, MdOutlineSettingsInputComponent, 
+//   MdContactEmergency, BiMoneyWithdraw, BiSend, BiSolidOffer, IoDocumentTextSharp, 
+//   BsTicketPerforated, GrServicePlay, RiBankLine, FaSignOutAlt, FaUserFriends, 
+//   FaGlobeAsia, FaPeopleGroup, TbCategory2, TbMan, PiHandWithdrawFill, 
+//   CiDeliveryTruck, CiSettings, CiUser 
+// } from 'react-icons/all';
+
 
