@@ -13,6 +13,7 @@ import {
   ModalContent,
   ModalBody,
   ModalCloseButton,
+  GridItem
 } from "@chakra-ui/react";
 import { Upload, message } from "antd";
 import CardBox from "../../../Component/Charts/CardBox";
@@ -338,7 +339,7 @@ const AddNewSeller = () => {
             </FormControl>   
 
             <FormControl>
-              <FormLabel>Seller Document (500 x 500 px)</FormLabel>
+              <FormLabel>Seller Document</FormLabel>
               <Upload
                 listType="picture-card"
                 fileList={fileList}
@@ -355,7 +356,26 @@ const AddNewSeller = () => {
                 )}
               </Upload>
             </FormControl>
-                
+                 <GridItem
+                                      display="flex"
+                                      justifyContent="start"
+                                      alignItems="center"
+                                      mt={4}
+                                      mb={5}
+                                    >
+                                      <Box display="flex" gap={5} mr={5} mt={6}>
+                                        <Button
+                                          colorScheme="gray"
+                                     
+                                          type="button"
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Button colorScheme="blue" type="submit">
+                                          Submit
+                                        </Button>
+                                      </Box>
+                                    </GridItem>
 
 
           </SimpleGrid>

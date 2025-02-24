@@ -44,6 +44,9 @@ import TransactionReport from "../Pages/SalesAndTransactionReport/TransactionRep
 import CustomerList from "../Pages/UserManagement/Customers/CustomerList";
 import CustomerReviews from "../Pages/UserManagement/Customers/CustomerReviews";
 import AddNewSeller from "../Pages/UserManagement/Sellers/AddNewSeller";
+import SellerList from "../Pages/UserManagement/Sellers/SellerList";
+import EditSellerInfo from "../Pages/UserManagement/Sellers/EditSellerInfo";
+import Withdraws from "../Pages/UserManagement/Sellers/Withdraws";
 const RouteContent = () => {
   return (
     <>
@@ -98,6 +101,9 @@ const RouteContent = () => {
           <Route path="/CustomerList" element={<ProtectedRoutes> <CustomerList/>  </ProtectedRoutes>} /> 
           <Route path="/CustomerReviews" element={<ProtectedRoutes> <CustomerReviews/>  </ProtectedRoutes>} /> 
           <Route path="/AddNewSeller" element={<ProtectedRoutes><AddNewSeller/></ProtectedRoutes>} /> 
+          <Route path="/SellerList" element={<ProtectedRoutes> <SellerList/> </ProtectedRoutes>} /> 
+          <Route path="/EditSellerInfo" element={<ProtectedRoutes> <EditSellerInfo/> </ProtectedRoutes>} /> 
+          <Route path="/SellerWithdraws" element={<ProtectedRoutes> <Withdraws/> </ProtectedRoutes>} /> 
 
 
         {/* authentication routes */}

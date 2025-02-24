@@ -8,10 +8,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const GenerateBarCode = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Hook to access the location state
+  const location = useLocation(); 
 
   // Get data passed from the previous component
-  const { productSku, productPrice } = location.state || {}; // Default to empty object if state is undefined
+  const { productSku, productPrice } = location.state || {}; 
 
   const [productNumber, setProductNumber] = useState(productSku || "");
   const [numberOfBarcodes, setNumberOfBarcodes] = useState(3);
