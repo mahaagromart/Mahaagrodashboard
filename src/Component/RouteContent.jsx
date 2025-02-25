@@ -47,6 +47,10 @@ import AddNewSeller from "../Pages/UserManagement/Sellers/AddNewSeller";
 import SellerList from "../Pages/UserManagement/Sellers/SellerList";
 import EditSellerInfo from "../Pages/UserManagement/Sellers/EditSellerInfo";
 import Withdraws from "../Pages/UserManagement/Sellers/Withdraws";
+import AddNewDeliveryman from "../Pages/UserManagement/Delivery_man/AddNewDeliveryman";
+import DeliverymanList from "../Pages/UserManagement/Delivery_man/DeliverymanList";
+import EarningStatement from "../Pages/UserManagement/Delivery_man/EarningStatement";
+import DeliverymanWithdraw from "../Pages/UserManagement/Delivery_man/DeliverymanWithdraw";
 const RouteContent = () => {
   return (
     <>
@@ -104,6 +108,12 @@ const RouteContent = () => {
           <Route path="/SellerList" element={<ProtectedRoutes> <SellerList/> </ProtectedRoutes>} /> 
           <Route path="/EditSellerInfo" element={<ProtectedRoutes> <EditSellerInfo/> </ProtectedRoutes>} /> 
           <Route path="/SellerWithdraws" element={<ProtectedRoutes> <Withdraws/> </ProtectedRoutes>} /> 
+
+          {/* Delivery Man Route */}
+          <Route path="/AddNewDelivery-man" element={<ProtectedRoutes> <AddNewDeliveryman/> </ProtectedRoutes>} /> 
+          <Route path="/Deliver-manList" element={<ProtectedRoutes> <DeliverymanList/> </ProtectedRoutes>} /> 
+          <Route path="/EarningStatement" element={<ProtectedRoutes> <EarningStatement/> </ProtectedRoutes>} /> 
+          <Route path="/Delivery-manWithdraws" element={<ProtectedRoutes> <DeliverymanWithdraw/> </ProtectedRoutes>} /> 
 
 
         {/* authentication routes */}

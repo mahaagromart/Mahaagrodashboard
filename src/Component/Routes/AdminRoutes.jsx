@@ -107,8 +107,7 @@ export const adminRoutes = [
     { label: 'Sellers', icon: <TbMan />, 
       children : [
       { label: 'Add New Seller', icon: <MdAdd />, key: '/AddNewSeller' },
-      { label: 'Seller List', icon: <FaList/>, key: '/SellerList' },
-      { label: 'Seller Category', icon: <TbCategory2 />, key: '/SellerCategory' },
+      { label: 'Seller List', icon: <MdListAlt />, key: '/SellerList' },
       { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/SellerWithdraws' },
       { label: 'Withdraws Methods', icon: < PiHandWithdrawFill/>, key: '/WithdrawsMethods' },
       ]
@@ -116,10 +115,10 @@ export const adminRoutes = [
     { label: 'Delivery-Man', icon: <CiDeliveryTruck /> ,
       children : [
       { label: 'Add New', icon: <MdAdd />, key: '/AddNewDelivery-man' },
-      { label: 'List', icon: <FaList/>, key: '/Deliver-manList' },
+      { label: 'List', icon: <MdListAlt />, key: '/Deliver-manList' },
       { label: 'Chat', icon: <TbCategory2 />, key: '/Delivery-manChat' },
       { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/Delivery-manWithdraws' },
-      { label: 'Emergency Contact', icon: < MdContactEmergency/>, key: '/Delivery-manEmergencyContact' },
+      // { label: 'Emergency Contact', icon: < MdContactEmergency/>, key: '/Delivery-manEmergencyContact' },
       ]
     },
 

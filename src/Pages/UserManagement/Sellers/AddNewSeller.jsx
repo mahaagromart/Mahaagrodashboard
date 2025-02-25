@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   SimpleGrid,
@@ -13,7 +13,7 @@ import {
   ModalContent,
   ModalBody,
   ModalCloseButton,
-  GridItem
+  GridItem,
 } from "@chakra-ui/react";
 import { Upload, message } from "antd";
 import CardBox from "../../../Component/Charts/CardBox";
@@ -41,15 +41,30 @@ const AddNewSeller = () => {
 
   const sellerTypeOptions = {
     GoldPackage: [
-      "Business", "Mil", "Fertilizers", "Pesticides", "FP0/FPC", "SHG", "Mahila Bachat Gat",
-      "Khadi Udyog", "Blind Organisation", "Handicap Organization", "Prison Organization",
-      "NGO", "Distressed Farmers", "Government Organization"
+      "Business",
+      "Mil",
+      "Fertilizers",
+      "Pesticides",
+      "FP0/FPC",
+      "SHG",
+      "Mahila Bachat Gat",
+      "Khadi Udyog",
+      "Blind Organisation",
+      "Handicap Organization",
+      "Prison Organization",
+      "NGO",
+      "Distressed Farmers",
+      "Government Organization",
     ],
     CommercialVendors: ["Business", "Mil", "Fertilizers", "Pesticides"],
     Concessional: ["FP0/FPC", "SHG", "Mahila Bachat Gat", "Khadi Udyog"],
     Free: [
-      "Blind Organisation", "Handicap Organization", "Prison Organization", "NGO",
-      "Distressed Farmers", "Government Organization"
+      "Blind Organisation",
+      "Handicap Organization",
+      "Prison Organization",
+      "NGO",
+      "Distressed Farmers",
+      "Government Organization",
     ],
   };
 
@@ -73,7 +88,6 @@ const AddNewSeller = () => {
     setFileList([]); // Remove the image
   };
 
-
   useEffect(() => {
     let timer;
     if (otpSent && resendTimer > 0) {
@@ -83,25 +97,31 @@ const AddNewSeller = () => {
     }
     return () => clearInterval(timer);
   }, [otpSent, resendTimer]);
-  
+
   const handleVerifyEmail = () => {
     setOtpSent(true);
     setResendTimer(30);
     alert(`Verification email sent to ${email}`);
   };
 
-
-
   return (
     <Box marginTop="1%">
-     <h2 className="content-title" style={{ textAlign: "center", fontWeight: "600", fontSize: "20px", color: "#4A5568" }}>
-            Add New Seller
-          </h2>
+      <h2
+        className="content-title"
+        style={{
+          textAlign: "center",
+          fontWeight: "600",
+          fontSize: "20px",
+          color: "#4A5568",
+        }}
+      >
+        Add New Seller
+      </h2>
 
       <Box mx="auto" mt={2}>
         <CardBox>
           <Box mb={6}>
-          <div style={{ paddingTop: "10px" }}>
+            <div style={{ paddingTop: "10px" }}>
               <span
                 style={{
                   marginLeft: "10px",
@@ -111,7 +131,7 @@ const AddNewSeller = () => {
                 }}
               >
                 {" "}
-               Seller Information{" "}
+                Seller Information{" "}
               </span>
             </div>
           </Box>
@@ -119,33 +139,56 @@ const AddNewSeller = () => {
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} p={5}>
             <FormControl>
               <FormLabel>First Name</FormLabel>
-              <Input placeholder="Ex: Himanshu" focusBorderColor="blue.500" size="md" />
+              <Input
+                placeholder="Ex: Himanshu"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Last Name</FormLabel>
-              <Input placeholder="Ex: Vishwakarma" focusBorderColor="blue.500" size="md" />
+              <Input
+                placeholder="Ex: Vishwakarma"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Phone</FormLabel>
-              <Input type="number" placeholder="Ex: +9112345678" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="number"
+                placeholder="Ex: +9112345678"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Seller Package</FormLabel>
               <Select onChange={handlePackageChange} value={selectedPackage}>
-                {Object.entries(packageOptions).map(([key, { label, price }]) => (
-                  <option key={key} value={key}>{`${label} (₹${price})`}</option>
-                ))}
+                {Object.entries(packageOptions).map(
+                  ([key, { label, price }]) => (
+                    <option
+                      key={key}
+                      value={key}
+                    >{`${label} (₹${price})`}</option>
+                  )
+                )}
               </Select>
             </FormControl>
 
             <FormControl>
               <FormLabel>Seller Type</FormLabel>
-              <Select onChange={(e) => setSellerType(e.target.value)} value={sellerType}>
+              <Select
+                onChange={(e) => setSellerType(e.target.value)}
+                value={sellerType}
+              >
                 {(sellerTypeOptions[selectedPackage] || []).map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </Select>
             </FormControl>
@@ -163,7 +206,9 @@ const AddNewSeller = () => {
                 {fileList.length >= 1 ? null : (
                   <Box>
                     <PlusOutlined style={{ fontSize: "24px" }} />
-                    <Box mt={2} fontSize="14px">Upload</Box>
+                    <Box mt={2} fontSize="14px">
+                      Upload
+                    </Box>
                   </Box>
                 )}
               </Upload>
@@ -186,9 +231,9 @@ const AddNewSeller = () => {
       </Box>
 
       <Box marginTop="1%">
-      <CardBox>
+        <CardBox>
           <Box mb={6}>
-          <div style={{ paddingTop: "10px" }}>
+            <div style={{ paddingTop: "10px" }}>
               <span
                 style={{
                   marginLeft: "10px",
@@ -205,38 +250,69 @@ const AddNewSeller = () => {
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} p={5}>
             <FormControl>
               <FormLabel>Email</FormLabel>
-              <Input type="email" placeholder="Ex: himanshu123@gmail.com" focusBorderColor="blue.500" size="md" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <Button mt={2} colorScheme="blue" onClick={handleVerifyEmail} isDisabled={otpSent && resendTimer > 0}>
-                {otpSent && resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Verify Email"}
+              <Input
+                type="email"
+                placeholder="Ex: himanshu123@gmail.com"
+                focusBorderColor="blue.500"
+                size="md"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button
+                mt={2}
+                colorScheme="blue"
+                onClick={handleVerifyEmail}
+                isDisabled={otpSent && resendTimer > 0}
+              >
+                {otpSent && resendTimer > 0
+                  ? `Resend OTP in ${resendTimer}s`
+                  : "Verify Email"}
               </Button>
             </FormControl>
 
             {otpSent && (
               <FormControl>
                 <FormLabel>Enter OTP</FormLabel>
-                <Input type="text" placeholder="Enter OTP" focusBorderColor="blue.500" size="md" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                <Input
+                  type="text"
+                  placeholder="Enter OTP"
+                  focusBorderColor="blue.500"
+                  size="md"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
               </FormControl>
             )}
 
             <FormControl>
               <FormLabel>Password</FormLabel>
-              <Input type="password" placeholder="Ex : 8+ character" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="password"
+                placeholder="Ex : 8+ character"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Confirm Password</FormLabel>
-              <Input type="password" placeholder="Ex : 8+ character" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="password"
+                placeholder="Ex : 8+ character"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
           </SimpleGrid>
-        </CardBox> 
-    </Box>
+        </CardBox>
+      </Box>
 
-                {/* shop information */}
+      {/* shop information */}
 
-    <Box marginTop="1%">
-      <CardBox>
+      <Box marginTop="1%">
+        <CardBox>
           <Box mb={6}>
-          <div style={{ paddingTop: "10px" }}>
+            <div style={{ paddingTop: "10px" }}>
               <span
                 style={{
                   marginLeft: "10px",
@@ -249,37 +325,66 @@ const AddNewSeller = () => {
                 Shop Information{" "}
               </span>
             </div>
-            
           </Box>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} p={5}>
             <FormControl>
               <FormLabel>Shop Name</FormLabel>
-              <Input type="text" placeholder="Ex: Noga Store " focusBorderColor="blue.500" size="md" />
+              <Input
+                type="text"
+                placeholder="Ex: Noga Store "
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Shop Pincode</FormLabel>
-              <Input type="number" placeholder="Ex : 400062" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="number"
+                placeholder="Ex : 400062"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Shop City</FormLabel>
-              <Input type="text" placeholder="Ex : mumbai" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="text"
+                placeholder="Ex : mumbai"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
 
             <FormControl>
               <FormLabel>Shop State</FormLabel>
-              <Input type="text" placeholder="Ex : maharastra" focusBorderColor="blue.500" size="md" />
-            </FormControl>        
-            
+              <Input
+                type="text"
+                placeholder="Ex : maharastra"
+                focusBorderColor="blue.500"
+                size="md"
+              />
+            </FormControl>
+
             <FormControl>
               <FormLabel>Shop Address</FormLabel>
-              <Input type="text" placeholder="Ex:  Krishi udyog Goregawon east MAIDC Mumbai Maharastra 400061" focusBorderColor="blue.500" size="md" />
+              <Input
+                type="text"
+                placeholder="Ex:  Krishi udyog Goregawon east MAIDC Mumbai Maharastra 400061"
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
             <FormControl>
               <FormLabel>Shop About</FormLabel>
-              <Input type="text" placeholder="Ex: Krishi related products " focusBorderColor="blue.500" size="md" />
+              <Input
+                type="text"
+                placeholder="Ex: Krishi related products "
+                focusBorderColor="blue.500"
+                size="md"
+              />
             </FormControl>
             <FormControl>
               <FormLabel>Shop Logo (Ratio 1 :1 )</FormLabel>
@@ -289,12 +394,14 @@ const AddNewSeller = () => {
                 onChange={handleUpload}
                 onPreview={handlePreview}
                 onRemove={handleRemove}
-                beforeUpload={() => false} 
+                beforeUpload={() => false}
               >
                 {fileList.length >= 1 ? null : (
                   <Box>
                     <PlusOutlined style={{ fontSize: "24px" }} />
-                    <Box mt={2} fontSize="14px">Upload</Box>
+                    <Box mt={2} fontSize="14px">
+                      Upload
+                    </Box>
                   </Box>
                 )}
               </Upload>
@@ -312,31 +419,33 @@ const AddNewSeller = () => {
                 {fileList.length >= 1 ? null : (
                   <Box>
                     <PlusOutlined style={{ fontSize: "24px" }} />
-                    <Box mt={2} fontSize="14px">Upload</Box>
+                    <Box mt={2} fontSize="14px">
+                      Upload
+                    </Box>
                   </Box>
                 )}
               </Upload>
             </FormControl>
 
-             <FormControl>
-                <FormLabel>Document Type</FormLabel>    
-                <Select>
-                    <option>Sales Licence</option>
-                    <option>CIB</option>
-                    <option>GST Registration</option>
-                    <option>Pan Card</option>
-                    <option>MSME</option>
-                    <option>G-2</option>
-                    <option>FCO</option>
-                    <option>Adhar Card</option>
-                    <option>Manufacturing Licence</option>
-                    <option>FSSAI Licence</option>
-                    <option>Udyog Aadhar</option>
-                    <option>Shop Registration</option>
-                    <option>Driving Licence</option>
-                    <option>Incorporation Certificate</option>
-                </Select>
-            </FormControl>   
+            <FormControl>
+              <FormLabel>Document Type</FormLabel>
+              <Select>
+                <option>Sales Licence</option>
+                <option>CIB</option>
+                <option>GST Registration</option>
+                <option>Pan Card</option>
+                <option>MSME</option>
+                <option>G-2</option>
+                <option>FCO</option>
+                <option>Adhar Card</option>
+                <option>Manufacturing Licence</option>
+                <option>FSSAI Licence</option>
+                <option>Udyog Aadhar</option>
+                <option>Shop Registration</option>
+                <option>Driving Licence</option>
+                <option>Incorporation Certificate</option>
+              </Select>
+            </FormControl>
 
             <FormControl>
               <FormLabel>Seller Document</FormLabel>
@@ -346,44 +455,37 @@ const AddNewSeller = () => {
                 onChange={handleUpload}
                 onPreview={handlePreview}
                 onRemove={handleRemove}
-                beforeUpload={() => false} 
+                beforeUpload={() => false}
               >
                 {fileList.length >= 1 ? null : (
                   <Box>
                     <PlusOutlined style={{ fontSize: "24px" }} />
-                    <Box mt={2} fontSize="14px">Upload</Box>
+                    <Box mt={2} fontSize="14px">
+                      Upload
+                    </Box>
                   </Box>
                 )}
               </Upload>
             </FormControl>
-                 <GridItem
-                                      display="flex"
-                                      justifyContent="start"
-                                      alignItems="center"
-                                      mt={4}
-                                      mb={5}
-                                    >
-                                      <Box display="flex" gap={5} mr={5} mt={6}>
-                                        <Button
-                                          colorScheme="gray"
-                                     
-                                          type="button"
-                                        >
-                                          Reset
-                                        </Button>
-                                        <Button colorScheme="blue" type="submit">
-                                          Submit
-                                        </Button>
-                                      </Box>
-                                    </GridItem>
-
-
+            <GridItem
+              display="flex"
+              justifyContent="start"
+              alignItems="center"
+              mt={4}
+              mb={5}
+            >
+              <Box display="flex" gap={5} mr={5} mt={6}>
+                <Button colorScheme="gray" type="button">
+                  Reset
+                </Button>
+                <Button colorScheme="blue" type="submit">
+                  Submit
+                </Button>
+              </Box>
+            </GridItem>
           </SimpleGrid>
-
-        </CardBox> 
+        </CardBox>
       </Box>
-
-
 
       <Modal isOpen={previewOpen} onClose={() => setPreviewOpen(false)}>
         <ModalOverlay />
