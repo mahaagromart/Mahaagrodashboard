@@ -66,6 +66,7 @@ const Register = () => {
       .finally(() => {
         setLoading(false); 
       });
+      
   }, []);
 
 

@@ -1,6 +1,6 @@
 import React from "react";
-import Card from "../../Component/Card";
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import Card from "../../../Component/Card";
+import { Box, SimpleGrid, GridItem } from "@chakra-ui/react";
 import { MdBarChart, MdCurrencyRupee, MdPendingActions } from "react-icons/md";
 import { LiaStoreSolid } from "react-icons/lia";
 import { AiFillProduct } from "react-icons/ai";
@@ -14,18 +14,20 @@ import {
 import { CiDeliveryTruck, CiRoute } from "react-icons/ci";
 import { PiKeyReturnBold } from "react-icons/pi";
 import { TbCancel, TbTax } from "react-icons/tb";
-import HistogramChart from "../../Component/Charts/HistogramChart";
-import CardBox from "../../Component/Charts/CardBox";
-import LineChart from "../../Component/Charts/LineChart";
-import TopUser from "../../Component/Table/TopUser";
+import HistogramChart from "../../../Component/Charts/HistogramChart";
+import CardBox from "../../../Component/Charts/CardBox";
+import LineChart from "../../../Component/Charts/LineChart";
+import TopUser from "../../../Component/Table/TopUser";
 
-import Piecharts from "../../Component/Charts/Piecharts";
-import CenterBox from "../../Component/Charts/CenterBox";
+import Piecharts from "../../../Component/Charts/Piecharts";
+import CenterBox from "../../../Component/Charts/CenterBox";
 
-import TopSeller from "../../Component/Table/TopSeller";
-import MyCalendar from "../../Component/MyCalender";
+import TopSeller from "../../../Component/Table/TopSeller";
+import MyCalendar from "../../../Component/MyCalender";
+import TopSellingProductTable from "../../../Component/VendorTable/TopSellingProductTable";
+import MostPopularProductTable from "../../../Component/VendorTable/MostPopularProductTable";
 
-const Dashboard = () => {
+const VendorDashobard = () => {
   return (
     <>
       <div>
@@ -43,17 +45,6 @@ const Dashboard = () => {
             gap="20px"
             mb="20px"
           >
-            <Card
-              icon={<MdBarChart />}
-              heading={"Total Sales"}
-              money={"642"}
-              ht={"80px"}
-            />
-            <Card
-              icon={<LiaStoreSolid />}
-              heading={"Total Stores"}
-              money={"654"}
-            />
             <Card
               icon={<AiFillProduct />}
               heading={"Total Products"}
@@ -78,13 +69,13 @@ const Dashboard = () => {
               ht={"90px"}
             />
             <Card
-              icon={<GiBoxUnpacking />}
-              heading={"Packaging"}
+              icon={<CiDeliveryTruck />}
+              heading={"Delivered"}
               money={"₹350.04"}
             />
             <Card
-              icon={<CiDeliveryTruck />}
-              heading={"Delivered"}
+              icon={<GiBoxUnpacking />}
+              heading={"Packaging"}
               money={"₹350.04"}
             />
             <Card
@@ -119,7 +110,6 @@ const Dashboard = () => {
               <CardBox>
                 <HistogramChart />
               </CardBox>
-
               <CardBox>
                 <LineChart />
               </CardBox>
@@ -130,7 +120,7 @@ const Dashboard = () => {
             className="content-title"
             style={{ fontSize: "24px", fontWeight: 500, marginBottom: "10px" }}
           >
-            Admin Wallet
+            Seller Wallet
           </h2>
 
           <Box>
@@ -140,13 +130,13 @@ const Dashboard = () => {
               mb="20px"
             >
               <Card
-                icon={<MdBarChart />}
+                icon={<MdBarChart style={{ color: "green" }} />}
                 heading={"Earnings"}
                 money={"₹642"}
                 ht={"80px"}
               />
               <Card
-                icon={<MdCurrencyRupee />}
+                icon={<MdCurrencyRupee style={{ color: "green" }} />}
                 heading={"Commission Earned"}
                 money={"₹642.39"}
                 ht={"90px"}
@@ -162,56 +152,31 @@ const Dashboard = () => {
                 money={"₹642.39"}
               />
               <Card
-                icon={<TbTax />}
+                icon={<TbTax style={{ color: "yellowgreen" }} />}
                 heading={"Pending Amount"}
                 money={"₹642.39"}
               />
             </SimpleGrid>
 
-            <Box mx="auto">
+            <Box mx="auto" bg="#F4F7FE">
               <SimpleGrid
-                columns={{ base: 1, md: 1, lg: 2, "2xl": 3 }}
+                columns={{ base: 1, md: 2, }}
                 gap="20px"
                 mb="20px"
-                style={{ backgroundColor: "#F4F7FE" }}
               >
-                {/* CardBox for the data table with horizontal scrolling */}
-                <CardBox>
-                  <Box overflowX="auto">
-                    <TopUser />
-                  </Box>
-                </CardBox>
+                <GridItem>
+                  <CardBox>
+                    <TopSellingProductTable />
+                  </CardBox>
+                </GridItem>
 
-                {/* Other components */}
+                <GridItem>
                 <CardBox>
-                  <CenterBox>
-                    <Box overflowX="auto">
-                      <Piecharts />
-                    </Box>
-                  </CenterBox>
-                </CardBox>
-                <CardBox>
-                  <Box overflowX="auto">
-                    <CenterBox>
-                      <MyCalendar />
-                    </CenterBox>
-                  </Box>
-                </CardBox>
-              </SimpleGrid>
-            </Box>
+                    <MostPopularProductTable />
+                  </CardBox>
 
-            <Box>
-              <SimpleGrid
-                columns={{ base: 1, md: 1, lg: 1, "2xl": 1 }}
-                gap="20px"
-                mb="20px"
-                style={{ backgroundColor: "#F4F7FE" }}
-              >
-                <CardBox>
-                  <Box overflowX="auto">
-                    <TopSeller />
-                  </Box>
-                </CardBox>
+                </GridItem>
+
               </SimpleGrid>
             </Box>
           </Box>
@@ -221,4 +186,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default VendorDashobard;

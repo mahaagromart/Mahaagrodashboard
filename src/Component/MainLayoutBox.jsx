@@ -5,13 +5,16 @@ import { Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import HeaderBox from "./HeaderBox";
-import RouteContent from "./RouteContent";
+import RouteContent from "./RoutingContent/RouteContent";
+import VendorRouteContent from "./RoutingContent/VendorRouteContent";
 import MenuList from './MenuList';
 import ProtectedRoutes from "./ProtectedRoutes";
-
+import { useSelector } from "react-redux";
+import { login } from "../redux/Features/AuthSlice";
 const MainLayoutBox = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const { role } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
   const { Sider, Content } = Layout;
@@ -93,7 +96,10 @@ const MainLayoutBox = () => {
               marginLeft: "20px",
             }}
           >
-            <RouteContent />
+
+            {role == 'Admin' ? <RouteContent/> : <VendorRouteContent/>}
+
+     
           </Content>
         </Layout>
       </Layout>

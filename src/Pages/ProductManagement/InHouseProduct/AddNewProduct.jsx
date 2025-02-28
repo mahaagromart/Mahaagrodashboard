@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   SimpleGrid,
@@ -11,925 +11,1913 @@ import {
   Tag,
   TagLabel,
   TagCloseButton,
-  Image
+  Image,
+  Text,
 } from "@chakra-ui/react";
 import CardBox from "../../../Component/Charts/CardBox";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { MdInfo, MdSettings } from "react-icons/md";
-import Logo1 from "../../../assets/1.png"
-import Logo2 from "../../../assets/2.png"
+import Logo1 from "../../../assets/1.png";
+import Logo2 from "../../../assets/2.png";
 import CenterBox from "../../../Component/Charts/CenterBox";
 import UploadImages from "./UploadImages";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from "yup";
+import Swal from "sweetalert2";
+import axios from "axios";
+import {startLoading, stopLoading} from "../../../redux/Features/LoadingSlice";
+import { useDispatch , useSelector } from "react-redux";
+
 
 
 const AddNewProduct = () => {
-  const [description, setDescription] = useState("");
-  const [sku, setSku] = useState("");
-  const [tags, setTags] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-  const [mrp, setMrp] = useState();
-  const [sellingPrice, setSellingPrice] = useState();
-  const [minimumOrderQty, setMinimumOrderQty] = useState();
-  const [currentStockQty, setCurrentStockQty] = useState();
-  const [discountType, setDiscountType] = useState("Flat");
-  const [discountAmount, setDiscountAmount] = useState();
-  const [taxAmount, setTaxAmount] = useState();
-  const [taxCalculation, setTaxCalculation] = useState();
+
+  const dispatch = useDispatch();
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [showPrice, setShowPrice] = useState(false);
-
-  const [shape, setShape] = useState("cuboid");
-  const [length, setLength] = useState("");
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-  const [diameter, setDiameter] = useState("");
-  const [weight, setWeight] = useState("");
   const [volume, setVolume] = useState(null);
-
-  const handleShapeChange = (e) => {
-    setShape(e.target.value);
+  const { token } = useSelector((state) => state.auth);
+  const storedToken = token || localStorage.getItem("token");
+  const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubCategoryList] = useState([]);
+  const [subSubCategory, setSubSubCategoryList] = useState([]);
+  const [productAttribute, setProductAttribute] = useState([]);
+  const getCategory = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+      // Ensure correct response structure before updating state
+      if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
+        setCategoryList(res.data.categoryList.$values);
+      } else {
+        await Swal.fire({
+          title: "Error in Getting Category List",
+          text: "Invalid response format. Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      await Swal.fire({
+        title: "Error",
+        text:
+          error.response?.data?.message ||
+          "Failed to fetch the category list. Please try again later.",
+        icon: "error",
+      });
+    }
   };
-  const calculateVolume = () => {
-    if (shape === "cuboid") {
 
+  const getAllAttributes = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}ProductAttribute/GetAllAttribute`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+
+      if (res.data[0]?.retval === "SUCCESS" && res.data[0]?.dataset?.$values) {
+        setProductAttribute(res.data[0].dataset.$values);
+      } else {
+        Swal.fire(
+          "Error",
+          "Error fetching attributes, please try again.",
+          "error"
+        );
+      }
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        `Failed to fetch attributes. ${error.message}`,
+        "error"
+      );
+    }
+  };
+
+  useEffect(() => {
+    getCategory();
+    getAllAttributes();
+  }, []);
+
+  const fetchSubCategoryData = async (selectedCategory) => {
+    if (!selectedCategory) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Category Selected",
+        text: "Please select a category to load subcategories.",
+      });
+      return;
+    }
+
+    try {
+
+
+      const res = await axios.post(
+        `${apiUrl}SubCategory/GetSubCategoryThroughCategoryId`,
+        { category_id: selectedCategory },
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      if (res.data && res.data[0]?.dataset?.$values) {
+        setSubCategoryList(res.data[0].dataset.$values);
+      } else {
+        throw new Error("No subcategories found");
+      }
+    } catch (error) {
+      console.error("Error fetching subcategory data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error Fetching Subcategories",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong.",
+      });
+    }
+  };
+
+  const fetchSubSubCategoryData = async (selectedSubCategory) => {
+    if (!selectedSubCategory) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Sub Category Selected",
+        text: "Please select a sub category to load subcategories.",
+      });
+      return;
+    }
+
+    try {
+  
+      const res = await axios.post(
+        `${apiUrl}SubCategory/GetSubCategoryThroughCategoryId`,
+        { subcategory_id: selectedSubCategory },
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+
+
+      if (res.data && res.data[0]?.dataset?.$values) {
+        setSubSubCategoryList(res.data[0].dataset.$values);
+      } else {
+        throw new Error("No subcategories found");
+      }
+    } catch (error) {
+      console.error("Error fetching subcategory data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error Fetching Subcategories",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong.",
+      });
+    }
+  };
+
+  // const handleShapeChange = (e) => {
+  //   setShape(e.target.value);
+  // };
+  const calculateVolume = (value) => {
+    const { shape, length, width, height, diameter } = value;
+    if (shape === "cuboid") {
       if (length && width && height) {
         const vol = parseFloat(length) * parseFloat(width) * parseFloat(height);
-        setVolume(vol);
+        setVolume(Math.round(vol));
       }
     } else if (shape === "cylinder") {
-    
+      
+      let pi = 3.14;
+      let radius = diameter / 2;
       if (radius && height) {
-        const vol = Math.PI * Math.pow(parseFloat(radius), 2) * parseFloat(height);
-        setVolume(vol);
+        const vol = pi * Math.pow(parseFloat(radius), 2) * parseFloat(height);
+        setVolume(Math.round(vol));
+        return Math.round(vol);
       }
     }
   };
 
-  const [errorFields, setErrorFields] = useState({
-    mrp: false,
-    sellingPrice: false,
-    minimumOrderQty: false,
-    currentStockQty: false,
-    discountAmount: false,
-    taxAmount: false,
+  const initialValues = {
+    productName: "",
+    productDescription: "",
+    category: "",
+    subCategory: "",
+    brand: "",
+    sku: "",
+    hsn: "",
+    unit: "",
+    mrp: "",
+    tags: [],
+    tagsInput: "",
+    sellingPrice: "",
+    minimumOrderQty: "",
+    currentStockQty: "",
+    discountType: "",
+    discountAmount: "",
+    taxCalculation: "Include",
+    taxAmount: "",
+    weight: "",
+    shape: "",
+    length: "",
+    width: "",
+    height: "",
+    diameter: "",
+    images: [],
+    calculatedPrice: "",
+    calculatedVolume: "",
+  };
+  const validationSchema = yup.object().shape({
+    productName: yup.string().required("Product name is required"),
+    productDescription: yup
+      .string()
+      .required("Product Description is required"),
+    category: yup.string().required("Category is required"),
+    subCategory: yup.string().required("Sub Category is required"),
+    subSubCategory: yup.string().notRequired(),
+    brand: yup.string().notRequired(),
+    sku: yup.string().required("SKU is required"),
+    hsn: yup
+      .string() // Store as string to prevent issues with leading zeros
+      .matches(/^\d{8}$/, "HSN must be exactly 8 digits") // Ensures 8-digit numeric input
+      .required("HSN is required"),
+    unit: yup.string().required("Unit is required"),
+    tags: yup.array().min(1, "At least one tag is required"),
+    mrp: yup
+      .number()
+      .required("MRP is required")
+      .min(0, "MRP must be positive"),
+    sellingPrice: yup
+      .number()
+      .required("Selling Price is required")
+      .min(0, "Selling Price must be positive"),
+    minimumOrderQty: yup
+      .number()
+      .required("Minimum Order Quantity is required")
+      .min(1, "Minimum Order Quantity must be at least 1"),
+    currentStockQty: yup
+      .number()
+      .required("Current Stock Quantity is required")
+      .min(0, "Current Stock Quantity must be positive"),
+    discountType: yup.string().required("Please select the discount type"),
+    discountAmount: yup.number().min(0, "Discount Amount must be positive"),
+    discountPercentage: yup
+      .number()
+      .min(0, "Discount Percentage must be positive"),
+    taxCalculation: yup.string().required("tax calculation is required"),
+    taxAmount: yup.number().when("taxCalculation", {
+      is: "Exclude", // Only apply validation when "Exclude" is selected
+      then: (schema) =>
+        schema
+          .required("Tax Amount is required")
+          .min(0, "Tax Amount must be positive"),
+      otherwise: (schema) => schema.notRequired(), // Not required if "Include" is selected
+    }),
+    shape: yup.string().required("Package shape is required"),
+    length: yup.number().when("shape", {
+      is: "cuboid",
+      then: (schema) =>
+        schema.required("Length is required").min(0, "Must be positive"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    width: yup.number().when("shape", {
+      is: "cuboid",
+      then: (schema) =>
+        schema.required("Width is required").min(0, "Must be positive"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    height: yup.number().when("shape", {
+      is: "cuboid",
+      then: (schema) =>
+        schema.required("Height is required").min(0, "Must be positive"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    diameter: yup.number().when("shape", {
+      is: "cylinder",
+      then: (schema) =>
+        schema.required("Diameter is required").min(0, "Must be positive"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    weight: yup
+      .number()
+      .required("Weight is required")
+      .min(0, "Must be positive"),
   });
 
-  const handleInputChange = (e, fieldName, setValue) => {
-    const value = e.target.value;
-    if (value === "" || Number(value) >= 0) {
-      setErrorFields((prev) => ({ ...prev, [fieldName]: false }));
-      setValue(value === "" ? 0 : Number(value));
-    } else {
-      setErrorFields((prev) => ({ ...prev, [fieldName]: true }));
-    }
-  };
+  // const [errorFields, setErrorFields] = useState({
+  //   mrp: false,
+  //   sellingPrice: false,
+  //   minimumOrderQty: false,
+  //   currentStockQty: false,
+  //   discountAmount: false,
+  //   taxAmount: false,
+  // });
 
+  const calculateDiscountedPrice = (values) => {
+    let { sellingPrice, discountAmount, discountType, taxCalculation, taxAmount } = values;
 
-  const calculateDiscountedPrice = () => {
+  
+  
+    sellingPrice = Number(sellingPrice) || 0;
+    discountAmount = Number(discountAmount) || 0;
+    taxAmount = Number(taxAmount) || 0;
+  
     let finalPrice = sellingPrice;
-
+  
+    // Apply Discount
     if (discountType === "Flat") {
       finalPrice -= discountAmount;
     } else if (discountType === "Percentage") {
       finalPrice -= (finalPrice * discountAmount) / 100;
     }
-
-    if (taxCalculation === "Exclude with product") {
+  
+    // Apply Tax (Only if "Exclude with product" is selected)
+    if (taxCalculation === "Exclude") {
       finalPrice += (finalPrice * taxAmount) / 100;
     }
-
-    return finalPrice;
+  
+    return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
   };
-
-  const handlePriceCalculation = () => {
-    if (mrp && sellingPrice && discountAmount >= 0) {
+  
+  const handlePriceCalculation = (values) => {
+    const { mrp, sellingPrice, discountAmount, taxCalculation } = values;
+  
+    if ((mrp && sellingPrice && discountAmount >= 0) || taxCalculation) {
       setShowPrice(true);
+      const finalPrice = calculateDiscountedPrice(values); 
+      
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addTag(inputValue);
+  const generateCode = (setFieldValue) => {
+    const newSku = "SKU" + Math.floor(Math.random() * 1000000);
+    setFieldValue("sku", newSku);
+  };
+
+
+
+
+  const uploadImage = async (imageFile, folderType) => {
+    try {
+      if (!imageFile) {
+        throw new Error("No image file selected");
+      }
+  
+      const formData = new FormData();
+      formData.append("Image", imageFile.originFileObj || imageFile); // Get the actual file object
+      formData.append("folderType", folderType); // Append folder type
+  
+      console.log("📤 Uploading Image:", imageFile.name); // Debugging
+  
+      const response = await axios.post(`${apiUrl}SaveFile/SaveImage`, formData, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "multipart/form-data", // Important for file uploads
+        },
+      });
+  
+      if (response.data.success) {
+        console.log("✅ Image uploaded successfully:", response.data.path);
+        return response.data.path; // Return uploaded image path
+      } else {
+        throw new Error(response.data.message || "Image upload failed");
+      }
+    } catch (error) {
+      console.error("❌ Error uploading image:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Image Upload Failed",
+        text: error.message || "Failed to upload image",
+      });
+      return null;
     }
   };
+  
 
-  const addTag = (tag) => {
-    if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag.trim()]);
-      setInputValue("");
+  // const payload = {
+  //   Product_Name: values.productName.toString(),
+  //   PRODUCT_DESCRIPTION: values.productDescription.toString(),
+  //   CATEGORY_ID: values.category.toString(),
+  //   SUB_CATEGORY_ID: values.subCategory.toString(),
+  //   Images: imagePath.toString(),
+  //   BRAND: values.brand ? values.brand.toString() : "",
+  //   sku: values.sku.toString(),
+  //   UNIT: values.unit.toString(),
+  //   TAGS_INPUT: values.tags || [],
+  //   HSN: values.hsn ? values.hsn.toString() : "",
+  //   PRICING: Number(values.sellingPrice) || 0,
+  //   MAXIMUM_RETAIL_PRICE: Number(values.mrp) || 0,
+  //   SELLING_PRICE: Number(values.sellingPrice) || 0,
+  //   MINIMUM_ORDER_QUANTITY: Number(values.minimumOrderQty) || 0,
+  //   CURRENT_STOCK_QUANTITY: Number(values.currentStockQty) || 0,
+  
+  //   DISCOUNT_TYPE: values.discountType ? values.discountType.toString() : "",
+  //   DISCOUNT_AMOUNT: values.discountAmount.toString() || "0",
+  //   TAX_AMOUNT: values.taxAmount.toString() || "",
+  //   TAX_CALCULATION: values.taxCalculation.toString() || "",
+  //   CALCULATED_PRICE: values.calculatedPrice.toString() || 0,
+
+  //   PACKAGE_SHAPE: values.shape ? values.shape.toString() : "",
+  //   PACKAGE_LENGTH: values.length ? values.length.toString() : "0",
+  //   PACKAGE_WIDTH: values.width ? values.width.toString() : "0",
+  //   PACKAGE_HEIGHT: values.height ? values.height.toString() : "0",
+  //   PACKAGE_WEIGHT: Number(values.weight) || 0,
+  //   PACKAGE_DIAMETER: values.diameter ? values.diameter.toString() : "0",
+  //   PACKAGE_TOTAL_VOLUME: values.calculatedVolume ? values.calculatedVolume.toString() : "0",
+  // };
+  
+  
+  const submitFormData = async (values) => {
+    try {
+      dispatch(startLoading());
+      
+      let imagePath = "";
+      if (values.images?.length > 0) {
+        try {
+          const uploadedImagePath = await uploadImage(values.images[0], "Products");
+          if (!uploadedImagePath) {
+            throw new Error("Image upload failed.");
+          }
+          imagePath = uploadedImagePath;
+        } catch (err) {
+          console.error("❌ Image Upload Error:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Image Upload Failed",
+            text: "Could not upload the image. Please try again.",
+          });
+          dispatch(stopLoading());
+          return; // Stop execution if image upload fails
+        }
+      }
+  
+      const payload = {
+        Product_Name: values.productName.toString(),
+        PRODUCT_DESCRIPTION: values.productDescription.toString(),
+        CATEGORY_ID: values.category.toString(),
+        SUB_CATEGORY_ID: values.subCategory.toString(),
+        Images: imagePath.toString(),
+        BRAND: values.brand ? values.brand.toString() : "",
+        sku: values.sku.toString(),
+        UNIT: values.unit.toString(),
+        TAGS_INPUT: values.tags || [],
+        HSN: values.hsn ? values.hsn.toString() : "",
+        PRICING: Number(values.sellingPrice) || 0,
+        MAXIMUM_RETAIL_PRICE: Number(values.mrp) || 0,
+        SELLING_PRICE: Number(values.sellingPrice) || 0,
+        MINIMUM_ORDER_QUANTITY: Number(values.minimumOrderQty) || 0,
+        CURRENT_STOCK_QUANTITY: Number(values.currentStockQty) || 0,
+      
+        DISCOUNT_TYPE: values.discountType ? values.discountType.toString() : "",
+        DISCOUNT_AMOUNT: values.discountAmount.toString() || "0",
+        TAX_AMOUNT: values.taxAmount.toString() || "",
+        TAX_CALCULATION: values.taxCalculation.toString() || "",
+        CALCULATED_PRICE: values.calculatedPrice.toString() || 0,
+    
+        PACKAGE_SHAPE: values.shape ? values.shape.toString() : "",
+        PACKAGE_LENGTH: values.length ? values.length.toString() : "0",
+        PACKAGE_WIDTH: values.width ? values.width.toString() : "0",
+        PACKAGE_HEIGHT: values.height ? values.height.toString() : "0",
+        PACKAGE_WEIGHT: Number(values.weight) || 0,
+        PACKAGE_DIAMETER: values.diameter ? values.diameter.toString() : "0",
+        PACKAGE_TOTAL_VOLUME: values.calculatedVolume ? values.calculatedVolume.toString() : "0",
+      };
+      
+  
+      try {
+        const res = await axios.post(`${apiUrl}Product/InsertProduct`, payload, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+   
+         
+         
+        if (res.data[0].message === "SUCCESS" || res.data[0].code==200  ) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Product inserted successfully!",
+          });
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: res.data?.message || res.data?.[0]?.message || "Unexpected response from server",
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error submitting form:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error?.response?.data?.message || error?.response?.data?.Message || "Failed to insert product",
+        });
+      }
+    } catch (err) {
+      console.error("❌ Unexpected Error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      dispatch(stopLoading()); // Ensures loading is stopped even if an error occurs
     }
   };
-
-  // Remove a tag
-  const removeTag = (tagToRemove) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
-  const handleDescriptionChange = (value) => {
-    setDescription(value);
-  };
-
-  const generateCode = () => {
-    const randomCode = Math.floor(100000 + Math.random() * 900000);
-    setSku(randomCode.toString());
-  };
-
+  
   return (
     <>
-      <Box marginTop="1%">
-        <Box mb={6}>
-          <h2
-            className="content-title"
-            style={{
-              textAlign: "center",
-              fontWeight: "600",
-              fontSize: "20px",
-              color: "#4A5568",
-            }}
-          >
-            Add New Product
-          </h2>
-        </Box>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={async (values, { resetForm }) => {
+          const finalPrice = calculateDiscountedPrice(values);
+          values.calculatedPrice = finalPrice;
 
-        <Box mx="auto" mt={2}>
-          <CardBox>
-            <Box mb={6}></Box>
-            <SimpleGrid
-              columns={{ base: 1 }}
-              spacing={6}
-              alignItems="center"
-              gap={10}
-              p={3}
-            >
-              <CardBox>
-                <FormControl mb={4}>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Product Name
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    placeholder="Enter product name"
-                    focusBorderColor="blue.500"
-                    size="lg"
-                    borderRadius="md"
-                  />
-                </FormControl>
-              </CardBox>
+          const finalVolume = calculateVolume(values);
+          values.calculatedVolume = finalVolume;
 
-              {/* React Quill Editor */}
-              <CardBox>
-                <FormControl>
-                  <FormLabel fontWeight="bold" color="gray.600">
-                    Product Description
-                  </FormLabel>
-                  <div
+          console.log("Form submitted:", values);
+
+          await submitFormData(values);
+          // resetForm();
+        }}
+      >
+        {({ values, handleChange, handleBlur, setFieldValue, resetForm }) => {
+          const handleKeyDown = (e) => {
+            if (e.key === "Enter" || e.key === ",") {
+              e.preventDefault();
+              e.stopPropagation();
+
+              let tagInput = values.tagsInput?.trim().replace(/,$/, "");
+
+              if (tagInput && !values.tags.includes(tagInput)) {
+                setFieldValue("tags", [...values.tags, tagInput]);
+                setFieldValue("tagsInput", "");
+              }
+            }
+          };
+
+          return (
+            <Form>
+              <Box marginTop="1%">
+                <Box mb={6}>
+                  <h2
+                    className="content-title"
                     style={{
-                      marginBottom: "16px",
-                      paddingBottom: "10px",
-                      minHeight: "200px",
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "20px",
+                      color: "#4A5568",
                     }}
                   >
-                    <ReactQuill
-                      value={description}
-                      onChange={handleDescriptionChange}
-                      theme="snow"
-                      modules={{
-                        toolbar: [
-                          [{ header: "1" }, { header: "2" }, { font: [] }],
-                          [{ list: "ordered" }, { list: "bullet" }],
-                          [{ align: [] }],
-                          ["bold", "italic", "underline"],
-                          ["link", "image"],
-                          ["blockquote", "code-block"],
-                          ["clean"],
-                        ],
-                      }}
-                      style={{
-                        height: "200px",
-                        resize: "vertical",
-                        overflow: "auto",
-                        border: "1px solid black",
-                        borderRadius: "10px",
-                      }}
-                    />
-                  </div>
-                </FormControl>
-              </CardBox>
-            </SimpleGrid>
-          </CardBox>
-        </Box>
-
-        <Box mt={4}>
-          <CardBox>
-            <div style={{ paddingTop: "10px" }}>
-              <span
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px",
-                  fontSize: "18px",
-                  borderBottom: "1px solid Green",
-                }}
-              >
-                {" "}
-                General Setup{" "}
-              </span>
-            </div>
-
-            <SimpleGrid
-              columns={{ base: 1, md: 2 }}
-              spacing={6}
-              alignItems="center"
-              p={3}
-              mb={1}
-            >
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="category">Category</FormLabel>
-                  <Select
-                    placeholder="Select category"
-                    name="category"
-                    id="category"
-                  ></Select>
-                </FormControl>
-              </CardBox>
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="subCategory">Sub Category</FormLabel>
-                  <Select
-                    placeholder="Select Sub category"
-                    name="subCategory"
-                    id="subCategory"
-                  ></Select>
-                </FormControl>
-              </CardBox>
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="subSubCategory">Sub Category</FormLabel>
-                  <Select
-                    placeholder="Select Sub category"
-                    name="subSubCategory"
-                    id="subSubCategory"
-                  ></Select>
-                </FormControl>
-              </CardBox>
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="brand">Brand</FormLabel>
-                  <Select
-                    placeholder="Select Brand"
-                    name="brand"
-                    id="brand"
-                  ></Select>
-                </FormControl>
-              </CardBox>
-
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="sku" display="flex" alignItems="center">
-                    Product SKU{" "}
-                    <Tooltip
-                      label="Create a unique product code by clicking on the 'Generate Code' button"
-                      aria-label="Info Tooltip"
-                      hasArrow
-                      placement="top"
-                      style={{marginLeft : "10% !important" }}
-                    >
-                      <span style={{  cursor: "pointer" }}>
-                        <MdInfo />
-                      </span>
-                    </Tooltip>
-                    <Button
-                      size="sm"
-                      colorScheme="blue"
-                      onClick={generateCode}
-                      style={{ marginLeft: "10%" }}
-                    >
-                      Generate Code
-                    </Button>
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    id="sku"
-                    name="sku"
-                    value={sku}
-                    readOnly
-                    placeholder="Click 'Generate Code' to create a unique SKU"
-                  />
-                </FormControl>
-              </CardBox>
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="unit">Unit</FormLabel>
-                  <Select
-                    placeholder="Select Unit"
-                    name="unit"
-                    id="unit"
-                  ></Select>
-                </FormControl>
-              </CardBox>
-
-              <CardBox>
-                <FormControl>
-                  <FormLabel htmlFor="tags" display="flex" alignItems="center">
-                    Product Tags{" "}
-                    <Tooltip
-                      label="Enter Tags Separated by ',' so that customers will be able to find the products easily"
-                      aria-label="Info Tooltip"
-                      hasArrow
-                      placement="top"
-                    >
-                      <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                        <MdInfo />
-                      </span>
-                    </Tooltip>
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    id="tags"
-                    name="tags"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Enter tags and press Enter or ',' to add"
-                  />
-                  <div style={{ marginTop: "10px" }}>
-                    {tags.map((tag, index) => (
-                      <Tag
-                        size="md"
-                        key={index}
-                        marginRight="5px"
-                        marginBottom="5px"
-                        variant="solid"
-                        colorScheme="blue"
-                      >
-                        <TagLabel>{tag}</TagLabel>
-                        <TagCloseButton onClick={() => removeTag(tag)} />
-                      </Tag>
-                    ))}
-                  </div>
-                </FormControl>
-              </CardBox>
-            </SimpleGrid>
-          </CardBox>
-        </Box>
-        <Box>
-          <CardBox>
-            <div style={{ paddingTop: "10px" }}>
-              <span
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px",
-                  fontSize: "18px",
-                  borderBottom: "1px solid Green",
-                }}
-              >
-                Pricing & others
-              </span>
-            </div>
-
-            <SimpleGrid
-              columns={{ base: 1, md: 2, lg: 2, "2xl": 4 }}
-              spacing={6}
-              alignItems="center"
-              p={3}
-              mb={1}
-              pb={10}
-            >
-              {/* MRP */}
-              <CardBox>
-                <FormLabel htmlFor="mrp" display="flex" alignItems="center">
-                  MRP ₹{" "}
-                  <Tooltip
-                    label="Add the purchase price for this product"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={mrp}
-                  onChange={(e) => handleInputChange(e, "mrp", setMrp)}
-                  style={{
-                    borderColor: errorFields.mrp ? "red" : "initial",
-                  }}
-                />
-              </CardBox>
-
-              {/* Selling Price */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="sellingPrice"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Selling Price ₹{" "}
-                  <Tooltip
-                    label="Add the selling price for this product"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={sellingPrice}
-                  onChange={(e) =>
-                    handleInputChange(e, "sellingPrice", setSellingPrice)
-                  }
-                  style={{
-                    borderColor: errorFields.sellingPrice ? "red" : "initial",
-                  }}
-                />
-              </CardBox>
-
-              {/* Minimum Order Qty */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="minimumOrderQty"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Minimum Order Qty{" "}
-                  <Tooltip
-                    label="Set the min order quantity that customer must choose"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={minimumOrderQty}
-                  onChange={(e) =>
-                    handleInputChange(e, "minimumOrderQty", setMinimumOrderQty)
-                  }
-                  style={{
-                    borderColor: errorFields.minimumOrderQty
-                      ? "red"
-                      : "initial",
-                  }}
-                />
-              </CardBox>
-
-              {/* Current Stock Qty */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="currentStockQty"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Current Stock Qty{" "}
-                  <Tooltip
-                    label="Set the current stock quantity available"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={currentStockQty}
-                  onChange={(e) =>
-                    handleInputChange(e, "currentStockQty", setCurrentStockQty)
-                  }
-                  style={{
-                    borderColor: errorFields.currentStockQty
-                      ? "red"
-                      : "initial",
-                  }}
-                />
-              </CardBox>
-
-              {/* Discount Type */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="discountType"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Discount Type{" "}
-                  <Tooltip
-                    label="Select Flat or Percentage discount"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Select
-                  value={discountType}
-                  onChange={(e) => setDiscountType(e.target.value)}
-                >
-                  <option>Flat</option>
-                  <option>Percentage</option>
-                </Select>
-              </CardBox>
-
-              {/* Discount Amount */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="discountAmount"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Discount {discountType === "Flat" ? "₹" : "%"}{" "}
-                  <Tooltip
-                    label="If 'flat' then enter the amount if 'Percentage' then enter percentage"
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={discountAmount}
-                  onChange={(e) => setDiscountAmount(Number(e.target.value))}
-                />
-              </CardBox>
-
-              <CardBox>
-                <FormLabel
-                  htmlFor="taxCalculation"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Tax Calculation{" "}
-                  <Tooltip
-                    label="If Included the price will remain same after the discount. If Excluded the tax will be added after the discount."
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Select
-                  name="taxCalculation"
-                  id="taxCalculation"
-                  value={taxCalculation}
-                  onChange={(e) => setTaxCalculation(e.target.value)} // To track the value
-                >
-                  <option>Include with product</option>
-                  <option>Exclude with product</option>
-                </Select>
-              </CardBox>
-
-              {/* Tax Amount */}
-              <CardBox>
-                <FormLabel
-                  htmlFor="taxAmount"
-                  display="flex"
-                  alignItems="center"
-                >
-                  Tax Amount (%){" "}
-                  <Tooltip
-                    label="Set the Tax Amount."
-                    aria-label="Info Tooltip"
-                    hasArrow
-                    placement="top"
-                  >
-                    <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                      <MdInfo />
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <Input
-                  type="number"
-                  value={taxAmount}
-                  onChange={(e) => setTaxAmount(Number(e.target.value))}
-                  disabled={taxCalculation === "Include with product"} 
-                  style={{
-                    backgroundColor:
-                      taxCalculation === "Include with product"
-                        ? "#f0f0f0"
-                        : "white", 
-                    opacity:
-                      taxCalculation === "Include with product" ? 0.6 : 1, 
-                  }}
-                />
-              </CardBox>
-
-              <CardBox>
-                <Box mt={8}>
-                  <Button onClick={handlePriceCalculation}>
-                    Calculate Price
-                  </Button>
+                    Add New Product
+                  </h2>
                 </Box>
-              </CardBox>
-              {/* Conditionally render price and buttons */}
-              {showPrice && (
-                <CardBox>
-                  <Box mt={6}>
-                    <span style={{ fontWeight: "bold" }}>
-                      Final Price: ₹ {calculateDiscountedPrice().toFixed(2)}
-                    </span>
-                  </Box>
-                </CardBox>
-              )}
 
-              {/* Calculate Button */}
-            </SimpleGrid>
-          </CardBox>
-        </Box>
+                <Box mx="auto" mt={2}>
+                  <CardBox>
+                    <Box mb={6}></Box>
+                    <SimpleGrid
+                      columns={{ base: 1 }}
+                      spacing={6}
+                      alignItems="center"
+                      gap={10}
+                      p={3}
+                    >
+                      <CardBox>
+                        <FormControl mb={4}>
+                          <FormLabel
+                            htmlFor="productName"
+                            fontWeight="bold"
+                            color="gray.600"
+                          >
+                            Product Name
+                          </FormLabel>
+                          <Field
+                            as={Input}
+                            name="productName"
+                            id="productName"
+                            placeholder="Enter product name"
+                            focusBorderColor="blue.500"
+                            size="lg"
+                            borderRadius="md"
+                          />
+                          <Text color="red.500" fontSize="sm" display="block">
+                            <ErrorMessage name="productName" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
 
-        <Box>
-          <CardBox>
-            <div style={{ paddingTop: "10px" }}>
-              <span
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px",
-                  fontSize: "18px",
-                  borderBottom: "1px solid Green",
-                }}
-              >
-                {" "}
-                Logistic Setup{" "}
-              </span>
-            </div>
+                      {/* React Quill Editor */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel fontWeight="bold" color="gray.600">
+                            Product Description
+                          </FormLabel>
 
-            <SimpleGrid
-  columns={{ base: 1, md: 2, lg: 2 }} 
-  spacing={6}
-  alignItems="center" 
-  p={3} 
-  pb={10} 
->
-  {/* CardBox for Image */}
-  <CardBox>
-    <CenterBox>
-      <Image 
-        src={Logo1} 
-        maxW={{ base: "50%", md: "70%", lg: "50%" }} 
-        objectFit="contain" 
-        alt="Logo" 
-      />
-    </CenterBox>
-  </CardBox>
+                          {/* Quill Editor */}
+                          <Box
+                            border="1px solid black"
+                            borderRadius="10px"
+                            padding="10px"
+                            minHeight="200px"
+                            marginBottom="16px"
+                          >
+                            <ReactQuill
+                              value={values.productDescription}
+                              onChange={(value) =>
+                                setFieldValue("productDescription", value)
+                              }
+                              theme="snow"
+                              modules={{
+                                toolbar: [
+                                  [
+                                    { header: "1" },
+                                    { header: "2" },
+                                    { font: [] },
+                                  ],
+                                  [{ list: "ordered" }, { list: "bullet" }],
+                                  [{ align: [] }],
+                                  ["bold", "italic", "underline"],
+                                  ["link", "image"],
+                                  ["blockquote", "code-block"],
+                                  ["clean"],
+                                ],
+                              }}
+                              style={{
+                                height: "160px",
+                                resize: "vertical",
+                                overflow: "auto",
+                              }}
+                            />
+                          </Box>
 
-  <CardBox>
-    <CenterBox>
-      <Image 
-        src={Logo2} 
-        maxW={{ base: "50%", md: "70%", lg: "50%" }} 
-        objectFit="contain" 
-        alt="Logo" 
-      />
-    </CenterBox>
-  </CardBox>
-</SimpleGrid>
+                          {/* Error Message */}
+                          <ErrorMessage name="productDescription">
+                            {(msg) => (
+                              <Text color="red.500" fontSize="sm">
+                                {msg}
+                              </Text>
+                            )}
+                          </ErrorMessage>
+                        </FormControl>
+                      </CardBox>
 
-            <SimpleGrid
-              columns={{ base: 1, md: 2 , lg: 4 }}
-              spacing={6}
-              alignItems="center"
-              p={3}
-              pb={10}
-            >
-              {/* Shipping Details */}
-              <CardBox>
-        <FormLabel htmlFor="shape" display="flex" alignItems="center">
-          Package Shape
-          <Tooltip
-            label="Select the shape of the package."
-            aria-label="Info Tooltip"
-            hasArrow
-            placement="top"
-          >
-            <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-              <MdInfo />
-            </span>
-          </Tooltip>
-        </FormLabel>
-        <Select
-          id="shape"
-          name="shape"
-          value={shape}
-          onChange={handleShapeChange}
-          style={{ padding: "8px", width: "100%" }}
-        >
-          <option value="cuboid">Cuboid</option>
-          <option value="cylinder">Cylinder</option>
-        </Select>
-      </CardBox>
+                      <CardBox>
+                        <FormControl colSpan={2}>
+                          <FormLabel htmlFor="tags">Product Tags</FormLabel>
 
-      {/* Length for Cuboid */}
-      {shape === "cuboid" && (
-        <CardBox>
-          <FormLabel htmlFor="length" display="flex" alignItems="center">
-            Length (cm)
-            <Tooltip
-              label="Enter the package length in cm, including the packaging material."
-              aria-label="Info Tooltip"
-              hasArrow
-              placement="top"
-            >
-              <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                <MdInfo />
-              </span>
-            </Tooltip>
-          </FormLabel>
-          <Input
-            type="number"
-            name="length"
-            id="length"
-            value={length}
-            onChange={(e) => setLength(e.target.value)}
-          />
-        </CardBox>
-      )}
+                          {/* Input Field */}
+                          <Input
+                            type="text"
+                            id="tags"
+                            name="tagsInput"
+                            value={values.tagsInput || ""}
+                            onChange={(e) =>
+                              setFieldValue("tagsInput", e.target.value)
+                            }
+                            onKeyDown={handleKeyDown}
+                            placeholder="Enter tags and press Enter or ',' to add"
+                          />
 
-      {/* Width for Cuboid */}
-      {shape === "cuboid" && (
-        <CardBox>
-          <FormLabel htmlFor="width" display="flex" alignItems="center">
-            Width (cm)
-            <Tooltip
-              label="Enter the package width in cm, including the packaging material."
-              aria-label="Info Tooltip"
-              hasArrow
-              placement="top"
-            >
-              <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                <MdInfo />
-              </span>
-            </Tooltip>
-          </FormLabel>
-          <Input
-            type="number"
-            name="width"
-            id="width"
-            value={width}
-            onChange={(e) => setWidth(e.target.value)}
-          />
-        </CardBox>
-      )}
+                          {/* Render Tags */}
+                          <div style={{ marginTop: "10px" }}>
+                            {values.tags.map((tag, index) => (
+                              <Tag
+                                key={index}
+                                size="md"
+                                marginRight="5px"
+                                marginBottom="5px"
+                                variant="solid"
+                                colorScheme="blue"
+                              >
+                                <TagLabel>{tag}</TagLabel>
+                                <TagCloseButton
+                                  onClick={() =>
+                                    setFieldValue(
+                                      "tags",
+                                      values.tags.filter((t) => t !== tag)
+                                    )
+                                  }
+                                />
+                              </Tag>
+                            ))}
+                          </div>
 
-      {/* Height */}
-      <CardBox>
-        <FormLabel htmlFor="height" display="flex" alignItems="center">
-          Height (cm)
-          <Tooltip
-            label="Enter the package height in cm, including the packaging material."
-            aria-label="Info Tooltip"
-            hasArrow
-            placement="top"
-          >
-            <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-              <MdInfo />
-            </span>
-          </Tooltip>
-        </FormLabel>
-        <Input
-          type="number"
-          name="height"
-          id="height"
-          value={height}
-          onChange={(e) => setHeight(e.target.value)}
-        />
-      </CardBox>
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="tags" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
+
+                <Box mt={4}>
+                  <CardBox>
+                    <div style={{ paddingTop: "10px" }}>
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          padding: "10px",
+                          fontSize: "18px",
+                          borderBottom: "1px solid Green",
+                        }}
+                      >
+                        {" "}
+                        General Setup{" "}
+                      </span>
+                    </div>
+
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      mb={1}
+                    >
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="category">Category</FormLabel>
+
+                          <Field
+                            as={Select}
+                            name="category"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                            value={values.category}
+                            onChange={(e) => {
+                              const selectedValue = e.target.value;
+                              setFieldValue("category", selectedValue);
+                              fetchSubCategoryData(selectedValue);
+                           
+                            }}
+                          >
+                            <option value="" disabled>
+                              Select category
+                            </option>
+                            {categoryList.map((category) => (
+                              <option
+                                key={category.category_id}
+                                value={category.category_id}
+                                
+                              >
+                                {category.category_Name}
+                              </option>
+                            ))}
+                          </Field>
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="category" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="subCategory">
+                            Sub Category
+                          </FormLabel>
+                          <Field
+                            as={Select}
+                            name="subCategory"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                            value={values.subCategory}
+                            onChange={(e) => {
+                              const selectedValue = e.target.value;
+                              setFieldValue("subCategory", selectedValue);
+                            }}
+                          >
+                            <option value="" disabled selected>
+                              Select sub category
+                            </option>
+                            {subCategoryList.map((subCategory) => (
+                              <option
+                                key={subCategory.id}
+                                value={subCategory.id}
+                              >
+                                {subCategory.subcategory_Name}
+                              </option>
+                            ))}
+                          </Field>
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="subCategory" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="subSubCategory">
+                            Sub Sub Category
+                          </FormLabel>
+                          <Field
+                            as={Select}
+                            name="subSubCategory"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                          >
+                            <option value="" disabled selected>
+                              Select Sub Sub category
+                            </option>
+                            {/* {categoryList.map((category) => (
+                            <option
+                              key={category.category_id}
+                              value={category.category_id}
+                            >
+                              {category.category_Name}
+                            </option>
+                          ))} */}
+                          </Field>
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          ></Text>
+                        </FormControl>
+                      </CardBox>
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="brand">Brand</FormLabel>
+                          <Field
+                            as={Select}
+                            name="brand"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                          >
+                            <option value="" disabled selected>
+                              Select sub category
+                            </option>
+                            {/* {categoryList.map((category) => (
+                            <option
+                              key={category.category_id}
+                              value={category.category_id}
+                            >
+                              {category.category_Name}
+                            </option>
+                          ))} */}
+                          </Field>
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          ></Text>
+                        </FormControl>
+                      </CardBox>
+
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="sku"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Product SKU{" "}
+                            <Tooltip
+                              label="Create a unique product code by clicking on the 'Generate Code' button"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                              style={{ marginLeft: "10% !important" }}
+                            >
+                              <span style={{ cursor: "pointer" }}>
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                            <Button
+                              size="sm"
+                              colorScheme="blue"
+                              onClick={() => generateCode(setFieldValue)}
+                              style={{ marginLeft: "10%" }}
+                            >
+                              Generate Code
+                            </Button>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            name="sku"
+                            id="sku"
+                            placeholder="Click 'Generate Code'"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            readOnly
+                          />
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="sku" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="hsn"
+                            display="flex"
+                            alignItems="center"
+                            maxLength={8}
+                            marginTop={2}
+                          >
+                            HSN Code
+                            <Tooltip
+                              label="Enter the Harmonized System of Nomenclature."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                              style={{ marginLeft: "10% !important" }}
+                            >
+                              <span
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+                          <Field
+                            as={Input}
+                            name="hsn"
+                            id="hsn"
+                            onChange={(e) => {
+                              const value = e.target.value.trim();
+                              setFieldValue("hsn", value);
+                            }}
+                          />
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="hsn" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="unit">Unit</FormLabel>
+                          <Field
+                            as={Select}
+                            name="unit"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                          >
+                            <option value="" disabled>
+                              Select Unit
+                            </option>
+
+                            {productAttribute.map((attribut) => (
+                              <option key={attribut.id} value={attribut.id}>
+                                {attribut.attribute_Name}
+                              </option>
+                            ))}
+                          </Field>
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="unit" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
+                <Box>
+                  <CardBox>
+                    <div style={{ paddingTop: "10px" }}>
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          padding: "10px",
+                          fontSize: "18px",
+                          borderBottom: "1px solid Green",
+                        }}
+                      >
+                        Pricing & others
+                      </span>
+                    </div>
+
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2, lg: 2, "2xl": 4 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      mb={1}
+                      pb={10}
+                    >
+                      {/* MRP */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="mrp"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            MRP ₹{" "}
+                            <Tooltip
+                              label="Add the purchase price for this product"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            name="mrp"
+                            id="mrp"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) =>
+                              setFieldValue("mrp", Number(e.target.value))
+                            }
+                          />
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="mrp" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Selling Price */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="sellingPrice"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Selling Price ₹{" "}
+                            <Tooltip
+                              label="Add the selling price for this product"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            type="number"
+                            name="sellingPrice"
+                            id="sellingPrice"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            onChange={(e) =>
+                              setFieldValue(
+                                "sellingPrice",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="sellingPrice" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Minimum Order Qty */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="minimumOrderQty"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Minimum Order Qty{" "}
+                            <Tooltip
+                              label="Set the min order quantity that customer must choose"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            type="number"
+                            name="minimumOrderQty"
+                            id="minimumOrderQty"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) =>
+                              setFieldValue(
+                                "minimumOrderQty",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="minimumOrderQty" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Current Stock Qty */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="currentStockQty"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Current Stock Qty{" "}
+                            <Tooltip
+                              label="Set the current stock quantity available"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            type="number"
+                            name="currentStockQty"
+                            id="currentStockQty"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) =>
+                              setFieldValue(
+                                "currentStockQty",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="currentStockQty" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Discount Type */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="discountType"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Discount Type{" "}
+                            <Tooltip
+                              label="Select Flat or Percentage discount"
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Select}
+                            name="discountType"
+                            id="discountType"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) => {
+                              setFieldValue("discountType", e.target.value);
+                            }}
+                          >
+                            <option value="" disabled>
+                              Select Discount Type
+                            </option>
+                            <option value="Flat">Flat</option>
+                            <option value="Percentage">Percentage</option>
+                          </Field>
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="discountType" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="discountAmount"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Discount{" "}
+                            {values.discountType === "Flat" ? "₹" : "%"}{" "}
+                            <Tooltip
+                              label="If 'Flat', enter the amount. If 'Percentage', enter percentage."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Input}
+                            name="discountAmount"
+                            id="discountAmount"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) =>
+                              setFieldValue(
+                                "discountAmount",
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="discountAmount" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="taxCalculation"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Tax Calculation{" "}
+                            <Tooltip
+                              label="If Included, the price will remain the same after the discount. If Excluded, tax will be added after the discount."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Select}
+                            name="taxCalculation"
+                            id="taxCalculation"
+                            onChange={(e) => {
+                              setFieldValue("taxCalculation", e.target.value);
+                            }}
+                          >
+                            <option value="" disabled hidden>
+                              Select Tax Calculation
+                            </option>
+                            <option value="Include">
+                              Include with product
+                            </option>
+                            <option value="Exclude">
+                              Exclude with product
+                            </option>
+                          </Field>
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="taxCalculation" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Tax Amount */}
+                      <CardBox>
+                        {values.taxCalculation === "Exclude" && (
+                          <FormControl>
+                            <FormLabel
+                              htmlFor="taxAmount"
+                              display="flex"
+                              alignItems="center"
+                            >
+                              Tax Amount (%){" "}
+                              <Tooltip
+                                label="Set the Tax Amount."
+                                aria-label="Info Tooltip"
+                                hasArrow
+                                placement="top"
+                              >
+                                <span
+                                  style={{
+                                    marginLeft: "10px",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <MdInfo />
+                                </span>
+                              </Tooltip>
+                            </FormLabel>
+
+                            <Field
+                              as={Input}
+                              type="number"
+                              name="taxAmount"
+                              id="taxAmount"
+                              placeholder="Enter tax amount"
+                              onChange={(e) => {
+                                setFieldValue("taxAmount", e.target.value);
+                              }}
+                            />
+
+                            <Text
+                              color="red.500"
+                              fontSize="sm"
+                              minH="20px"
+                              display="block"
+                            >
+                              <ErrorMessage name="taxAmount" />
+                            </Text>
+                          </FormControl>
+                        )}
+                      </CardBox>
+
+                      <CardBox>
+                        <Box mt={8}>
+                          <Button
+                            onClick={() => handlePriceCalculation(values)}
+                          >
+                            Calculate Price
+                          </Button>
+                        </Box>
+                      </CardBox>
+                      {/* Conditionally render price and buttons */}
+                      {showPrice && (
+                        <CardBox>
+                          <Box mt={6}>
+                            <span style={{ fontWeight: "bold" }}>
+                              Final Price: ₹{" "}
+                              {calculateDiscountedPrice(values).toFixed(2)}
+                            </span>
+                          </Box>
+                        </CardBox>
+                      )}
+
+                      {/* Calculate Button */}
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
+
+                <Box>
+                  <CardBox>
+                    <div style={{ paddingTop: "10px" }}>
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          padding: "10px",
+                          fontSize: "18px",
+                          borderBottom: "1px solid Green",
+                        }}
+                      >
+                        {" "}
+                        Logistic Setup{" "}
+                      </span>
+                    </div>
+
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2, lg: 2 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      pb={10}
+                    >
+                      {/* CardBox for Image */}
+                      <CardBox>
+                        <CenterBox>
+                          <Image
+                            src={Logo1}
+                            maxW={{ base: "50%", md: "70%", lg: "50%" }}
+                            objectFit="contain"
+                            alt="Logo"
+                          />
+                        </CenterBox>
+                      </CardBox>
+
+                      <CardBox>
+                        <CenterBox>
+                          <Image
+                            src={Logo2}
+                            maxW={{ base: "50%", md: "70%", lg: "50%" }}
+                            objectFit="contain"
+                            alt="Logo"
+                          />
+                        </CenterBox>
+                      </CardBox>
+                    </SimpleGrid>
+
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2, lg: 4 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      pb={10}
+                    >
+                      {/* Shipping Details */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="shape"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Package Shape
+                            <Tooltip
+                              label="Select the shape of the package."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <Field
+                            as={Select}
+                            name="shape"
+                            id="shape"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            borderRadius="md"
+                            onChange={(e) => {
+                              setFieldValue("shape", e.target.value);
+                            }}
+                          >
+                            <option value="">Select Shape</option>
+                            <option value="cuboid">Cuboid</option>
+                            <option value="cylinder">Cylinder</option>
+                          </Field>
+
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="shape" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
+
+                      {/* Fields for Cuboid */}
+                      {values.shape === "cuboid" && (
+                        <>
+                          <CardBox>
+                            <FormControl>
+                              <FormLabel
+                                htmlFor="length"
+                                display="flex"
+                                alignItems="center"
+                              >
+                                Length (cm)
+                                <Tooltip
+                                  label="Enter the package length in cm."
+                                  aria-label="Info Tooltip"
+                                  hasArrow
+                                  placement="top"
+                                >
+                                  <span
+                                    style={{
+                                      marginLeft: "10px",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    <MdInfo />
+                                  </span>
+                                </Tooltip>
+                              </FormLabel>
+                              <Field
+                                as={Input}
+                                name="length"
+                                id="length"
+                                onChange={(e) => {
+                                  const value = e.target.value.trim();
+                                  setFieldValue("length", value);
+                                }}
+                              />
+                              <Text
+                                color="red.500"
+                                fontSize="sm"
+                                minH="20px"
+                                display="block"
+                              >
+                                <ErrorMessage name="length" />
+                              </Text>
+                            </FormControl>
+                          </CardBox>
+
+                          <CardBox>
+                            <FormLabel
+                              htmlFor="width"
+                              display="flex"
+                              alignItems="center"
+                            >
+                              Width (cm)
+                              <Tooltip
+                                label="Enter the package width in cm."
+                                aria-label="Info Tooltip"
+                                hasArrow
+                                placement="top"
+                              >
+                                <span
+                                  style={{
+                                    marginLeft: "10px",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <MdInfo />
+                                </span>
+                              </Tooltip>
+                            </FormLabel>
+                            <Field
+                              as={Input}
+                              name="width"
+                              id="width"
+                              onChange={(e) => {
+                                const value = e.target.value.trim();
+                                setFieldValue("width", value);
+                              }}
+                            />
+                            <Text
+                              color="red.500"
+                              fontSize="sm"
+                              minH="20px"
+                              display="block"
+                            >
+                              <ErrorMessage name="width" />
+                            </Text>
+                          </CardBox>
+                        </>
+                      )}
+
+                      {/* Field for Cylinder */}
+                      {values.shape === "cylinder" && (
+                        <CardBox>
+                          <FormLabel
+                            htmlFor="diameter"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Diameter (cm)
+                            <Tooltip
+                              label="Enter the diameter of the package."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
+                          <Field
+                            as={Input}
+                            name="diameter"
+                            id="diameter"
+                            onChange={(e) => {
+                              const value = e.target.value.trim();
+                              setFieldValue("diameter", value);
+                            }}
+                          />
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="diameter" />
+                          </Text>
+                        </CardBox>
+                      )}
 
 
-      {/* Radius for Cylinder */}
-      {shape === "cylinder" && (
-        <CardBox>
-          <FormLabel htmlFor="diameter" display="flex" alignItems="center">
-            Diameter (cm)
-            <Tooltip
-              label="Enter the radius of the package (only for cylinder)."
-              aria-label="Info Tooltip"
-              hasArrow
-              placement="top"
-            >
-              <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-                <MdInfo />
-              </span>
-            </Tooltip>
-          </FormLabel>
-          <Input
-            type="number"
-            name="diameter"
-            id="diameter"
-            value={radius}
-            onChange={(e) => setDiameter(e.target.value)}
-          />
-        </CardBox>
-      )}
-      
-      {/* Weight */}
-      <CardBox>
-        <FormLabel htmlFor="weight" display="flex" alignItems="center">
-          Weight (gram)
-          <Tooltip
-            label="Enter the package Weight in gram"
-            aria-label="Info Tooltip"
-            hasArrow
-            placement="top"
-          >
-            <span style={{ marginLeft: "10px", cursor: "pointer" }}>
-              <MdInfo />
-            </span>
-          </Tooltip>
-        </FormLabel>
-        <Input
-          type="number"
-          name="weight"
-          id="weight"
-          value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-        />
-      </CardBox>
 
-      {/* Volume Calculation Button */}
-      <CardBox>
-       <Box mt={8}>
-       <Button
-          onClick={calculateVolume}
-          
-        >
-          Calculate Volume
-        </Button>
-       </Box>
-      </CardBox>
+<CardBox>
+                            <FormControl>
+                            <FormLabel
+                              htmlFor="height"
+                              display="flex"
+                              alignItems="center"
+                            >
+                              Height (cm)
+                              <Tooltip
+                                label="Enter the package height in cm."
+                                aria-label="Info Tooltip"
+                                hasArrow
+                                placement="top"
+                              >
+                                <span
+                                  style={{
+                                    marginLeft: "10px",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <MdInfo />
+                                </span>
+                              </Tooltip>
+                            </FormLabel>
+                            <Field
+                              as={Input}
+                              name="height"
+                              id="height"
+                              onChange={(e) => {
+                                setFieldValue("height", e.target.value);
+                              }}
+                            />
+                            <Text
+                              color="red.500"
+                              fontSize="sm"
+                              minH="20px"
+                              display="block"
+                            >
+                              <ErrorMessage name="height" />
+                            </Text>
+                            </FormControl>
+                          </CardBox>
 
-      {/* Display Volume */}
-      {volume !== null && (
-        <CardBox>
-            <Box mt={6}>
-              <span style={{fontWeight : "bold"}}>
-               Calculated Volume: {volume.toFixed(2)} cm³ </span> 
-             
-            </Box>
 
-   
-        </CardBox>
-      )}
-            
-            </SimpleGrid>
-          </CardBox>
-        </Box>
+                      {/* Weight */}
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel
+                            htmlFor="weight"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            Weight (gram)
+                            <Tooltip
+                              label="Enter the package weight in grams."
+                              aria-label="Info Tooltip"
+                              hasArrow
+                              placement="top"
+                            >
+                              <span
+                                style={{
+                                  marginLeft: "10px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <MdInfo />
+                              </span>
+                            </Tooltip>
+                          </FormLabel>
 
-        {/* Product Varients */}
+                          <Field
+                            as={Input}
+                            name="weight"
+                            id="weight"
+                            onChange={(e) => {
+                              const value = e.target.value.trim();
+                              setFieldValue("weight", value);
+                            }}
+                          />
 
-        {/* Product Image Uploads  */}
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="weight" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
 
-        <Box>
-          <CardBox>
-          <div style={{ paddingTop: "10px" }}>
-              <span
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px",
-                  fontSize: "18px",
-                  borderBottom: "1px solid Green",
-                }}
-              >
-                {" "}
-                Image Setup{" "}
-              </span>
-            </div>
-           <SimpleGrid
-                         columns={{ base: 1, md: 2  }}
-                         spacing={6}
-                         alignItems="center"
-                         p={3}
-                         pb={10}
-                         mt={10}
-           >
-           <UploadImages/>
-           </SimpleGrid>
-          </CardBox>
-        </Box>
-      </Box>
+                      {/* Volume Calculation Button */}
+                      <CardBox>
+                        <Box mt={4}>
+                          <Button onClick={() => calculateVolume(values)}>
+                            Calculate Volume
+                          </Button>
+                        </Box>
+                      </CardBox>
+
+                      {/* Display Volume */}
+                      {volume !== null && (
+                        <CardBox>
+                          <Box mt={6}>
+                            <span style={{ fontWeight: "bold" }}>
+                              Calculated Volume: {volume.toFixed(2)} cm³{" "}
+                            </span>
+                          </Box>
+                        </CardBox>
+                      )}
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
+
+                <Box>
+                  <CardBox>
+                    <div style={{ paddingTop: "10px" }}>
+                      <span
+                        style={{
+                          marginLeft: "10px",
+                          padding: "10px",
+                          fontSize: "18px",
+                          borderBottom: "1px solid Green",
+                        }}
+                      >
+                        {" "}
+                        Image Setup{" "}
+                      </span>
+                    </div>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      pb={10}
+                      mt={10}
+                    >
+                      <UploadImages
+                        values={values}
+                        setFieldValue={setFieldValue}
+                      />
+                    </SimpleGrid>
+
+                    <SimpleGrid
+                      colSpan={{ base: 1, md: 2 }}
+                      display="flex"
+                      justifyContent="start"
+                      alignItems="center"
+                      gap={6}
+                      p={5}
+                    >
+                      {/* Reset Button */}
+                      <Button
+                        colorScheme="gray"
+                        mr={5}
+                        size="lg"
+                        onClick={() => resetForm()}
+                        type="button"
+                      >
+                        Reset
+                      </Button>
+
+                      {/* Submit Button */}
+                      <Button
+                        bg="blue.500"
+                        color="white"
+                        _hover={{ bg: "blue.600" }}
+                        size="lg"
+                        borderRadius="md"
+                        width="auto"
+                        type="submit"
+                      >
+                        Submit
+                      </Button>
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
+              </Box>
+            </Form>
+          );
+        }}
+      </Formik>
     </>
   );
 };
 
 export default AddNewProduct;
-

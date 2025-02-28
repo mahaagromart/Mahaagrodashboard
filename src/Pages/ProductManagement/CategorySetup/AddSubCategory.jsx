@@ -48,36 +48,32 @@ const AddSubCategory = () => {
 
 
 
-
+  
   const getCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceCategory/GetAllCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      console.log(res)
-      if (res.data.Message === "success") {
-        setCategoryList(res.data.CategoryList);
-
-        
+      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+  
+      if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
+        setCategoryList(res.data.categoryList.$values);
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
-          text: "Please try again.",
+          text: "Invalid response format. Please try again.",
           icon: "error",
         });
       }
     } catch (error) {
+      console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later.",error,
+        text: error.response?.data?.message || "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
+  
 
   const handleSubmit = async (values, { resetForm }) => {
     dispatch(startLoading());
@@ -124,7 +120,6 @@ const AddSubCategory = () => {
   useEffect(() => {
     getCategory();
 
-    
   }, []);
 
   return (

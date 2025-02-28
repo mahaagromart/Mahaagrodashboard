@@ -1,60 +1,69 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
-import LoginForm from "../Pages/Login/Login";
-import Dashboard from "../Pages/Dashboard/Dashboard";
-import ProtectedRoutes from "./ProtectedRoutes";
 
-import AddCategory from '../Pages/ProductManagement/CategorySetup/AddCategory';
-import AddSubCategory from "../Pages/ProductManagement/CategorySetup/AddSubCategory";
-import AddSubSubCagtegory from "../Pages/ProductManagement/CategorySetup/AddSubSubCagtegory";
-import AddNewProduct from "../Pages/ProductManagement/InHouseProduct/AddNewProduct";
-import ProductList from "../Pages/ProductManagement/InHouseProduct/ProductList";
-import BulkInsert from "../Pages/ProductManagement/InHouseProduct/BulkInsert";
-import NewProductRequest from "../Pages/ProductManagement/SellerProduct/NewProductRequest";
-import ApprovedProducts from "../Pages/ProductManagement/SellerProduct/ApprovedProducts";
-import DeniedProduct from "../Pages/ProductManagement/SellerProduct/DeniedProduct";
-import Banner from "../Pages/Promotionmanagement/Banner/Banner";
-import Coupon from "../Pages/Promotionmanagement/offersAndDeals/Coupon";
-import Flashdeals from "../Pages/Promotionmanagement/offersAndDeals/Flashdeals";
-import PushNotification from "../Pages/Promotionmanagement/Notification/BroadcastNotification";
-import SendNotification from "../Pages/Promotionmanagement/Notification/sendNotification";
-import Testimonial from "../Pages/Promotionmanagement/Testimonial/Testimonial";
-import Message from "../Pages/HelpsandSupport/Message";
+// **************************   therse are all admin Routes ****************************
+import LoginForm from "../../Pages/Login/Login";
+import Dashboard from "../../Pages/Dashboard/Dashboard"
+import ProtectedRoutes from "../ProtectedRoutes";
+import AddCategory from '../../Pages/ProductManagement/CategorySetup/AddCategory';
+import AddSubCategory from "../../Pages/ProductManagement/CategorySetup/AddSubCategory";
+import AddSubSubCagtegory from "../../Pages/ProductManagement/CategorySetup/AddSubSubCagtegory";
+import AddNewProduct from "../../Pages/ProductManagement/InHouseProduct/AddNewProduct";
+import ProductList from "../../Pages/ProductManagement/InHouseProduct/ProductList";
+import BulkInsert from "../../Pages/ProductManagement/InHouseProduct/BulkInsert";
+import NewProductRequest from "../../Pages/ProductManagement/SellerProduct/NewProductRequest";
+import ApprovedProducts from "../../Pages/ProductManagement/SellerProduct/ApprovedProducts";
+import DeniedProduct from "../../Pages/ProductManagement/SellerProduct/DeniedProduct";
+import Banner from "../../Pages/Promotionmanagement/Banner/Banner";
+import Coupon from "../../Pages/Promotionmanagement/offersAndDeals/Coupon";
+import Flashdeals from "../../Pages/Promotionmanagement/offersAndDeals/Flashdeals";
+import PushNotification from "../../Pages/Promotionmanagement/Notification/BroadcastNotification";
+import SendNotification from "../../Pages/Promotionmanagement/Notification/sendNotification";
+import Testimonial from "../../Pages/Promotionmanagement/Testimonial/Testimonial";
+import Message from "../../Pages/HelpsandSupport/Message";
+import BusinessToBusiness from "../../Pages/HelpsandSupport/BusinessToBusiness";
+import SupportTicket from "../../Pages/HelpsandSupport/SupportTicket";
+import Register from "../../Pages/Register/Register";
+import GenerateBarCode from "../../Pages/ProductManagement/InHouseProduct/GenerateBarCode";
+import Dealoftheday from "../../Pages/Promotionmanagement/offersAndDeals/Dealoftheday";
+import Featureddeal from "../../Pages/Promotionmanagement/offersAndDeals/Featureddeal";
+import BroadcastNotification from "../../Pages/Promotionmanagement/Notification/BroadcastNotification";
+import MessageView from "../../Pages/HelpsandSupport/MessageView";
+import SupportTicketChatRoom from "../../Pages/HelpsandSupport/SupportTicketChatRoom";
+import Service from "../../Pages/HelpsandSupport/Service";
+import ServiceEnquiry from "../../Pages/HelpsandSupport/ServiceEnquiry";
+import InHouseSales from "../../Pages/SalesAndTransactionReport/InHouseSales";
+import AdminEarningReport from "../../Pages/SalesAndTransactionReport/EarningReport/AdminEarningReport";
+import TotalEarningTable from "../Table/TotalEarningTable";
+import EarningReport from "../../Pages/SalesAndTransactionReport/EarningReport/EarningReport";
+import ProductAttribute from "../../Pages/ProductManagement/ProductAttribute/ProductAttribute";
+import SellerSales from "../../Pages/SalesAndTransactionReport/SellerSales";
+import TransactionReport from "../../Pages/SalesAndTransactionReport/TransactionReport";
+import CustomerList from "../../Pages/UserManagement/Customers/CustomerList";
+import CustomerReviews from "../../Pages/UserManagement/Customers/CustomerReviews";
+import AddNewSeller from "../../Pages/UserManagement/Sellers/AddNewSeller";
+import SellerList from "../../Pages/UserManagement/Sellers/SellerList";
+import EditSellerInfo from "../../Pages/UserManagement/Sellers/EditSellerInfo";
+import Withdraws from "../../Pages/UserManagement/Sellers/Withdraws";
+import AddNewDeliveryman from "../../Pages/UserManagement/Delivery_man/AddNewDeliveryman";
+import DeliverymanList from "../../Pages/UserManagement/Delivery_man/DeliverymanList";
+import EarningStatement from "../../Pages/UserManagement/Delivery_man/EarningStatement";
+import DeliverymanWithdraw from "../../Pages/UserManagement/Delivery_man/DeliverymanWithdraw";
+import VendorDashobard from "../../Pages/Vendor/VendorDashboard/VendorDashobard";
 
-import BusinessToBusiness from "../Pages/HelpsandSupport/BusinessToBusiness";
-import SupportTicket from "../Pages/HelpsandSupport/SupportTicket";
+// **************************   therse are all Venodor Routes ****************************
 
 
-import Register from "../Pages/Register/Register";
-import GenerateBarCode from "../Pages/ProductManagement/InHouseProduct/GenerateBarCode";
-import Dealoftheday from "../Pages/Promotionmanagement/offersAndDeals/Dealoftheday";
-import Featureddeal from "../Pages/Promotionmanagement/offersAndDeals/Featureddeal";
-import BroadcastNotification from "../Pages/Promotionmanagement/Notification/BroadcastNotification";
-import MessageView from "../Pages/HelpsandSupport/MessageView";
-import SupportTicketChatRoom from "../Pages/HelpsandSupport/SupportTicketChatRoom";
-import Service from "../Pages/HelpsandSupport/Service";
-import ServiceEnquiry from "../Pages/HelpsandSupport/ServiceEnquiry";
-import InHouseSales from "../Pages/SalesAndTransactionReport/InHouseSales";
-import AdminEarningReport from "../Pages/SalesAndTransactionReport/EarningReport/AdminEarningReport";
-import TotalEarningTable from "./Table/TotalEarningTable";
-import EarningReport from "../Pages/SalesAndTransactionReport/EarningReport/EarningReport";
-import ProductAttribute from "../Pages/ProductManagement/ProductAttribute/ProductAttribute";
-import SellerSales from "../Pages/SalesAndTransactionReport/SellerSales";
-import TransactionReport from "../Pages/SalesAndTransactionReport/TransactionReport";
-import CustomerList from "../Pages/UserManagement/Customers/CustomerList";
-import CustomerReviews from "../Pages/UserManagement/Customers/CustomerReviews";
-import AddNewSeller from "../Pages/UserManagement/Sellers/AddNewSeller";
-import SellerList from "../Pages/UserManagement/Sellers/SellerList";
-import EditSellerInfo from "../Pages/UserManagement/Sellers/EditSellerInfo";
-import Withdraws from "../Pages/UserManagement/Sellers/Withdraws";
-import AddNewDeliveryman from "../Pages/UserManagement/Delivery_man/AddNewDeliveryman";
-import DeliverymanList from "../Pages/UserManagement/Delivery_man/DeliverymanList";
-import EarningStatement from "../Pages/UserManagement/Delivery_man/EarningStatement";
-import DeliverymanWithdraw from "../Pages/UserManagement/Delivery_man/DeliverymanWithdraw";
+
+
+
 const RouteContent = () => {
   return (
     <>
       <Routes>
+
+          {/*------------------------------ These are all admin Routes ---------------------------------- */}
+
         <Route path="/" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
 
         {/* product management start here */}
@@ -123,6 +132,7 @@ const RouteContent = () => {
 
         {/* catch-all route to redirect to main route */}
         <Route path="*" element={<Navigate to="/" />} />
+
       </Routes>
     </>
   );

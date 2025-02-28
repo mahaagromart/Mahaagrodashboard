@@ -153,7 +153,7 @@ const Service = () => {
   {({ setFieldValue, resetForm }) => (
     <Form>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} p={5}>
-        {/* ✅ Service Name */}
+   
         <GridItem colSpan={2}>
           <FormControl>
             <FormLabel fontWeight="bold" color="gray.600">
@@ -174,7 +174,7 @@ const Service = () => {
           </FormControl>
         </GridItem>
 
-        {/* ✅ Price */}
+    
         <GridItem colSpan={2}>
           <FormControl>
             <FormLabel fontWeight="bold" color="gray.600">
@@ -195,7 +195,7 @@ const Service = () => {
           </FormControl>
         </GridItem>
 
-        {/* ✅ Description */}
+      
         <GridItem colSpan={2}>
           <FormControl>
             <FormLabel fontWeight="bold" color="gray.600">

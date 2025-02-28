@@ -24,72 +24,97 @@ const LoginForm = () => {
     Password: Yup.string().required("Password is required"),
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-
+  const handleSubmit = async (values, { setSubmitting }) => { 
     dispatch(startLoading());
-
     setFormData(values);
-
+  
     try {
-      const response = await axios.post(
-        `${apiUrl}Authentication/Login?EmailId=${values.EmailId}&Password=${values.Password}`,
-      );
+      const response = await axios.post(`${apiUrl}Authentication/Login`, {
+        EmailId: values.EmailId, 
+        Password: values.Password,
+      });
 
-      if (response.data.Code === 200) {
-      
-        let userData = response.data.AuthenticationsList[0];
+  
+      if (response.data.code === 200) {
+        // Extract user data safely
+        const userArray = response.data.authenticationsList?.$values || [];
+        const userData = userArray.length > 0 ? userArray[0] : null; 
+  
+        if (!userData) {
+          dispatch(stopLoading());
+          Swal.fire({
+            title: "Login Failed",
+            text: "User data not found!",
+            icon: "error",
+          });
+          return;
+        }
+  
+        // Structuring user data
         let data = {
-          user: userData.FirstName + " " + userData.LastName,
-          token: response.data.Token,
-          role: userData.DesignationName,
+          user: `${userData.firstName} ${userData.lastName}`,
+          token: response.data.token,
+          role: userData.designationName,
+          userId: userData.userId,
         };
-
+  
+        // Storing in localStorage
         localStorage.setItem("token", data.token);
-        localStorage.setItem("UserId", userData.UserId);
+        localStorage.setItem("UserId", data.userId);
         localStorage.removeItem("Password");
-
+  
+        // Dispatching login action
         dispatch(
           login({
             user: data.user,
             role: data.role,
             token: data.token,
-            UserId: userData.UserId,
+            UserId: data.userId,
           })
         );
-
-        dispatch(stopLoading());
-        await Swal.fire({
-          title : "Login Successfull",
-          text : " You Have Logged In.",
-          icon : "success"
-        })
-        navigate("/"); 
-      
-      } else if(response.data.Message==="User Not Exists"){
   
         dispatch(stopLoading());
+  
+        // Show success alert
         await Swal.fire({
-          title: "Email Already Exists",  
-          text: "The email you entered is already associated with an existing account. Please use a different email.", 
+          title: "Login Successful",
+          text: "You have logged in.",
+          icon: "success",
+        });
+  
+        navigate("/"); 
+      } 
+      
+      else if (response.data.message === "User Not Exists") {
+        dispatch(stopLoading());
+        await Swal.fire({
+          title: "User Not Found",  
+          text: "The email you entered does not exist. Please register first.", 
           icon: "error",
         });
+      } 
       
-      }else{
+      else {
         dispatch(stopLoading());
         Swal.fire({
           title: "Error",  
-          text: "An unexpected error occurred during registration. Please try again later.",
+          text: "An unexpected error occurred. Please try again later.",
           icon: "error",
         });
-
       }
     } catch (error) {
       dispatch(stopLoading());
-      alert("An error occurred. Please check your network connection.", error);
+      Swal.fire({
+        title: "Network Error",
+        text: "An error occurred. Please check your network connection.",
+        icon: "error",
+      });
+      console.error("Login Error:", error);
     }
+  
     setSubmitting(false);
   };
-
+  
   const handleRegisterRedirect = () => {
     navigate('/Register');
   };
