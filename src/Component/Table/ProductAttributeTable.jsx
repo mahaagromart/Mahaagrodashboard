@@ -108,7 +108,7 @@ const ProductAttributeTable = () => {
         `${apiUrl}ProductAttribute/UpdateAttribute`,
         {
           id: values.id,
-          Attribute_Name: values.attribute_Name, // Ensure key name matches backend model
+          Attribute_Name: values.attribute_Name, 
         },
         {
           headers: {
@@ -117,9 +117,6 @@ const ProductAttributeTable = () => {
           },
         }
       );
-
-      console.log("API Response:", res);
-      console.log("Response Code:", res.data[0]?.Code);
 
       if (res.data[0]?.retval === "SUCCESS") {
         Swal.fire("Success", "Attribute updated successfully!", "success");

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useCallback } from "react";
 import {
   Box,
   SimpleGrid,
@@ -37,6 +37,7 @@ const AddNewProduct = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [showPrice, setShowPrice] = useState(false);
   const [volume, setVolume] = useState(null);
+  const [showVolume, setShowVolume] = useState(false);
   const { token } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
   const [categoryList, setCategoryList] = useState([]);
@@ -179,24 +180,7 @@ const AddNewProduct = () => {
   // const handleShapeChange = (e) => {
   //   setShape(e.target.value);
   // };
-  const calculateVolume = (value) => {
-    const { shape, length, width, height, diameter } = value;
-    if (shape === "cuboid") {
-      if (length && width && height) {
-        const vol = parseFloat(length) * parseFloat(width) * parseFloat(height);
-        setVolume(Math.round(vol));
-      }
-    } else if (shape === "cylinder") {
-      
-      let pi = 3.14;
-      let radius = diameter / 2;
-      if (radius && height) {
-        const vol = pi * Math.pow(parseFloat(radius), 2) * parseFloat(height);
-        setVolume(Math.round(vol));
-        return Math.round(vol);
-      }
-    }
-  };
+
 
   const initialValues = {
     productName: "",
@@ -238,8 +222,8 @@ const AddNewProduct = () => {
     brand: yup.string().notRequired(),
     sku: yup.string().required("SKU is required"),
     hsn: yup
-      .string() // Store as string to prevent issues with leading zeros
-      .matches(/^\d{8}$/, "HSN must be exactly 8 digits") // Ensures 8-digit numeric input
+      .string() 
+      .matches(/^\d{8}$/, "HSN must be exactly 8 digits") 
       .required("HSN is required"),
     unit: yup.string().required("Unit is required"),
     tags: yup.array().min(1, "At least one tag is required"),
@@ -266,42 +250,64 @@ const AddNewProduct = () => {
       .min(0, "Discount Percentage must be positive"),
     taxCalculation: yup.string().required("tax calculation is required"),
     taxAmount: yup.number().when("taxCalculation", {
-      is: "Exclude", // Only apply validation when "Exclude" is selected
+      is: "Exclude", 
       then: (schema) =>
         schema
           .required("Tax Amount is required")
           .min(0, "Tax Amount must be positive"),
-      otherwise: (schema) => schema.notRequired(), // Not required if "Include" is selected
+      otherwise: (schema) => schema.notRequired(), 
     }),
     shape: yup.string().required("Package shape is required"),
-    length: yup.number().when("shape", {
+    length: yup
+    .number()
+    .typeError("Length must be a number")
+    .transform((value) => (value === "" ? null : value)) // Converts empty string to null
+    .when("shape", {
       is: "cuboid",
       then: (schema) =>
         schema.required("Length is required").min(0, "Must be positive"),
-      otherwise: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.notRequired().nullable(),
     }),
-    width: yup.number().when("shape", {
+
+  width: yup
+    .number()
+    .typeError("Width must be a number")
+    .transform((value) => (value === "" ? null : value))
+    .when("shape", {
       is: "cuboid",
       then: (schema) =>
         schema.required("Width is required").min(0, "Must be positive"),
-      otherwise: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.notRequired().nullable(),
     }),
-    height: yup.number().when("shape", {
+
+  height: yup
+    .number()
+    .typeError("Height must be a number")
+    .transform((value) => (value === "" ? null : value))
+    .when("shape", {
       is: "cuboid",
       then: (schema) =>
         schema.required("Height is required").min(0, "Must be positive"),
-      otherwise: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.notRequired().nullable(),
     }),
-    diameter: yup.number().when("shape", {
+
+  diameter: yup
+    .number()
+    .typeError("Diameter must be a number")
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .when("shape", {
       is: "cylinder",
-      then: (schema) =>
-        schema.required("Diameter is required").min(0, "Must be positive"),
-      otherwise: (schema) => schema.notRequired(),
+      then: (schema) => schema.required("Diameter is required").min(0, "Must be positive"),
+      otherwise: (schema) => schema.notRequired().nullable(),
     }),
-    weight: yup
-      .number()
-      .required("Weight is required")
-      .min(0, "Must be positive"),
+
+  weight: yup
+    .number()
+    .typeError("Weight must be a number")
+    .transform((value) => (value === "" ? null : value))
+    .required("Weight is required")
+    .min(0, "Must be positive"),
   });
 
   // const [errorFields, setErrorFields] = useState({
@@ -313,15 +319,34 @@ const AddNewProduct = () => {
   //   taxAmount: false,
   // });
 
+
+
+  const calculateVolume = useCallback(({ shape, length, width, height, diameter }) => {
+    if (shape === "cuboid" && length && width && height) {
+      return Math.round(length * width * height);
+    } 
+    if (shape === "cylinder" && diameter && height) {
+      const radius = diameter / 2;
+      return Math.round(3.14 * Math.pow(radius, 2) * height);
+    }
+    return null;
+  }, []);
+
+  const handleVolumeCalculation = (values) => {
+    const vol = calculateVolume(values);
+    if (vol !== null) {
+      setVolume(vol);
+      values.calculatedVolume = volume;
+      setShowVolume(true);
+    }
+  };
+
   const calculateDiscountedPrice = (values) => {
     let { sellingPrice, discountAmount, discountType, taxCalculation, taxAmount } = values;
-
-  
-  
     sellingPrice = Number(sellingPrice) || 0;
     discountAmount = Number(discountAmount) || 0;
     taxAmount = Number(taxAmount) || 0;
-  
+   
     let finalPrice = sellingPrice;
   
     // Apply Discount
@@ -336,6 +361,7 @@ const AddNewProduct = () => {
       finalPrice += (finalPrice * taxAmount) / 100;
     }
   
+    values.calculatedPrice = Math.round(finalPrice);
     return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
   };
   
@@ -344,8 +370,8 @@ const AddNewProduct = () => {
   
     if ((mrp && sellingPrice && discountAmount >= 0) || taxCalculation) {
       setShowPrice(true);
-      const finalPrice = calculateDiscountedPrice(values); 
-      
+      setPriceCalculated(true);
+      let finalPrice = calculateDiscountedPrice(values);
     }
   };
 
@@ -367,7 +393,7 @@ const AddNewProduct = () => {
       formData.append("Image", imageFile.originFileObj || imageFile); // Get the actual file object
       formData.append("folderType", folderType); // Append folder type
   
-      console.log("📤 Uploading Image:", imageFile.name); // Debugging
+      console.log("Uploading Image:", imageFile.name); // Debugging
   
       const response = await axios.post(`${apiUrl}SaveFile/SaveImage`, formData, {
         headers: {
@@ -439,18 +465,20 @@ const AddNewProduct = () => {
             throw new Error("Image upload failed.");
           }
           imagePath = uploadedImagePath;
+          values.images = [imagePath];  
         } catch (err) {
-          console.error("❌ Image Upload Error:", err);
+        
           Swal.fire({
             icon: "error",
             title: "Image Upload Failed",
             text: "Could not upload the image. Please try again.",
           });
           dispatch(stopLoading());
-          return; // Stop execution if image upload fails
+          return;
         }
       }
-  
+      
+
       const payload = {
         Product_Name: values.productName.toString(),
         PRODUCT_DESCRIPTION: values.productDescription.toString(),
@@ -467,23 +495,22 @@ const AddNewProduct = () => {
         SELLING_PRICE: Number(values.sellingPrice) || 0,
         MINIMUM_ORDER_QUANTITY: Number(values.minimumOrderQty) || 0,
         CURRENT_STOCK_QUANTITY: Number(values.currentStockQty) || 0,
-      
         DISCOUNT_TYPE: values.discountType ? values.discountType.toString() : "",
         DISCOUNT_AMOUNT: values.discountAmount.toString() || "0",
         TAX_AMOUNT: values.taxAmount.toString() || "",
         TAX_CALCULATION: values.taxCalculation.toString() || "",
-        CALCULATED_PRICE: values.calculatedPrice.toString() || 0,
-    
-        PACKAGE_SHAPE: values.shape ? values.shape.toString() : "",
-        PACKAGE_LENGTH: values.length ? values.length.toString() : "0",
-        PACKAGE_WIDTH: values.width ? values.width.toString() : "0",
-        PACKAGE_HEIGHT: values.height ? values.height.toString() : "0",
+        CALCULATED_PRICE: values.calculatedPrice.toString() || "",
+        PACKAGE_SHAPE:  values.shape.toString() || "",
+        PACKAGE_LENGTH:  values.length.toString() || "0",
+        PACKAGE_WIDTH:  values.width.toString() || "0",
+        PACKAGE_HEIGHT:  values.height.toString() || "0",
         PACKAGE_WEIGHT: Number(values.weight) || 0,
-        PACKAGE_DIAMETER: values.diameter ? values.diameter.toString() : "0",
-        PACKAGE_TOTAL_VOLUME: values.calculatedVolume ? values.calculatedVolume.toString() : "0",
+        PACKAGE_DIAMETER:  values.diameter.toString() || "0",
+        PACKAGE_TOTAL_VOLUME: values.calculatedVolume.toString() || "0"
       };
       
-  
+     
+
       try {
         const res = await axios.post(`${apiUrl}Product/InsertProduct`, payload, {
           headers: {
@@ -492,8 +519,6 @@ const AddNewProduct = () => {
           },
         });
    
-         
-         
         if (res.data[0].message === "SUCCESS" || res.data[0].code==200  ) {
           Swal.fire({
             icon: "success",
@@ -516,14 +541,14 @@ const AddNewProduct = () => {
         });
       }
     } catch (err) {
-      console.error("❌ Unexpected Error:", err);
+      console.error("Unexpected Error:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "An unexpected error occurred. Please try again.",
       });
     } finally {
-      dispatch(stopLoading()); // Ensures loading is stopped even if an error occurs
+      dispatch(stopLoading());
     }
   };
   
@@ -535,12 +560,8 @@ const AddNewProduct = () => {
         onSubmit={async (values, { resetForm }) => {
           const finalPrice = calculateDiscountedPrice(values);
           values.calculatedPrice = finalPrice;
-
           const finalVolume = calculateVolume(values);
           values.calculatedVolume = finalVolume;
-
-          console.log("Form submitted:", values);
-
           await submitFormData(values);
           // resetForm();
         }}
@@ -559,6 +580,26 @@ const AddNewProduct = () => {
               }
             }
           };
+
+          useEffect(() => {
+
+            
+            
+            if(values.taxCalculation === 'Exclude'){
+              setShowPrice(false);
+            }
+
+
+
+            if (values.shape === "cuboid") {
+              setFieldValue("diameter", ""); 
+            } else if (values.shape === "cylinder") {
+              setFieldValue("length", "");
+              setFieldValue("width", "");
+              setFieldValue("height", "");
+              setShowVolume(false);
+            }
+          }, [values.shape, setFieldValue , values.taxCalculation]);
 
           return (
             <Form>
@@ -1069,19 +1110,22 @@ const AddNewProduct = () => {
                               </span>
                             </Tooltip>
                           </FormLabel>
-
                           <Field
                             as={Input}
                             name="mrp"
                             id="mrp"
                             focusBorderColor="blue.500"
                             size="md"
-                            borderRadius="md"
-                            onChange={(e) =>
-                              setFieldValue("mrp", Number(e.target.value))
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("mrp", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("mrp", finalValue);
+                            }}
                           />
-
                           <Text
                             color="red.500"
                             fontSize="sm"
@@ -1121,17 +1165,19 @@ const AddNewProduct = () => {
 
                           <Field
                             as={Input}
-                            type="number"
                             name="sellingPrice"
                             id="sellingPrice"
                             focusBorderColor="blue.500"
                             size="md"
-                            onChange={(e) =>
-                              setFieldValue(
-                                "sellingPrice",
-                                Number(e.target.value)
-                              )
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("sellingPrice", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("sellingPrice", finalValue);
+                            }}
                           />
 
                           <Text
@@ -1173,18 +1219,19 @@ const AddNewProduct = () => {
 
                           <Field
                             as={Input}
-                            type="number"
                             name="minimumOrderQty"
                             id="minimumOrderQty"
                             focusBorderColor="blue.500"
                             size="md"
-                            borderRadius="md"
-                            onChange={(e) =>
-                              setFieldValue(
-                                "minimumOrderQty",
-                                Number(e.target.value)
-                              )
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("minimumOrderQty", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("minimumOrderQty", finalValue);
+                            }}
                           />
 
                           <Text
@@ -1224,22 +1271,23 @@ const AddNewProduct = () => {
                             </Tooltip>
                           </FormLabel>
 
+
                           <Field
                             as={Input}
-                            type="number"
                             name="currentStockQty"
                             id="currentStockQty"
                             focusBorderColor="blue.500"
                             size="md"
-                            borderRadius="md"
-                            onChange={(e) =>
-                              setFieldValue(
-                                "currentStockQty",
-                                Number(e.target.value)
-                              )
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("currentStockQty", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("currentStockQty", finalValue);
+                            }}
                           />
-
                           <Text
                             color="red.500"
                             fontSize="sm"
@@ -1330,21 +1378,22 @@ const AddNewProduct = () => {
                                 <MdInfo />
                               </span>
                             </Tooltip>
-                          </FormLabel>
-
+                          </FormLabel>      
                           <Field
                             as={Input}
                             name="discountAmount"
                             id="discountAmount"
                             focusBorderColor="blue.500"
                             size="md"
-                            borderRadius="md"
-                            onChange={(e) =>
-                              setFieldValue(
-                                "discountAmount",
-                                Number(e.target.value)
-                              )
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("discountAmount", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("discountAmount", finalValue);
+                            }}
                           />
 
                           <Text
@@ -1438,18 +1487,23 @@ const AddNewProduct = () => {
                                   <MdInfo />
                                 </span>
                               </Tooltip>
-                            </FormLabel>
-
-                            <Field
-                              as={Input}
-                              type="number"
-                              name="taxAmount"
-                              id="taxAmount"
-                              placeholder="Enter tax amount"
-                              onChange={(e) => {
-                                setFieldValue("taxAmount", e.target.value);
-                              }}
-                            />
+                            </FormLabel>      
+                          <Field
+                            as={Input}
+                            name="taxAmount"
+                            id="taxAmount"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("taxAmount", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("taxAmount", finalValue);
+                            }}
+                          />
 
                             <Text
                               color="red.500"
@@ -1623,15 +1677,23 @@ const AddNewProduct = () => {
                                   </span>
                                 </Tooltip>
                               </FormLabel>
+
                               <Field
-                                as={Input}
-                                name="length"
-                                id="length"
-                                onChange={(e) => {
-                                  const value = e.target.value.trim();
-                                  setFieldValue("length", value);
-                                }}
-                              />
+                            as={Input}
+                            name="length"
+                            id="length"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("length", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("length", finalValue);
+                            }}
+                          />
                               <Text
                                 color="red.500"
                                 fontSize="sm"
@@ -1666,15 +1728,23 @@ const AddNewProduct = () => {
                                 </span>
                               </Tooltip>
                             </FormLabel>
+
                             <Field
-                              as={Input}
-                              name="width"
-                              id="width"
-                              onChange={(e) => {
-                                const value = e.target.value.trim();
-                                setFieldValue("width", value);
-                              }}
-                            />
+                            as={Input}
+                            name="width"
+                            id="width"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("width", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("width", finalValue);
+                            }}
+                          />
                             <Text
                               color="red.500"
                               fontSize="sm"
@@ -1712,13 +1782,21 @@ const AddNewProduct = () => {
                               </span>
                             </Tooltip>
                           </FormLabel>
+
                           <Field
                             as={Input}
                             name="diameter"
                             id="diameter"
+                            focusBorderColor="blue.500"
+                            size="md"
                             onChange={(e) => {
-                              const value = e.target.value.trim();
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
                               setFieldValue("diameter", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("diameter", finalValue);
                             }}
                           />
                           <Text
@@ -1734,7 +1812,7 @@ const AddNewProduct = () => {
 
 
 
-<CardBox>
+                <CardBox>
                             <FormControl>
                             <FormLabel
                               htmlFor="height"
@@ -1758,14 +1836,23 @@ const AddNewProduct = () => {
                                 </span>
                               </Tooltip>
                             </FormLabel>
+
                             <Field
-                              as={Input}
-                              name="height"
-                              id="height"
-                              onChange={(e) => {
-                                setFieldValue("height", e.target.value);
-                              }}
-                            />
+                            as={Input}
+                            name="height"
+                            id="height"
+                            focusBorderColor="blue.500"
+                            size="md"
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
+                              setFieldValue("height", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("height", finalValue);
+                            }}
+                          />
                             <Text
                               color="red.500"
                               fontSize="sm"
@@ -1804,13 +1891,21 @@ const AddNewProduct = () => {
                             </Tooltip>
                           </FormLabel>
 
+                         
                           <Field
                             as={Input}
                             name="weight"
                             id="weight"
+                            focusBorderColor="blue.500"
+                            size="md"
                             onChange={(e) => {
-                              const value = e.target.value.trim();
+                              const value = e.target.value.replace(/[^0-9.]/g, "");
+                              if ((value.match(/\./g) || []).length > 1) return;
                               setFieldValue("weight", value);
+                            }}
+                            onBlur={(e) => {
+                              const finalValue = parseFloat(e.target.value) || "";
+                              setFieldValue("weight", finalValue);
                             }}
                           />
 
@@ -1827,19 +1922,19 @@ const AddNewProduct = () => {
 
                       {/* Volume Calculation Button */}
                       <CardBox>
-                        <Box mt={4}>
-                          <Button onClick={() => calculateVolume(values)}>
-                            Calculate Volume
-                          </Button>
+                        <Box mt={3}>
+                        <Button onClick={() => handleVolumeCalculation(values)}>Calculate Volume</Button>
                         </Box>
                       </CardBox>
 
+                        {/* Sanjeev */}
                       {/* Display Volume */}
-                      {volume !== null && (
+                      {showVolume && volume !== null && (
+                        
                         <CardBox>
                           <Box mt={6}>
                             <span style={{ fontWeight: "bold" }}>
-                              Calculated Volume: {volume.toFixed(2)} cm³{" "}
+                            <strong>Calculated Volume: {volume} cm³</strong>
                             </span>
                           </Box>
                         </CardBox>
