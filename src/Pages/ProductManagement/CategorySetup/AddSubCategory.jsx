@@ -54,7 +54,7 @@ const AddSubCategory = () => {
       const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-  
+      // Ensure correct response structure before updating state
       if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
         setCategoryList(res.data.categoryList.$values);
       } else {
@@ -68,7 +68,9 @@ const AddSubCategory = () => {
       console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text: error.response?.data?.message || "Failed to fetch the category list. Please try again later.",
+        text:
+          error.response?.data?.message ||
+          "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
@@ -222,14 +224,15 @@ const AddSubCategory = () => {
                             );
                           }}
                         >
-                          {categoryList.map((category) => (
-                            <option
-                              key={category.Category_id}
-                              value={category.Category_id}
-                            >
-                              {category.Category_Name}
-                            </option>
-                          ))}
+                            {categoryList.map((category) => (
+                              <option
+                                key={category.category_id}
+                                value={category.category_id}
+                                
+                              >
+                                {category.category_Name}
+                              </option>
+                            ))}
                         </Field>
                         <Text color="red.500" fontSize="sm" minHeight="20px">
                           <ErrorMessage name="category_id" />

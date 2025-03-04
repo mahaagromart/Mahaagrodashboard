@@ -25,31 +25,68 @@ const ProductList = () => {
 
   const getCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceCategory/GetAllCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message === "success") {
-        setCategoryList(res.data.CategoryList);
+      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+    
+      if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
+        setCategoryList(res.data.categoryList.$values);
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
-          text: "Please try again.",
+          text: "Invalid response format. Please try again.",
           icon: "error",
         });
       }
     } catch (error) {
+      console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later.",
+        text:
+          error.response?.data?.message ||
+          "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
 
+  const fetchSubCategoryData = async (selectedCategory) => {
+    if (!selectedCategory) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Category Selected",
+        text: "Please select a category to load subcategories.",
+      });
+      return;
+    }
+
+    try {
+
+
+      const res = await axios.post(
+        `${apiUrl}SubCategory/GetSubCategoryThroughCategoryId`,
+        { category_id: selectedCategory },
+        {
+          headers: { Authorization: `Bearer ${storedToken}` },
+        }
+      );
+      if (res.data && res.data[0]?.dataset?.$values) {
+        setSubCategoryList(res.data[0].dataset.$values);
+      } else {
+        throw new Error("No subcategories found");
+      }
+    } catch (error) {
+      console.error("Error fetching subcategory data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error Fetching Subcategories",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong.",
+      });
+    }
+  };
   const getSubCategory = async () => {
     try {
       const res = await axios.post(
@@ -108,7 +145,7 @@ const ProductList = () => {
 
   useEffect(() => {
     getCategory();
-    getSubCategory();
+  
 
     // getSubSubSubCategory();
   }, []);
@@ -161,15 +198,18 @@ const ProductList = () => {
                     placeholder="Select Main Category"
                     focusBorderColor="blue.500"
                     size="md"
+                    onChange={(e) => fetchSubCategoryData(e.target.value)}
+
                   >
                     {categoryList.map((category) => (
-                      <option
-                        key={category.Category_id}
-                        value={category.Category_id}
-                      >
-                        {category.Category_Name}
-                      </option>
-                    ))}
+                              <option
+                                key={category.category_id}
+                                value={category.category_id}
+                                
+                              >
+                                {category.category_Name}
+                              </option>
+                            ))}
                   </Select>
                 </FormControl>
               </CardBox>
@@ -185,7 +225,7 @@ const ProductList = () => {
                   >
                     {subCategoryList.map((r) => (
                       <option key={r.id} value={r.id}>
-                        {r.Subcategory_Name}
+                        {r.subcategory_Name}
                       </option>
                     ))}
                   </Select>

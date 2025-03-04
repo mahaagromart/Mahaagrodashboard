@@ -1,6 +1,77 @@
+// import React, { useState } from "react";
+// import { PlusOutlined } from "@ant-design/icons";
+// import { Image, Upload, Modal } from "antd";
+
+// const getBase64 = (file) =>
+//   new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.readAsDataURL(file);
+//     reader.onload = () => resolve(reader.result);
+//     reader.onerror = (error) => reject(error);
+//   });
+
+// const UploadImages = ({ setFieldValue }) => {
+//   const [previewOpen, setPreviewOpen] = useState(false);
+//   const [previewImage, setPreviewImage] = useState("");
+//   const [previewTitle, setPreviewTitle] = useState("");
+//   const [fileList, setFileList] = useState([]);
+
+
+//   const handlePreview = async (file) => {
+//     if (!file.url && !file.preview) {
+//       file.preview = await getBase64(file.originFileObj);
+//     }
+//     setPreviewImage(file.url || file.preview);
+//     setPreviewOpen(true);
+//     setPreviewTitle(file.name || "Preview");
+//   };
+
+//   const handleUpload = ({ fileList: newFileList }) => {
+//     setFileList(newFileList);
+//     setFieldValue("images", newFileList);
+//   };
+
+//   const handleRemove = (file) => {
+//     const updatedFileList = fileList.filter((item) => item.uid !== file.uid);
+//     setFileList(updatedFileList);
+//     setFieldValue("images", updatedFileList);
+//   };
+
+//   return (
+//     <>
+//       <Upload
+//         listType="picture-card"
+//         fileList={fileList}
+//         onPreview={handlePreview} 
+//         onChange={handleUpload}
+//         onRemove={handleRemove}
+//         beforeUpload={() => false}
+//       >
+//         {fileList.length >= 8 ? null : (
+//           <div>
+//             <PlusOutlined />
+//             <div style={{ marginTop: 8 }}>Upload</div>
+//           </div>
+//         )}
+//       </Upload>
+
+
+//       <Modal
+//         open={previewOpen}
+//         title={previewTitle}
+//         footer={null}
+//         onCancel={() => setPreviewOpen(false)}
+//       >
+//         <img alt="Preview" style={{ width: "100%" }} src={previewImage} />
+//       </Modal>
+//     </>
+//   );
+// };
+
+// export default UploadImages;
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Image, Upload, Modal } from "antd";
+import { Upload, Modal } from "antd";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -15,7 +86,6 @@ const UploadImages = ({ setFieldValue }) => {
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
-
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -42,7 +112,7 @@ const UploadImages = ({ setFieldValue }) => {
       <Upload
         listType="picture-card"
         fileList={fileList}
-        onPreview={handlePreview} 
+        onPreview={handlePreview}
         onChange={handleUpload}
         onRemove={handleRemove}
         beforeUpload={() => false}
@@ -55,6 +125,10 @@ const UploadImages = ({ setFieldValue }) => {
         )}
       </Upload>
 
+      {/* Display the number of uploaded images */}
+      <p style={{ textAlign: "center", marginTop: 10 , fontWeight : "bold" }}>
+         {fileList.length} / 8 images uploaded
+      </p>
 
       <Modal
         open={previewOpen}

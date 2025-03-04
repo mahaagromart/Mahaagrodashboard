@@ -207,7 +207,7 @@ const AddNewProduct = () => {
     width: "",
     height: "",
     diameter: "",
-    images: [],
+    images: "",
     calculatedPrice: "",
     calculatedVolume: "",
   };
@@ -310,14 +310,7 @@ const AddNewProduct = () => {
     .min(0, "Must be positive"),
   });
 
-  // const [errorFields, setErrorFields] = useState({
-  //   mrp: false,
-  //   sellingPrice: false,
-  //   minimumOrderQty: false,
-  //   currentStockQty: false,
-  //   discountAmount: false,
-  //   taxAmount: false,
-  // });
+
 
 
 
@@ -370,7 +363,7 @@ const AddNewProduct = () => {
   
     if ((mrp && sellingPrice && discountAmount >= 0) || taxCalculation) {
       setShowPrice(true);
-      setPriceCalculated(true);
+
       let finalPrice = calculateDiscountedPrice(values);
     }
   };
@@ -390,26 +383,25 @@ const AddNewProduct = () => {
       }
   
       const formData = new FormData();
-      formData.append("Image", imageFile.originFileObj || imageFile); // Get the actual file object
-      formData.append("folderType", folderType); // Append folder type
+      formData.append("Image", imageFile.originFileObj || imageFile); 
+      formData.append("folderType", folderType); 
   
-      console.log("Uploading Image:", imageFile.name); // Debugging
+      console.log("Uploading Image:", imageFile.name); 
   
       const response = await axios.post(`${apiUrl}SaveFile/SaveImage`, formData, {
         headers: {
           Authorization: `Bearer ${storedToken}`,
-          "Content-Type": "multipart/form-data", // Important for file uploads
+          "Content-Type": "multipart/form-data", 
         },
       });
   
       if (response.data.success) {
-        console.log("✅ Image uploaded successfully:", response.data.path);
-        return response.data.path; // Return uploaded image path
+        return response.data.path; 
       } else {
         throw new Error(response.data.message || "Image upload failed");
       }
     } catch (error) {
-      console.error("❌ Error uploading image:", error);
+      console.error(" Error uploading image:", error);
       Swal.fire({
         icon: "error",
         title: "Image Upload Failed",
@@ -460,31 +452,37 @@ const AddNewProduct = () => {
       let imagePath = "";
       if (values.images?.length > 0) {
         try {
-          const uploadedImagePath = await uploadImage(values.images[0], "Products");
-          if (!uploadedImagePath) {
-            throw new Error("Image upload failed.");
+          let uploadedImagePaths = []; 
+          for (const image of values.images) {
+            const uploadedImagePath = await uploadImage(image, "Products");
+            if (!uploadedImagePath) {
+              throw new Error("Image upload failed.");
+            }
+            uploadedImagePaths.push(uploadedImagePath);
           }
-          imagePath = uploadedImagePath;
-          values.images = [imagePath];  
+          const imagePathString = uploadedImagePaths.join(",");
+
+          values.images = imagePathString;
+          
         } catch (err) {
-        
           Swal.fire({
             icon: "error",
             title: "Image Upload Failed",
-            text: "Could not upload the image. Please try again.",
+            text: "Could not upload one or more images. Please try again.",
           });
           dispatch(stopLoading());
           return;
         }
       }
       
-
+      console.log(values.images)
+      debugger
       const payload = {
         Product_Name: values.productName.toString(),
         PRODUCT_DESCRIPTION: values.productDescription.toString(),
         CATEGORY_ID: values.category.toString(),
         SUB_CATEGORY_ID: values.subCategory.toString(),
-        Images: imagePath.toString(),
+        IMAGES: values.images.toString(),
         BRAND: values.brand ? values.brand.toString() : "",
         sku: values.sku.toString(),
         UNIT: values.unit.toString(),
@@ -583,9 +581,12 @@ const AddNewProduct = () => {
 
           useEffect(() => {
 
+            setShowPrice(false);
             
-            
-            if(values.taxCalculation === 'Exclude'){
+            if(values.taxCalculation === "Exclude" && values.taxAmount != null){
+              setShowPrice(false);
+            }else{
+              values.taxAmount = 0;
               setShowPrice(false);
             }
 

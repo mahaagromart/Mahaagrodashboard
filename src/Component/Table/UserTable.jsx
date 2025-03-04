@@ -228,7 +228,7 @@ const UserTable = () => {
 
       <Modal
         title="Send Notification"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancel}
         onOk={handleOk}
       >

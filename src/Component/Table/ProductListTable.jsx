@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Space, Table, Input, Tooltip, Modal } from "antd";
+import { Button, Space, Table, Input, Tooltip, Modal , Rate } from "antd";
 import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import Swal from "sweetalert2";
 import { FaEye } from "react-icons/fa";
@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 const { Column } = Table;
 
 const ProductListTable = () => {
-  const [data, setData] = useState([]);
+  const [productList, setProductList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -25,21 +25,17 @@ const ProductListTable = () => {
 
   const getInHouseProduct = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}EcommerceProduct/GetAllProducts`,
-        {},
+      console.log("Calling API...");
+      const res = await axios.get(
+        `http://localhost:5136/Product/GetAllProducts`,  // Ensure correct URL
         {
-          headers: { Authorization: `Bearer ${storedToken}` },
+          headers: { Authorization: `Bearer ${storedToken}` }
         }
       );
 
-      if (res.data.Message === "SUCCESS") {
-        // Remove duplicates by using a Set and converting it back to an array
-        const uniqueProducts = Array.from(new Set(res.data.ProductList.map(p => p.Product_id)))
-          .map(id => {
-            return res.data.ProductList.find(p => p.Product_id === id);
-          });
-        setData(uniqueProducts);
+      if (res.data.message === "SUCCESS") {
+        const products = res.data.dataset?.$values || [];
+        setProductList(products);
       } else {
         await Swal.fire({
           title: "Error in Getting Product List",
@@ -48,15 +44,16 @@ const ProductListTable = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error.response || error);
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the product list. Please try again later. " + error,
+        text: `Failed to fetch product list: ${error.response?.status} ${error.message}`,
         icon: "error",
       });
     }
-  };
+};
 
+  
   const handleToggleStatus = async (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -108,6 +105,16 @@ const ProductListTable = () => {
       }
     });
   };
+
+
+  const getValue = (value)=>{
+    if(value === 0){
+      return "Active";
+    }else{
+      return "Deactivate"
+    }
+  }
+
 
   const handleToggleVerified = async (record) => {
     Swal.fire({
@@ -226,8 +233,8 @@ const ProductListTable = () => {
     setSelectedProduct(null);
   };
 
-  const filteredData = data.filter((item) =>
-    item.Product_Name.toLowerCase().includes(searchText.toLowerCase())
+  const filteredData = productList.filter((item) =>
+    item.product_Name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
@@ -251,66 +258,86 @@ const ProductListTable = () => {
       </div>
 
       <Table dataSource={filteredData} rowKey="Product_id" pagination={{ pageSize: 5 }}>
-        <Column title="ID" dataIndex="Product_id" key="Product_id" align="center" />
+        <Column title="ID" dataIndex="id" key="id" align="center" />
+
         <Column
-          title="Product Image"
-          dataIndex="Image"
-          key="Image"
-          align="center"
-          render={(text) => (
-            <img
-              src={text}
-              alt="Product"
-              style={{
-                width: "50px",
-                height: "50px",
-                objectFit: "cover",
-                borderRadius: "8px",
-              }}
+            title="Product Image"
+            dataIndex="images"
+            key="images"
+            align="center"
+          render={(images) => (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+               src={`${apiUrl}/${images}`}
+                alt="Brand Logo"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  objectFit: "contain",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                  padding: "5px",
+                  backgroundColor: "#fff",
+                }}
+                onError={(e) => (e.target.style.display = "none")}
+              />
+            </div>
+          )}
+        />
+        <Column title="Product Name" dataIndex="product_Name" key="product_Name" align="center" />
+        <Column title="Description" dataIndex="product_Description" key="product_Description" align="center" />
+        <Column title="Price" dataIndex="sellinG_PRICE" key="sellinG_PRICE" align="center" />
+        <Column title="Quantity" dataIndex="currenT_STOCK_QUANTITY" key="currenT_STOCK_QUANTITY" align="center" />
+        <Column
+            title="Rating"
+            dataIndex="rating"
+            key="rating"
+            align="center"
+            minWidth={180} 
+            render={(rating) => (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Rate allowHalf defaultValue={rating} disabled />
+              </div>
+            )}
+          />
+
+            <Column
+              title="Certification"
+              dataIndex="certification"
+              key="certification"
+              align="center"
+              render={(_, record) => (
+                <Button
+                  onClick={() => handleToggleVerified(record)}
+                  style={{
+                    background: record.certification === 0 ? "#52c41a" : "#f5222d",
+                    color: "#fff",
+                    border: "none",
+                  }}
+                >
+                  {record.certification === 0 ? "Activate" : "Deactivate"} 
+                </Button>
+              )}
             />
-          )}
-        />
-        <Column title="Product Name" dataIndex="Product_Name" key="Product_Name" align="center" />
-        <Column title="Description" dataIndex="Description" key="Description" align="center" />
-        <Column title="Price" dataIndex="Price" key="Price" align="center" />
-        <Column title="Quantity" dataIndex="Quantity" key="Quantity" align="center" />
-        <Column title="Rating" dataIndex="Rating" key="Rating" align="center" />
-        <Column
-          title="Certification"
-          dataIndex="verified"
-          key="verified"
-          align="center"
-          render={(_, record) => (
-            <Button
-              onClick={() => handleToggleVerified(record)}
-              style={{
-                background: record.verified === "Active" ? "#52c41a" : "#f5222d",
-                color: "#fff",
-                border: "none",
-              }}
-            >
-              {record.verified === "Active" ? "Deactivate" : "Activate"}
-            </Button>
-          )}
-        />
-        <Column
-          title="Status"
-          dataIndex="status"
-          key="status"
-          align="center"
-          render={(_, record) => (
-            <Button
-              onClick={() => handleToggleStatus(record)}
-              style={{
-                background: record.status === "Active" ? "#52c41a" : "#f5222d",
-                color: "#fff",
-                border: "none",
-              }}
-            >
-              {record.status === "Active" ? "Deactivate" : "Activate"}
-            </Button>
-          )}
-        />
+
+            <Column
+              title="Status"
+              dataIndex="status"
+              key="status"
+              align="center"
+              render={(_, record) => (
+                <Button
+                  onClick={() => handleToggleStatus(record)}
+                  style={{
+                    background: record.status === 0 ? "#52c41a" : "#f5222d", 
+                    color: "#fff",
+                    border: "none",
+                  }}
+                >
+                  {record.status === 0 ? "Activate" : "Deactivate"} 
+                </Button>
+              )}
+            />
         <Column
           title="Action"
           key="action"
@@ -345,7 +372,7 @@ const ProductListTable = () => {
 
       <Modal
         title="Product Details"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleModalClose}
         footer={[
           <Button key="close" onClick={handleModalClose}>

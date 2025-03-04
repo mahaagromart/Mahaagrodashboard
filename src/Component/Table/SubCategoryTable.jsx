@@ -44,56 +44,55 @@ const SubCategoryTable = () => {
     categoryId: Yup.string().required("Category must be selected"),
   });
 
-
-
-  const getCategory = async () => {
+  const getSubCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceCategory/GetAllCategory`,
-        {},
+      // Sending GET request with headers
+      const res = await axios.get(
+        `${apiUrl}SubCategory/GetAllSubCategory`, // Assuming apiUrl is defined
         {
-          headers: { Authorization: `Bearer ${storedToken}` },
+          headers: {
+            Authorization: `Bearer ${storedToken}`, // Replace storedToken with actual token if needed
+          },
         }
       );
-      if (res.data.Message === "success") {
-        setCategoryList(res.data.CategoryList);
-      } else {
+  
+      // Ensure the response message is "SUCCESS"
+      if (res.data.message?.toLowerCase() === "success") {
+        // Set the received subcategory list to state
+        setSubCategoryData(res.data.dataset?.$values || []); // Adjust based on actual response structure
+        console.log(res.data.dataset?.$values); // Logging for debugging purposes
+  
+        // Success alert using SweetAlert2
         await Swal.fire({
-          title: "Error in Getting Category List",
-          text: "Please try again.",
-          icon: "error",
+          title: 'Success!',
+          text: 'Sub-category list fetched successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+      } else {
+        // Error alert if Message is not "success"
+        await Swal.fire({
+          title: 'Error!',
+          text: 'Error fetching Sub-category List.',
+          icon: 'error',
+          confirmButtonText: 'Try Again',
         });
       }
     } catch (error) {
+      // Handle error and show message using SweetAlert2
       await Swal.fire({
-        title: "Error",
-        text: "Failed to fetch the category list. Please try again later."+error,
-        icon: "error",
+        title: 'Failed!',
+        text: `Failed to fetch Sub-category List: ${error.message}`,
+        icon: 'error',
+        confirmButtonText: 'Close',
       });
+  
+      console.error(error); // Log the error for further inspection
     }
   };
 
-  // Fetch subcategories
-  const getSubCategory = async () => {
-    try {
-      const res = await axios.post(
-        `${apiUrl}EcommerceSubcategory/GetAllSubCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubCategoryData(res.data.SubCategoryList);
-        console.log(res.data.SubCategoryList)
-      } else {
-        alert("Error fetching Sub-category List");
-      }
-    } catch (error) {
-      alert("Failed to fetch Sub-category List"+error);
-    }
-  };
-
+  
+  
 
   const handleEdit = (subcategory) => {
 
@@ -192,13 +191,13 @@ const SubCategoryTable = () => {
 
   useEffect(() => {
     getSubCategory();
-    getCategory();
+   console.log(subCategoryData)
    
   }, []);
 
   const filteredData =
     subCategoryData.filter((item) =>
-      item.Subcategory_Name.toLowerCase().includes(searchText.toLowerCase())
+      item.subcategory_Name.toLowerCase().includes(searchText.toLowerCase())
     ) || [];
 
   return (
@@ -231,20 +230,20 @@ const SubCategoryTable = () => {
           { title: "ID", dataIndex: "id", key: "id", align: "center" },
           {
             title: "Category Name",
-            dataIndex: "Category_Name",
-            key: "Category_Name",
+            dataIndex: "category_Name",
+            key: "category_Name",
             align: "center",
           },
           {
             title: "Sub-Category Name",
-            dataIndex: "Subcategory_Name",
-            key: "Subcategory_Name",
+            dataIndex: "subcategory_Name",
+            key: "subcategory_Name",
             align: "center",
           },
           {
             title: "Priority",
-            dataIndex: "Priority",
-            key: "Priority",
+            dataIndex: "priority",
+            key: "priority",
             align: "center",
           },
           {
