@@ -47,15 +47,38 @@ const GenerateBarCode = () => {
 
 
 
+  // const handlePrint = () => {
+  //   const printContents = document.getElementById("barcode-print-section").innerHTML;
+  //   const originalContents = document.body.innerHTML;
+
+  //   document.body.innerHTML = printContents;
+  //   window.print();
+  //   document.body.innerHTML = originalContents;
+  // };
   const handlePrint = () => {
+    const printWindow = window.open("", "_blank");
     const printContents = document.getElementById("barcode-print-section").innerHTML;
-    const originalContents = document.body.innerHTML;
-
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
+  
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Barcodes</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; }
+            .barcode-container { margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          ${printContents}
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
   };
-
   return (
     <>
       <Box marginTop="1%">

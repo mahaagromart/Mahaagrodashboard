@@ -10,7 +10,7 @@ import {
   Button,
   Tooltip,
 } from "@chakra-ui/react";
-import TableWithToggle from "../../../Component/Table/TableWithToggle";
+
 import { MdInfo } from "react-icons/md";
 import CouponListTable from "../../../Component/Table/CouponListTable";
 

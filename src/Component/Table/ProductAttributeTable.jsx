@@ -183,43 +183,44 @@ const ProductAttributeTable = () => {
 
       {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Product Attribute</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Formik
-              enableReinitialize
-              initialValues={{
-                id: editData?.id || "",
-                attribute_Name: editData?.attribute_Name || "",
-              }}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmit}
-            >
-              {({ errors, touched }) => (
-                <Form>
-                  <FormControl isInvalid={errors.attribute_Name && touched.attribute_Name}>
-                    <FormLabel>Attribute Name</FormLabel>
-                    <Field name="attribute_Name" className="chakra-input" />
-                    <FormErrorMessage>{errors.attribute_Name}</FormErrorMessage>
-                  </FormControl>
+  <ModalOverlay />
+  <ModalContent maxW="600px"> {/* Adjust width as needed */}
+    <ModalHeader>Edit Product Attribute</ModalHeader>
+    <ModalCloseButton />
+    <ModalBody>
+      <Formik
+        enableReinitialize
+        initialValues={{
+          id: editData?.id || "",
+          attribute_Name: editData?.attribute_Name || "",
+        }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched }) => (
+          <Form>
+            <FormControl isInvalid={errors.attribute_Name && touched.attribute_Name}>
+              <FormLabel>Attribute Name</FormLabel>
+              <Field name="attribute_Name" className="chakra-input" />
+              <FormErrorMessage>{errors.attribute_Name}</FormErrorMessage>
+            </FormControl>
 
-                  {/* Modal Footer */}
-                  <ModalFooter>
-                    <ChakraButton colorScheme="blue" mr={3} type="submit">
-                      Update
-                    </ChakraButton>
-                    <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
-                      Cancel
-                    </ChakraButton>
-                  </ModalFooter>
-                </Form>
-              )}
-            </Formik>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+            {/* Modal Footer */}
+            <ModalFooter>
+              <ChakraButton colorScheme="blue" mr={3} type="submit">
+                Update
+              </ChakraButton>
+              <ChakraButton variant="ghost" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </ChakraButton>
+            </ModalFooter>
+          </Form>
+        )}
+      </Formik>
+    </ModalBody>
+  </ModalContent>
+</Modal>
+
     </div>
   );
 };

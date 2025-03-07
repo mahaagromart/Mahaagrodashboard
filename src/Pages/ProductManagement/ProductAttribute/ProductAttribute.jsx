@@ -98,6 +98,7 @@ const ProductAttribute = () => {
                       size="lg"
                       borderRadius="md"
                       isLoading={isSubmitting}
+                      margin="2%"
                     >
                       Submit
                     </Button>

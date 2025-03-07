@@ -36,84 +36,98 @@ const SubSubCategoryTable = () => {
 
   const getCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceCategory/GetAllCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message === "success") {
-        setCategoryList(res.data.CategoryList);
+      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+      
+
+
+      if (res.data.message === "SUCCESS" || res.data.categoryList?.$values) {
+        setCategoryList(res.data.categoryList.$values);
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
-          text: "Please try again.",
+          text: "Invalid response format. Please try again.",
           icon: "error",
         });
       }
     } catch (error) {
+      console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text: "Failed to fetch the category list. Please try again later.",
+        text:
+          error.response?.data?.message ||
+          "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
+  
 
   const getSubCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceSubcategory/GetAllSubCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubCategoryData(res.data.SubCategoryList);
+      const res = await axios.get(`${apiUrl}SubCategory/GetAllSubCategory`, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.data[0].message === "SUCCESS") {
+        setSubCategoryData(res.data[0].dataset.$values)
       } else {
-        await Swal.fire({
-          title: "Error in Getting Sub-Category List",
-          text: "Please try again.",
+        Swal.fire({
+          title: "Error!",
+          text: "Error fetching Sub-category List.",
           icon: "error",
+          confirmButtonText: "Try Again",
         });
       }
     } catch (error) {
-      await Swal.fire({
-        title: "Error",
-        text: "Failed to fetch the sub-category list. Please try again later.",
+      console.error("Error fetching sub-categories:", error);
+  
+      Swal.fire({
+        title: "Failed!",
+        text: `Failed to fetch Sub-category List: ${error.message}`,
         icon: "error",
+        confirmButtonText: "Close",
       });
     }
   };
 
   const getSubSubCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceSubSubsubCategory/GetAllSubsubCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubSubCategory(res.data.SubsubCategoryList);
+      const res = await axios.get(`${apiUrl}SubsubCategory/GetAllSubsubCategory`, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+   
+      console.log(res)
+
+      if (res.data[0].retval === "SUCCESS") {
+  
+        setSubSubCategory(res.data[0].dataset.$values)
+
+  
       } else {
-        await Swal.fire({
-          title: "Error in Getting Sub-Subcategory List",
-          text: "Please try again.",
+        Swal.fire({
+          title: "Error!",
+          text: "Error fetching Sub-Subcategory List.",
           icon: "error",
+          confirmButtonText: "Try Again",
         });
       }
     } catch (error) {
-      await Swal.fire({
+      console.error("Error fetching sub-subcategories:", error);
+  
+      Swal.fire({
         title: "Error",
         text: "Failed to fetch the sub-subcategory list. Please try again later.",
         icon: "error",
       });
     }
   };
+  
 
   useEffect(() => {
     getCategory();
@@ -195,29 +209,34 @@ const SubSubCategoryTable = () => {
   };
 
   const filteredData = subsubCategory.filter((item) =>
-    item.SUBSUBCATEGORY_NAME.toLowerCase().includes(searchText.toLowerCase())
+    item.subsubcategorY_NAME.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const columns = [
     {
+      title : "ID",
+      dataIndex : "id",
+      key  : "id",
+    },
+    {
       title: "Sub-Subcategory Name",
-      dataIndex: "SUBSUBCATEGORY_NAME",
-      key: "SUBSUBCATEGORY_NAME",
+      dataIndex: "subsubcategorY_NAME",
+      key: "subsubcategorY_NAME",
     },
     {
       title: "Sub-Category Name",
-      dataIndex: "SUBCATEGORY_NAME",
-      key: "SUBCATEGORY_NAME",
+      dataIndex: "subcategorY_NAME",
+      key: "subcategorY_NAME",
     },
     {
       title: "Category Name",
-      dataIndex: "CATEGORY_NAME",
-      key: "CATEGORY_NAME",
+      dataIndex: "categorY_NAME",
+      key: "categorY_NAME",
     },
     {
       title: "Priority",
-      dataIndex: "PRIORITY",
-      key: "PRIORITY",
+      dataIndex: "priority",
+      key: "priority",
     },
     {
       title: "Actions",

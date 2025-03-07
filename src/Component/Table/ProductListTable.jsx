@@ -7,6 +7,23 @@ import { IoBarcode } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { 
+  IdcardOutlined, 
+  TagOutlined, 
+  FileTextOutlined, 
+  DollarOutlined, 
+  ShoppingCartOutlined, 
+  StarOutlined, 
+  SafetyCertificateOutlined, 
+  CheckCircleOutlined, 
+  CloseCircleOutlined, 
+  BarcodeOutlined, 
+  BoxPlotOutlined, 
+  GiftOutlined, 
+  GoldOutlined, 
+  PercentageOutlined, 
+  ContainerOutlined 
+} from "@ant-design/icons";
 const { Column } = Table;
 
 const ProductListTable = () => {
@@ -18,16 +35,79 @@ const ProductListTable = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
-
+  const [categoryData, setCategoryData] = useState([]);
+  const [subCategoryData, setSubCategoryData] = useState([]);
   useEffect(() => {
     getInHouseProduct();
+    getCategoryData();
+    getSubCategory();
   }, []);
+
+  const getCategoryData = async () => {
+    try {
+      const url = `${apiUrl}Category/GetAllCategory`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+
+      if (response.data.code === 200 && response.data.retval === "SUCCESS") {
+        setCategoryData(response.data.categoryList.$values);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  const getSubCategory = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}SubCategory/GetAllSubCategory`, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.data[0].message === "SUCCESS") {
+        setSubCategoryData(res.data[0].dataset.$values)
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "Error fetching Sub-category List.",
+          icon: "error",
+          confirmButtonText: "Try Again",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching sub-categories:", error);
+  
+      Swal.fire({
+        title: "Failed!",
+        text: `Failed to fetch Sub-category List: ${error.message}`,
+        icon: "error",
+        confirmButtonText: "Close",
+      });
+    }
+  };
+  
+
+
+  const getCategoryName = (categoryId, categoryData) => {
+    const category = categoryData.find(cat => cat.category_id === Number(categoryId));
+    return category ? category.category_Name : "Unknown Category";
+  };
+
+
+  const getSubCategoryName = (subCategoryId, subCategoryList) => {
+    const subCategory = subCategoryList.find(sub => sub.id === Number(subCategoryId));
+    return subCategory ? subCategory.subcategory_Name : "Unknown Subcategory";
+  };
+  
 
   const getInHouseProduct = async () => {
     try {
-      console.log("Calling API...");
+    
       const res = await axios.get(
-        `http://localhost:5136/Product/GetAllProducts`,  // Ensure correct URL
+        `${apiUrl}Product/GetAllProducts`, 
         {
           headers: { Authorization: `Bearer ${storedToken}` }
         }
@@ -171,8 +251,8 @@ const ProductListTable = () => {
   const handleGenerateCode = (record) => {
     navigate("/GenerateBarCode", {
       state: {
-        productSku: record.Product_id,
-        productPrice: record.Price,
+        productSku: record.sku,
+        productPrice: record.calculateD_PRICE,
       },
     });
   };
@@ -286,7 +366,7 @@ const ProductListTable = () => {
         />
         <Column title="Product Name" dataIndex="product_Name" key="product_Name" align="center" />
         <Column title="Description" dataIndex="product_Description" key="product_Description" align="center" />
-        <Column title="Price" dataIndex="sellinG_PRICE" key="sellinG_PRICE" align="center" />
+        <Column title="Price" dataIndex="calculateD_PRICE" key="sellincalculateD_PRICE" align="center" />
         <Column title="Quantity" dataIndex="currenT_STOCK_QUANTITY" key="currenT_STOCK_QUANTITY" align="center" />
         <Column
             title="Rating"
@@ -371,28 +451,46 @@ const ProductListTable = () => {
       </Table>
 
       <Modal
-        title="Product Details"
-        open={isModalVisible}
-        onCancel={handleModalClose}
-        footer={[
-          <Button key="close" onClick={handleModalClose}>
-            Close
-          </Button>,
-        ]}
-      >
-        {selectedProduct && (
-          <div>
-            <p><strong>ID:</strong> {selectedProduct.Product_id}</p>
-            <p><strong>Name:</strong> {selectedProduct.Product_Name}</p>
-            <p><strong>Description:</strong> {selectedProduct.Description}</p>
-            <p><strong>Price:</strong> {selectedProduct.Price}</p>
-            <p><strong>Quantity:</strong> {selectedProduct.Quantity}</p>
-            <p><strong>Rating:</strong> {selectedProduct.Rating}</p>
-            <p><strong>Certification:</strong> {selectedProduct.Certified==="0" ? "Certified":"Uncertified"}</p>
-            <p><strong>Status:</strong> {selectedProduct.status==="0" ? "Activated" : "Deactivated"}</p>
-          </div>
-        )}
-      </Modal>
+      title="🛍️ Product Details"
+      open={isModalVisible}
+      onCancel={handleModalClose}
+      footer={[
+        <Button key="close" type="primary" onClick={handleModalClose}>
+          Close
+        </Button>,
+      ]}
+
+    >
+      {selectedProduct && (
+        <div style={{ lineHeight: "1.8", fontSize: "16px" }}>
+          <p style={{margin: "5px 0px"}}><IdcardOutlined /> <strong>ID:</strong> {selectedProduct.id}</p>
+          <p style={{margin: "5px 0px"}}><BarcodeOutlined /> <strong>Product ID:</strong> {selectedProduct.proD_ID}</p>
+          <p style={{margin: "5px 0px"}}><TagOutlined /> <strong>Name:</strong> {selectedProduct.product_Name}</p>
+          <p style={{margin: "5px 0px"}}><FileTextOutlined /> <strong>Description:</strong> { selectedProduct.product_Description }</p>
+          <p style={{margin: "5px 0px"}}><GiftOutlined /> <strong>Category:</strong> {getCategoryName(selectedProduct.categorY_ID, categoryData)}</p>
+          <p style={{margin: "5px 0px"}}><GoldOutlined /> <strong>Subcategory:</strong> {getSubCategoryName(selectedProduct.suB_CATEGORY_ID, subCategoryData)}</p>
+          <p style={{margin: "5px 0px"}}><ShoppingCartOutlined /> <strong>Stock Quantity:</strong> {selectedProduct.currenT_STOCK_QUANTITY}</p>
+          <p style={{margin: "5px 0px"}}><StarOutlined style={{ color: "#fadb14" }} /> <strong>Rating:</strong> {selectedProduct.rating} ⭐</p>
+          <p style={{margin: "5px 0px"}}><ContainerOutlined /> <strong>Packaging:</strong> {selectedProduct.packagE_WEIGHT}g, {selectedProduct.packagE_SHAPE}</p>
+          <p style={{margin: "5px 0px"}}><BoxPlotOutlined /> <strong>Dimensions:</strong> {selectedProduct.packagE_LENGTH}x{selectedProduct.packagE_WIDTH}x{selectedProduct.packagE_HEIGHT} cm</p>
+          <p style={{margin: "5px 0px"}}><PercentageOutlined /> <strong>Discount:</strong> {selectedProduct.discounT_TYPE} - ₹{selectedProduct.discounT_AMOUNT}</p>
+          <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Tax Amount:</strong> ₹{selectedProduct.taX_AMOUNT} ({selectedProduct.taX_CALCULATION})</p>
+          <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Final Price:</strong> ₹{selectedProduct.calculateD_PRICE}</p>
+          <p>
+            <SafetyCertificateOutlined style={{ color: selectedProduct.certification === 0 ? "green" : "red" }} />
+            <strong> Certification:</strong> {selectedProduct.certification === 0 ? "Certified" : "Uncertified"}
+          </p>
+          <p>
+            {selectedProduct.status === 0 ? (
+              <CheckCircleOutlined style={{ color: "green" }} />
+            ) : (
+              <CloseCircleOutlined style={{ color: "red" }} />
+            )}
+            <strong> Status:</strong> {selectedProduct.status === 0 ? "Activated" : "Deactivated"}
+          </p>
+        </div>
+      )}
+    </Modal>
     </div>
   );
 };
