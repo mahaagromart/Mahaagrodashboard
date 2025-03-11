@@ -50,7 +50,7 @@ import DeliverymanList from "../../Pages/UserManagement/Delivery_man/Deliveryman
 import EarningStatement from "../../Pages/UserManagement/Delivery_man/EarningStatement";
 import DeliverymanWithdraw from "../../Pages/UserManagement/Delivery_man/DeliverymanWithdraw";
 import VendorDashobard from "../../Pages/Vendor/VendorDashboard/VendorDashobard";
-
+import MobileBanner from "../../Pages/Promotionmanagement/Banner/MobileBanner";
 // **************************   therse are all Venodor Routes ****************************
 
 
@@ -87,6 +87,7 @@ const RouteContent = () => {
 
         {/* promotional management start here */}
         <Route path="/Banner" element={<ProtectedRoutes><Banner /></ProtectedRoutes>} />
+        <Route path="/MobileBanner" element={<ProtectedRoutes><MobileBanner /></ProtectedRoutes>} />
         <Route path="/Coupon" element={<ProtectedRoutes><Coupon /></ProtectedRoutes>} />
         <Route path="/Flashdeals" element={<ProtectedRoutes><Flashdeals /></ProtectedRoutes>} />
         <Route path="/Dealoftheday" element={<ProtectedRoutes><Dealoftheday /></ProtectedRoutes>} />
