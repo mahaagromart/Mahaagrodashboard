@@ -125,19 +125,45 @@ const CategoryTable = () => {
       >
         <Column title="Id" dataIndex="category_id" key="category_id" align="center" />
 
-        <Column
+        {/* <Column
           title="Category Image"
-          dataIndex="categoryImage"
-          key="categoryImage"
+          dataIndex="image"
+          key="image"
           align="center"
-          render={(text) => (
+          render={(image) => (
             <img
-              src={text}
+              src={`${apiUrl}${image}`}
               alt="Category"
               style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px", marginLeft: "150px" }}
             />
           )}
+        /> */}
+
+<Column
+            title="Category Image"
+            dataIndex="image"
+            key="image"
+            align="center"
+            render={(images) => (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+               src={`${apiUrl}${images}`}
+                alt="Brand Logo"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  objectFit: "contain",
+                  borderRadius: "10px",
+                  border: "1px solid #ddd",
+                  padding: "5px",
+                  backgroundColor: "#fff",
+                }}
+                onError={(e) => (e.target.style.display = "none")}
+              />
+            </div>
+          )}
         />
+
 
         <Column title="Category" dataIndex="category_Name" key="category_Name" align="center" />
 

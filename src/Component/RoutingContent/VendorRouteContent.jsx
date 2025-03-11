@@ -6,6 +6,8 @@ import VendorDashobard from "../../Pages/Vendor/VendorDashboard/VendorDashobard"
 import AddNewBrand from "../../Pages/Vendor/Brand/AddNewBrand";
 import BrandList from "../../Pages/Vendor/Brand/BrandList";
 import AllOrders from "../../Pages/Vendor/Orders/AllOrders";
+import AddNewProduct from "../../Pages/Vendor/ProductManagement/AddNewProduct";
+import ProductList from "../../Pages/Vendor/ProductManagement/ProductList";
 
 
 const VendorRouteContent = () => {
@@ -27,7 +29,12 @@ const VendorRouteContent = () => {
 
 
 
+      {/* Product Management section */}
 
+        <Route path="/add-product" element={<ProtectedRoutes> <AddNewProduct/>  </ProtectedRoutes>} />
+        <Route path="/product-list" element={<ProtectedRoutes> <ProductList/>  </ProtectedRoutes>} />
+        
+        
 
       </Routes>
     </>

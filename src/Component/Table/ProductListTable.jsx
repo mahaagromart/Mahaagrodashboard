@@ -342,13 +342,13 @@ const ProductListTable = () => {
 
         <Column
             title="Product Image"
-            dataIndex="images"
-            key="images"
+            dataIndex="thumbnailImage"
+            key="thumbnailImage"
             align="center"
           render={(images) => (
             <div style={{ display: "flex", justifyContent: "center" }}>
               <img
-               src={`${apiUrl}/${images}`}
+               src={`${apiUrl}${images}`}
                 alt="Brand Logo"
                 style={{
                   width: "80px",
