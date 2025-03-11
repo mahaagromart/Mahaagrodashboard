@@ -87,6 +87,46 @@ const ProductList = () => {
       });
     }
   };
+
+  const fetchSubSubCategoryData = async (selectedSubCategory) => {
+    if (!selectedSubCategory) {
+      Swal.fire({
+        icon: "warning",
+        title: "No SubCategory Selected",
+        text: "Please select a Sub category to load sub-subcategories.",
+      });
+      return;
+    }
+  
+    try {
+      const res = await axios.post(
+        `${apiUrl}SubsubCategory/GetSubSubCategoryBySubCategoryId`,
+          { id : selectedSubCategory },
+          {
+            headers: { Authorization: `Bearer ${storedToken}` },
+          }
+      );
+  
+   
+      if (res.data && res.data[0]?.dataset?.subsubCategoryList?.$values) {
+        setSubSubCategoryList(res.data[0].dataset.subsubCategoryList.$values);
+      } else {
+        throw new Error("No sub-subcategories found");
+      }
+    } catch (error) {
+      console.error("Error fetching sub-subcategory data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error Fetching Sub-Subcategories",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong.",
+      });
+    }
+  };
+  
+
   const getSubCategory = async () => {
     try {
       const res = await axios.post(
@@ -145,9 +185,7 @@ const ProductList = () => {
 
   useEffect(() => {
     getCategory();
-  
 
-    // getSubSubSubCategory();
   }, []);
 
   return (
@@ -222,6 +260,7 @@ const ProductList = () => {
                     placeholder="Select Sub Category"
                     focusBorderColor="blue.500"
                     size="md"
+                    onChange={(e) => fetchSubSubCategoryData(e.target.value)}
                   >
                     {subCategoryList.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -243,11 +282,11 @@ const ProductList = () => {
                     focusBorderColor="blue.500"
                     size="md"
                   >
-                    {subCategoryList.map((subCategory) => {
-                      <option key={subCategory.id} value={subCategory.id}>
-                        {subCategory.Subcategory_Name}
-                      </option>;
-                    })}
+                      {subSubCategoryList.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.subsubcategorY_NAME}
+                      </option>
+                    ))}
                   </Select>
                 </FormControl>
               </CardBox>

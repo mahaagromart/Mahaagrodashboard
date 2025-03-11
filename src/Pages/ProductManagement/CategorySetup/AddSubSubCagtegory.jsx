@@ -39,7 +39,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const AddSubSubCategory = () => {
   const [categoryList, setCategoryList] = useState([]);
-  const [subCategoryList, setSubcategory] = useState([]);
+  const [subCategoryList, setSubcategoryList] = useState([]);
 
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -48,74 +48,133 @@ const AddSubSubCategory = () => {
   // Fetch categories
   const getCategory = async () => {
     try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceCategory/GetAllCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-
-      if (res.data.Message === "success") {
-        setCategoryList(res.data.CategoryList);
+      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
+      });
+      
+      if (res.data.message === "SUCCESS" || res.data.categoryList?.$values) {
+        setCategoryList(res.data.categoryList.$values);
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
-          text: "Please try again.",
+          text: "Invalid response format. Please try again.",
           icon: "error",
         });
       }
     } catch (error) {
+      console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text: `Failed to fetch the category list. Please try again later. ${error}`,
+        text:
+          error.response?.data?.message ||
+          "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
+  const getCategoryName = (id) => {
+    if (!categoryList || categoryList.length === 0) {
+      return "Unknown Category"; 
+    }
 
-  // Fetch subcategories
-  const getAllSubCategory = async () => {
+    const category = categoryList.find((cat) => cat.category_id === Number(id));
+    return category ? category.category_Name : "Unknown Category"; 
+  };
+
+  const getSubCategoryName = (id) => {
+    if (!subCategoryList || subCategoryList.length === 0) {
+      return "Unknown Category"; 
+    }
+
+    const Subcategory = subCategoryList.find((sub) => sub.id === Number(id));
+    return Subcategory ? Subcategory.subcategory_Name : "Unknown Category"; 
+  };
+
+
+
+
+  const fetchSubCategoryData = async (selectedCategory) => {
+    if (!selectedCategory) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Category Selected",
+        text: "Please select a category to load subcategories.",
+      });
+      return;
+    }
+
     try {
+
+
       const res = await axios.post(
-        `${apiUrl}/EcommerceSubcategory/GetAllSubCategory`,
-        {},
+        `${apiUrl}SubCategory/GetSubCategoryThroughCategoryId`,
+        { category_id: selectedCategory },
         {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubcategory(res.data.SubCategoryList);
+      if (res.data && res.data[0]?.dataset?.$values) {
+        setSubcategoryList(res.data[0].dataset.$values);
+      } else {
+        throw new Error("No subcategories found");
       }
     } catch (error) {
-      await Swal.fire({
-        title: "Error In Fetching SubCategory",
-        text:
-          "Failed to fetch the category list. Please try again later." + error,
+      console.error("Error fetching subcategory data:", error);
+      Swal.fire({
         icon: "error",
+        title: "Error Fetching Subcategories",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Something went wrong.",
       });
     }
   };
 
-  // Fetch data when component mounts
+
   useEffect(() => {
     getCategory();
-    getAllSubCategory();
+
   }, []);
 
   // Handle form submission
   const handleSubmit = async (values, { resetForm }) => {
     dispatch(startLoading());
+
+    console.log(values);  
+
+    const cat_name = getCategoryName(values.CATEGORY_NAME);
+    const sub_name = getSubCategoryName(values.SUBCATEGORY_NAME);
+
+    console.log("category name : ",cat_name)
+    console.log("subcategory name : ",sub_name)
+
+    debugger
+
+
+    const data = {
+          SUBSUBCATEGORY_NAME : values.SUBSUBCATEGORY_NAME.toString() || "",
+          SUBCATEGORY_NAME : sub_name.toString() || "",
+          CATEGORY_NAME : cat_name.toString() || "",
+          PRIORITY : Number(values.PRIORITY) || 0,
+          CATEGORY_ID : Number(values.CATEGORY_NAME) || 0,
+          SUBCATEGORY_ID : Number(values.SUBCATEGORY_NAME) || 0 
+    }
+
+    
+
+
     try {
       const res = await axios.post(
-        `${apiUrl}EcommerceSubSubsubCategory/InsertSubsubCategory`,
-        values,
+        `${apiUrl}SubsubCategory/InsertSubsubCategory`,
+        data,
         {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
+      console.log(res.data);
 
-      if (res.data.Message === "SUCCESS") {
+      if (res.data[0].message === "SUCCESS" && res.data[0].code === 200) {
         await Swal.fire({
           title: "Success",
           text: "Sub-category added successfully!",
@@ -164,6 +223,8 @@ const AddSubSubCategory = () => {
               CATEGORY_NAME: "",
               SUBCATEGORY_NAME: "",
               PRIORITY: "",
+              SUBCATEGORY_ID : "",
+              CATEGORY_ID : ""
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -221,16 +282,17 @@ const AddSubSubCategory = () => {
                         placeholder="Select Main Category"
                         focusBorderColor="blue.500"
                         size="md"
-                        onChange={(e) =>
-                          setFieldValue("CATEGORY_NAME", e.target.value)
-                        }
+                        onChange={(e) => {
+                          setFieldValue("CATEGORY_NAME", e.target.value);
+                          fetchSubCategoryData(e.target.value);
+                        }}
                       >
                         {categoryList.map((category) => (
                           <option
-                            key={category.Category_id}
-                            value={category.Category_Name}
+                            key={category.category_id}
+                            value={category.category_id}
                           >
-                            {category.Category_Name}
+                            {category.category_Name}
                           </option>
                         ))}
                       </Field>
@@ -260,12 +322,12 @@ const AddSubSubCategory = () => {
                           setFieldValue("SUBCATEGORY_NAME", e.target.value)
                         }
                       >
-                        {subCategoryList.map((category) => (
+                        {subCategoryList.map((s) => (
                           <option
-                            key={category.id}
-                            value={category.Subcategory_Name}
+                            key={s.id}
+                            value={s.id}
                           >
-                            {category.Subcategory_Name}
+                            {s.subcategory_Name}
                           </option>
                         ))}
                       </Field>

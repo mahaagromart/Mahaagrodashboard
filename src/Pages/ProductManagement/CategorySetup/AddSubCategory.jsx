@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   SimpleGrid,
@@ -20,11 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { startLoading, stopLoading } from "../../../redux/Features/LoadingSlice";
 import SubCategoryTable from "../../../Component/Table/SubCategoryTable";
 
-
-
-
-
-
 const validationSchema = yup.object().shape({
   Subcategory_Name: yup
     .string()
@@ -40,23 +35,28 @@ const validationSchema = yup.object().shape({
 const AddSubCategory = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const storedToken = token || localStorage.getItem("token");
+  const dispatch = useDispatch();
   const [categoryList, setCategoryList] = useState([]);
 
+  const getCategoryName = (id) => {
+    if (!categoryList || categoryList.length === 0) {
+      return "Unknown Category"; 
+    }
 
+    const category = categoryList.find((cat) => cat.category_id === Number(id));
+    return category ? category.category_Name : "Unknown Category"; 
+  };
 
-
-
-  
   const getCategory = async () => {
     try {
       const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      // Ensure correct response structure before updating state
-      if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
-        setCategoryList(res.data.categoryList.$values);
+
+      const categories = res.data.categoryList?.$values || res.data.categoryList;
+      if (res.data.message === "SUCCESS" && categories) {
+        setCategoryList(categories);
       } else {
         await Swal.fire({
           title: "Error in Getting Category List",
@@ -68,27 +68,35 @@ const AddSubCategory = () => {
       console.error("Error fetching categories:", error);
       await Swal.fire({
         title: "Error",
-        text:
-          error.response?.data?.message ||
-          "Failed to fetch the category list. Please try again later.",
+        text: error.response?.data?.message || "Failed to fetch the category list. Please try again later.",
         icon: "error",
       });
     }
   };
-  
 
   const handleSubmit = async (values, { resetForm }) => {
     dispatch(startLoading());
+
+    const c_name = getCategoryName(values.category_id);
+
     try {
+      const data = {
+        Subcategory_Name: values.Subcategory_Name.toString() || "",
+        Category_id: Number(values.category_id) || 0,
+        Category_Name: c_name.toString(),
+        Priority: Number(values.priority) || 0,
+      };
+
       const res = await axios.post(
-        `${apiUrl}/EcommerceSubcategory/InsertSubCategory`,
-        values,
+        `${apiUrl}SubCategory/InsertSubCategory`,
+        data,
         {
           headers: { Authorization: `Bearer ${storedToken}` },
         }
       );
 
-      if (res.data.Message.toLowerCase() === "success") {
+
+      if (res.data[0].message === "SUCCESS" && res.data[0].code === 200) {
         await Swal.fire({
           title: "Success",
           text: "Sub-category added successfully!",
@@ -115,18 +123,13 @@ const AddSubCategory = () => {
     }
   };
 
-
-
-
-
   useEffect(() => {
     getCategory();
-
   }, []);
 
   return (
     <>
-      <Box marginTop="1%" >
+      <Box marginTop="1%">
         <Box mb={6}>
           <h2
             className="content-title"
@@ -212,27 +215,14 @@ const AddSubCategory = () => {
                           focusBorderColor="blue.500"
                           size="md"
                           onChange={(e) => {
-                            const selectedCategory = categoryList.find(
-                              (category) =>
-                                category.Category_id ===
-                                parseInt(e.target.value)
-                            );
                             setFieldValue("category_id", e.target.value);
-                            setFieldValue(
-                              "Category_Name",
-                              selectedCategory?.Category_Name
-                            );
                           }}
                         >
-                            {categoryList.map((category) => (
-                              <option
-                                key={category.category_id}
-                                value={category.category_id}
-                                
-                              >
-                                {category.category_Name}
-                              </option>
-                            ))}
+                          {categoryList.map((category) => (
+                            <option key={category.category_id} value={category.category_id}>
+                              {category.category_Name}
+                            </option>
+                          ))}
                         </Field>
                         <Text color="red.500" fontSize="sm" minHeight="20px">
                           <ErrorMessage name="category_id" />
@@ -240,19 +230,9 @@ const AddSubCategory = () => {
                       </FormControl>
                     </CardBox>
 
-                    <GridItem
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      mt={4}
-                      mb={5}
-                    >
+                    <GridItem display="flex" justifyContent="center" alignItems="center" mt={4} mb={5}>
                       <Box display="flex" gap={5} mr={5} mt={6}>
-                        <Button
-                          colorScheme="gray"
-                          onClick={() => resetForm()}
-                          type="button"
-                        >
+                        <Button colorScheme="gray" onClick={() => resetForm()} type="button">
                           Reset
                         </Button>
                         <Button colorScheme="blue" type="submit">
@@ -270,7 +250,7 @@ const AddSubCategory = () => {
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-           <SubCategoryTable/>
+            <SubCategoryTable />
           </CardBox>
         </Box>
       </Box>

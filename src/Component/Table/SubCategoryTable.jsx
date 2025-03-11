@@ -36,7 +36,7 @@ const SubCategoryTable = () => {
   const [searchText, setSearchText] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
-  const [categoryList, setCategoryList] = useState([]);
+
 
   const validationSchema = Yup.object({
     subcategoryName: Yup.string().required("Subcategory Name is required"),
@@ -46,50 +46,34 @@ const SubCategoryTable = () => {
 
   const getSubCategory = async () => {
     try {
-      // Sending GET request with headers
-      const res = await axios.get(
-        `${apiUrl}SubCategory/GetAllSubCategory`, // Assuming apiUrl is defined
-        {
-          headers: {
-            Authorization: `Bearer ${storedToken}`, // Replace storedToken with actual token if needed
-          },
-        }
-      );
-  
-      // Ensure the response message is "SUCCESS"
-      if (res.data.message?.toLowerCase() === "success") {
-        // Set the received subcategory list to state
-        setSubCategoryData(res.data.dataset?.$values || []); // Adjust based on actual response structure
-        console.log(res.data.dataset?.$values); // Logging for debugging purposes
-  
-        // Success alert using SweetAlert2
-        await Swal.fire({
-          title: 'Success!',
-          text: 'Sub-category list fetched successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-        });
+      const res = await axios.get(`${apiUrl}SubCategory/GetAllSubCategory`, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.data[0].message === "SUCCESS") {
+        setSubCategoryData(res.data[0].dataset.$values)
       } else {
-        // Error alert if Message is not "success"
-        await Swal.fire({
-          title: 'Error!',
-          text: 'Error fetching Sub-category List.',
-          icon: 'error',
-          confirmButtonText: 'Try Again',
+        Swal.fire({
+          title: "Error!",
+          text: "Error fetching Sub-category List.",
+          icon: "error",
+          confirmButtonText: "Try Again",
         });
       }
     } catch (error) {
-      // Handle error and show message using SweetAlert2
-      await Swal.fire({
-        title: 'Failed!',
-        text: `Failed to fetch Sub-category List: ${error.message}`,
-        icon: 'error',
-        confirmButtonText: 'Close',
-      });
+      console.error("Error fetching sub-categories:", error);
   
-      console.error(error); // Log the error for further inspection
+      Swal.fire({
+        title: "Failed!",
+        text: `Failed to fetch Sub-category List: ${error.message}`,
+        icon: "error",
+        confirmButtonText: "Close",
+      });
     }
   };
+  
 
   
   
@@ -191,7 +175,6 @@ const SubCategoryTable = () => {
 
   useEffect(() => {
     getSubCategory();
-   console.log(subCategoryData)
    
   }, []);
 

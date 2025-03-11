@@ -7,7 +7,8 @@ import axios from "axios";
 
 const { Column } = Table;
 
-const TableWithToggle = () => {
+const CategoryTable = () => {
+  const apiUrl = import.meta.env.VITE_API_URL; 
   const [categoryData, setCategoryData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const { token } = useSelector((state) => state.auth);
@@ -16,23 +17,18 @@ const TableWithToggle = () => {
   // Fetch category data
   const getCategoryData = async () => {
     try {
-      const url = "http://localhost:49814/EcommerceCategory/GetAllCategory";
-      const response = await axios.post(
-        `${url}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        }
-      );
+      const url = `${apiUrl}Category/GetAllCategory`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
 
-      if (response.data.CategoryList) {
-        // Properly set category data
-        setCategoryData(response.data.CategoryList);
+      if (response.data.code === 200 && response.data.retval === "SUCCESS") {
+        setCategoryData(response.data.categoryList.$values);
       }
     } catch (error) {
-      console.log("Error occurred", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -51,16 +47,14 @@ const TableWithToggle = () => {
       if (result.isConfirmed) {
         setCategoryData((prevData) =>
           prevData.map((item) =>
-            item.id === categoryData.Category_id
-              ? { ...item, status: record.status === "Active" ? "Inactive" : "Active" }
+            item.Category_id === record.Category_id
+              ? { ...item, status: item.status === "Active" ? "Inactive" : "Active" }
               : item
           )
         );
         Swal.fire(
           "Updated!",
-          `The category is now ${
-            record.status === "Active" ? "Inactive" : "Active"
-          }.`,
+            `The category is now ${record.status === "Active" ? "Inactive" : "Active"}.`,
           "success"
         );
       }
@@ -69,6 +63,7 @@ const TableWithToggle = () => {
 
   // Handle delete category
   const handleDelete = (record) => {
+    console.log(record.category_id)
     Swal.fire({
       title: "Are you sure?",
       text: "You will not be able to recover this category!",
@@ -78,15 +73,20 @@ const TableWithToggle = () => {
       cancelButtonText: "No, cancel!",
     }).then((result) => {
       if (result.isConfirmed) {
-        setCategoryData((prevData) => prevData.filter((item) => item.id !== record.id));
-        Swal.fire("Deleted!", "The category has been deleted.", "success");
+        let response= axios.post(`${apiUrl}Category/DeleteProductCategory`,{Category_id:record.category_id}, {headers: {
+          Authorization: `Bearer ${storedToken}`}})
+          if(response){
+            console.log(response)
+          }
+        // setCategoryData((prevData) => prevData.filter((item) => item.Category_id !== record.Category_id));
+        // Swal.fire("Deleted!", "The category has been deleted.", "success");
       }
     });
   };
 
   // Filtered data based on search
   const filteredData = categoryData.filter((item) =>
-    item.Category_Name.toLowerCase().includes(searchText.toLowerCase())
+    item.category_Name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Fetch data on mount
@@ -116,14 +116,14 @@ const TableWithToggle = () => {
       {/* Table */}
       <Table
         dataSource={filteredData}
-        rowKey="Category_id"  
+        rowKey="category_id"  
         bordered={false}
         pagination={{ pageSize: 5 }}
         style={{
           border: "none",
         }}
       >
-        <Column title="Id" dataIndex="Category_id" key="Category_id" align="center" />
+        <Column title="Id" dataIndex="category_id" key="category_id" align="center" />
 
         <Column
           title="Category Image"
@@ -134,14 +134,14 @@ const TableWithToggle = () => {
             <img
               src={text}
               alt="Category"
-              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" , marginLeft :  "150px" }}
+              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px", marginLeft: "150px" }}
             />
           )}
         />
 
-        <Column title="Category" dataIndex="Category_Name" key="categoryName" align="center" />
+        <Column title="Category" dataIndex="category_Name" key="category_Name" align="center" />
 
-        <Column title="Priority" dataIndex="Priority" key="priority" align="center" />
+        <Column title="Priority" dataIndex="priority" key="priority" align="center" />
 
         <Column
           title="Status"
@@ -190,4 +190,6 @@ const TableWithToggle = () => {
   );
 };
 
-export default TableWithToggle;
+
+
+export default CategoryTable;
