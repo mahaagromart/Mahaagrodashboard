@@ -1,6 +1,6 @@
 import { SettingFilled } from '@ant-design/icons';
-import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaList, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags, FaUser, FaWallet } from 'react-icons/fa6';
-import { GiCheckMark, GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
+import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaList, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags,FaMobile, FaUser, FaWallet } from 'react-icons/fa6';
+import { GiCheckMark,GiPhone , GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
 import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard, MdBarcodeReader, MdReviews, MdOutlineSettingsInputComponent, MdContactEmergency } from 'react-icons/md';
 import { BiMoneyWithdraw, BiSend, BiSolidOffer } from "react-icons/bi";
 import { IoDocumentTextSharp } from "react-icons/io5";
@@ -24,7 +24,7 @@ export const adminRoutes = [
       { label: 'Sub Sub Category', icon: <MdAddToPhotos />, key: '/SubSubCategory' },
     ],
   },
-  
+
   { label: 'ProductAttribute', icon: <SettingFilled />, key: '/ProductAttribute' },
   {
     label: 'In-house Products',
@@ -33,7 +33,7 @@ export const adminRoutes = [
       { label: 'Product List', icon: <MdListAlt />, key: '/ProductList' },
       // { label: 'Generate BarCode', icon: <MdBarcodeReader />, key: '/GenerateBarCode' },
       { label: 'Add new Product', icon: <MdAddCircle />, key: '/AddNewProduct' },
-      { label: 'Bulk Insert', icon: <FaShirtsinbulk/>, key: '/BulkInsert' },
+      { label: 'Bulk Insert', icon: <FaShirtsinbulk />, key: '/BulkInsert' },
     ],
   },
   {
@@ -45,7 +45,13 @@ export const adminRoutes = [
       { label: 'Denied Product', icon: <GiCrossMark />, key: '/DeniedProduct' },
     ],
   },
-  { label: 'Banner', icon: <GiKnightBanner />, key: '/Banner' },
+  { label: "Banner's", icon: <GiKnightBanner />, 
+    children: [
+      { label: "Website Banner's", icon: <GiKnightBanner />, key: '/Banner' },
+      { label: "Mobile Banner's", icon: <FaMobile />, key: '/MobileBanner' },
+      // { label: 'Denied Product', icon: <GiCrossMark />, key: '/DeniedProduct' },
+    ],
+  },
   {
     label: 'Offers & Deals',
     icon: <BiSolidOffer />,
@@ -82,45 +88,50 @@ export const adminRoutes = [
     ],
   },
 
-    // user Management
+  // user Management
 
-    {
-      label: 'User Management',
-      icon: <FaUser />,
-      children: [
-        { label: 'Customers', icon: <FaPeopleGroup /> ,
-        children :[
+  {
+    label: 'User Management',
+    icon: <FaUser />,
+    children: [
+      {
+        label: 'Customers', icon: <FaPeopleGroup />,
+        children: [
           { label: 'Customer List', icon: <FaList />, key: '/CustomerList' },
           { label: 'Customer Reviews', icon: <MdReviews />, key: '/CustomerReviews' },
           { label: 'Wallet', icon: <FaWallet />, key: '/CustomerWallet' },
           { label: 'Wallet Bonus Setup', icon: <MdOutlineSettingsInputComponent />, key: '/WalletBonusSetup' },
-        ] },
-          { label: 'Employee', icon: < FaUserFriends/>,  
-            children : [
-            { label: 'Employee Role Setup', icon: <CiSettings />, key: '/EmployeeRoleSetup' },
-            { label: 'Employees', icon: <CiUser />, key: '/Employees' },
-            ]
-          },
+        ]
+      },
+      {
+        label: 'Employee', icon: < FaUserFriends />,
+        children: [
+          { label: 'Employee Role Setup', icon: <CiSettings />, key: '/EmployeeRoleSetup' },
+          { label: 'Employees', icon: <CiUser />, key: '/Employees' },
+        ]
+      },
 
-      ],
-    },
-    { label: 'Sellers', icon: <TbMan />, 
-      children : [
+    ],
+  },
+  {
+    label: 'Sellers', icon: <TbMan />,
+    children: [
       { label: 'Add New Seller', icon: <MdAdd />, key: '/AddNewSeller' },
       { label: 'Seller List', icon: <MdListAlt />, key: '/SellerList' },
-      { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/SellerWithdraws' },
-      { label: 'Withdraws Methods', icon: < PiHandWithdrawFill/>, key: '/WithdrawsMethods' },
-      ]
-    },
-    { label: 'Delivery-Man', icon: <CiDeliveryTruck /> ,
-      children : [
+      { label: 'Withdraws', icon: < BiMoneyWithdraw />, key: '/SellerWithdraws' },
+      { label: 'Withdraws Methods', icon: < PiHandWithdrawFill />, key: '/WithdrawsMethods' },
+    ]
+  },
+  {
+    label: 'Delivery-Man', icon: <CiDeliveryTruck />,
+    children: [
       { label: 'Add New', icon: <MdAdd />, key: '/AddNewDelivery-man' },
       { label: 'List', icon: <MdListAlt />, key: '/Deliver-manList' },
       { label: 'Chat', icon: <TbCategory2 />, key: '/Delivery-manChat' },
-      { label: 'Withdraws', icon: < BiMoneyWithdraw/>, key: '/Delivery-manWithdraws' },
+      { label: 'Withdraws', icon: < BiMoneyWithdraw />, key: '/Delivery-manWithdraws' },
       // { label: 'Emergency Contact', icon: < MdContactEmergency/>, key: '/Delivery-manEmergencyContact' },
-      ]
-    },
+    ]
+  },
 
 
 
@@ -134,7 +145,7 @@ export const adminRoutes = [
       { label: 'Transaction Report', icon: <FaMoneyBillTrendUp />, key: '/TransactionReport' },
     ],
   },
-  { label: 'Signout', icon: <FaSignOutAlt />, key: '/signout' , danger : true  },
+  { label: 'Signout', icon: <FaSignOutAlt />, key: '/signout', danger: true },
 
 ];
 
