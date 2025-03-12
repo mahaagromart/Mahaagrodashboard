@@ -1,7 +1,7 @@
 import { SettingFilled } from '@ant-design/icons';
 import { FaBell, FaBusinessTime, FaCodePullRequest, FaIdeal, FaList, FaMoneyBillTrendUp, FaShirtsinbulk, FaShop, FaTags,FaMobile, FaUser, FaWallet } from 'react-icons/fa6';
 import { GiCheckMark,GiPhone , GiCrossMark, GiKnightBanner, GiTakeMyMoney } from 'react-icons/gi';
-import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard, MdBarcodeReader, MdReviews, MdOutlineSettingsInputComponent, MdContactEmergency } from 'react-icons/md';
+import { MdCategory, MdAddCircle, MdAdd, MdAddToPhotos, MdHouse, MdListAlt, MdMessage, MdDashboard, MdBarcodeReader, MdReviews, MdOutlineSettingsInputComponent, MdContactEmergency, MdBorderColor,MdPendingActions,MdDeliveryDining, } from 'react-icons/md';
 import { BiMoneyWithdraw, BiSend, BiSolidOffer } from "react-icons/bi";
 import { IoDocumentTextSharp } from "react-icons/io5";
 import { BsTicketPerforated } from "react-icons/bs";
@@ -13,8 +13,27 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { TbCategory2, TbMan } from "react-icons/tb";
 import { PiHandWithdrawFill } from "react-icons/pi";
 import { CiDeliveryTruck, CiSettings, CiUser } from "react-icons/ci";
+import {LuListOrdered} from 'react-icons/lu'
+import { GiConfirmed,GiReturnArrow,GiBoxUnpacking  } from 'react-icons/gi';
+import { TbShoppingCartCancel } from 'react-icons/tb';
+import { AiOutlineDeliveredProcedure,AiFillCloseCircle } from 'react-icons/ai';
 export const adminRoutes = [
   { label: 'Dashboard', icon: <MdDashboard />, key: '/' },
+  {
+      label: "Order Management",
+      icon: <MdBorderColor />,
+      children: [
+        { label: "All Orders", icon: <LuListOrdered />, key: "/all-orders" },
+        { label: "Pending", icon: <MdPendingActions />, key: "/pending-orders" },
+        { label: "Confirmed", icon: <GiConfirmed />, key: "/confirmed-orders" },
+        { label: "Packaging", icon: <GiBoxUnpacking />, key: "/packaging-orders" },
+        { label: "Out For Delivery", icon: <MdDeliveryDining />, key: "/out-for-delivery" },
+        { label: "Delivered", icon: <AiOutlineDeliveredProcedure />, key: "/delivered-orders" },
+        { label: "Returned", icon: <GiReturnArrow />, key: "/returned-orders" },
+        { label: "Failed To Deliver", icon: <AiFillCloseCircle />, key: "/failed-orders" },
+        { label: "Cancelled", icon: <TbShoppingCartCancel />, key: "/cancelled-orders" },
+      ],
+    },
   {
     label: 'Category Setup',
     icon: <MdCategory />,

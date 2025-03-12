@@ -8,6 +8,15 @@ import BrandList from "../../Pages/Vendor/Brand/BrandList";
 import AllOrders from "../../Pages/Vendor/Orders/AllOrders";
 import AddNewProduct from "../../Pages/Vendor/ProductManagement/AddNewProduct";
 import ProductList from "../../Pages/Vendor/ProductManagement/ProductList";
+import PendingOrders from "../../Pages/Vendor/Orders/PendingOrders";
+import ConfirmedOrders from "../../Pages/Vendor/Orders/ConfirmedOrders";
+import Packaging from "../../Pages/Vendor/Orders/Packaging";
+import OrderListTable from "../VendorTable/OrderListTable";
+import OutForDelivery from "../../Pages/Vendor/Orders/OutForDelivery";
+import Delivered from "../../Pages/Vendor/Orders/Delivered";
+import Returned from "../../Pages/Vendor/Orders/Returned";
+import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
+import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
 
 
 const VendorRouteContent = () => {
@@ -26,6 +35,15 @@ const VendorRouteContent = () => {
 
             {/* Order's Section  */}
         <Route path="/all-orders" element={<ProtectedRoutes> <AllOrders/>   </ProtectedRoutes>} />
+        <Route path="/pending-orders" element={<ProtectedRoutes> <PendingOrders/>   </ProtectedRoutes>} />
+        <Route path="/pending-orders" element={<ProtectedRoutes> <PendingOrders/>   </ProtectedRoutes>} />
+        <Route path="/confirmed-orders" element={<ProtectedRoutes> <ConfirmedOrders/>   </ProtectedRoutes>} />
+        <Route path="/packaging-orders" element={<ProtectedRoutes> <Packaging/>   </ProtectedRoutes>} />
+        <Route path="/out-for-delivery" element={<ProtectedRoutes> <OutForDelivery/>   </ProtectedRoutes>} />
+        <Route path="/delivered-orders" element={<ProtectedRoutes> <Delivered/>   </ProtectedRoutes>} />
+        <Route path="/returned-orders" element={<ProtectedRoutes> <Returned/>   </ProtectedRoutes>} />
+        <Route path="/failed-orders" element={<ProtectedRoutes> <FailedToDelivery/>   </ProtectedRoutes>} />
+        <Route path="/cancelled-orders" element={<ProtectedRoutes> <Cancelled/>   </ProtectedRoutes>} />
 
 
 

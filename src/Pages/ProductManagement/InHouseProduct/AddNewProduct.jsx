@@ -558,6 +558,7 @@ const AddNewProduct = () => {
     try {
       dispatch(startLoading());
   
+      var PROD_ID = null;
       for (let i = 0; i < values.varientsData.length; i++) {
         let variant = values.varientsData[i];
   
@@ -565,7 +566,7 @@ const AddNewProduct = () => {
         let imagePathString = "";
         if (variant.images?.length > 0) {
           try {
-            let uploadedImagePaths = [];
+            let uploadedImagePaths = []; 
             for (const image of variant.images) {
               const uploadedImagePath = await uploadImage(image, "Products");
               if (!uploadedImagePath) {
@@ -584,40 +585,6 @@ const AddNewProduct = () => {
             return;
           }
         }
-  
-        // // ✅ Step 2: Prepare API Payload
-        // let payload = {
-        //   productName: values.productName,
-        //   productDescription: values.productDescription,
-        //   category: values.category,
-        //   subCategory: values.subCategory,
-        //   subSubCategory : values.subSubCategory,
-        //   brand: values.brand,
-        //   variantName: variant.variantName,
-        //   sku: variant.sku,
-        //   hsn: variant.hsn,
-        //   unit: variant.unit,
-        //   mrp: variant.mrp,
-        //   sellingPrice: variant.sellingPrice,
-        //   minimumOrderQty: variant.minimumOrderQty,
-        //   currentStockQty: variant.currentStockQty,
-        //   discountType: variant.discountType,
-        //   discountAmount: variant.discountAmount,
-        //   taxCalculation: variant.taxCalculation,
-        //   taxAmount: variant.taxAmount,
-        //   shape: variant.shape,
-        //   length: variant.length,
-        //   width: variant.width,
-        //   height: variant.height,
-        //   diameter: variant.diameter,
-        //   weight: variant.weight,
-        //   calculatedVolume: variant.calculatedVolume,
-        //   calculatedPrice: variant.calculatedPrice,
-        //   minimumCalculatePrice : variant.calculatedPrice*variant.minimumOrderQty,
-        //   images: imagePathString, 
-        // };
-
-        debugger
 
         let payload = {
 
@@ -626,15 +593,15 @@ const AddNewProduct = () => {
           SUB_SUB_CATEGORY_ID : values.subSubCategory.toString() || "",
           Product_Name: values.productName.toString(),
           Product_Description: values.productDescription.toString(),
-          Images: imagePathString.toString(),
+          ThumbnailImage: imagePathString.toString(),
           BRAND: values.brand.toString() || "",
           sku: variant.sku.toString(),
           UNIT: values.unit.toString()  || "",
-          TAGS_INPUT: values.tags || [],  // Assuming tags input comes from values
+          TAGS_INPUT: values.tags || [], 
           HSN: variant.hsn.toString(),
-      
+          PROD_ID: PROD_ID,
           // Pricing
-          PRICING: Number(variant.mrp),  // Assuming PRICING is equivalent to MRP
+          PRICING: Number(variant.mrp), 
           MAXIMUM_RETAIL_PRICE: Number(variant.mrp),
           SELLING_PRICE: Number(variant.sellingPrice),
           MINIMUM_ORDER_QUANTITY: Number(variant.minimumOrderQty),
@@ -670,18 +637,20 @@ const AddNewProduct = () => {
               "Content-Type": "application/json",
             },
           });
-  
-          if (res.data[0].message === "SUCCESS" || res.data[0].code === 200) {
-            console.log(`✅ Variant ${variant.variantName} inserted successfully!`);
+            console.log(res.data);
+          if (res.data[0].code === 200) {
+
+            PROD_ID = res.data[0].message;
+            console.log(PROD_ID)
+            
           } else {
-            console.warn(`⚠️ Variant ${variant.variantName} failed:`, res.data);
           }
         } catch (error) {
-          console.error(`❌ Error submitting variant ${variant.variantName}:`, error);
+
+
         }
       }
-  
-      // ✅ Success Message After All Variants Are Processed
+
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -689,7 +658,7 @@ const AddNewProduct = () => {
       });
   
     } catch (err) {
-      console.error("Unexpected Error:", err);
+   
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -699,42 +668,6 @@ const AddNewProduct = () => {
       dispatch(stopLoading());
     }
   };
-  
-
-
-
-  // const payload = {
-  //   Product_Name: values.productName.toString(),
-  //   PRODUCT_DESCRIPTION: values.productDescription.toString(),
-  //   CATEGORY_ID: values.category.toString(),
-  //   SUB_CATEGORY_ID: values.subCategory.toString(),
-  //   IMAGES: values.images.toString(),
-  //   BRAND: values.brand ? values.brand.toString() : "",
-  //   sku: values.sku.toString(),
-  //   UNIT: values.unit.toString(),
-  //   TAGS_INPUT: values.tags || [],
-  //   HSN: values.hsn ? values.hsn.toString() : "",
-  //   PRICING: Number(values.sellingPrice) || 0,
-  //   MAXIMUM_RETAIL_PRICE: Number(values.mrp) || 0,
-  //   SELLING_PRICE: Number(values.sellingPrice) || 0,
-  //   MINIMUM_ORDER_QUANTITY: Number(values.minimumOrderQty) || 0,
-  //   CURRENT_STOCK_QUANTITY: Number(values.currentStockQty) || 0,
-  //   DISCOUNT_TYPE: values.discountType
-  //     ? values.discountType.toString()
-  //     : "",
-  //   DISCOUNT_AMOUNT: values.discountAmount.toString() || "0",
-  //   TAX_AMOUNT: values.taxAmount.toString() || "",
-  //   TAX_CALCULATION: values.taxCalculation.toString() || "",
-  //   CALCULATED_PRICE: values.calculatedPrice.toString() || "",
-  //   PACKAGE_SHAPE: values.shape.toString() || "",
-  //   PACKAGE_LENGTH: values.length.toString() || "0",
-  //   PACKAGE_WIDTH: values.width.toString() || "0",
-  //   PACKAGE_HEIGHT: values.height.toString() || "0",
-  //   PACKAGE_WEIGHT: Number(values.weight) || 0,
-  //   PACKAGE_DIAMETER: values.diameter.toString() || "0",
-  //   PACKAGE_TOTAL_VOLUME: values.calculatedVolume.toString() || "0",
-  // };
-
 
 
   return (
@@ -749,12 +682,7 @@ const AddNewProduct = () => {
         }}
       >
     {({ values, errors, touched, setFieldValue, resetForm, isValid, dirty }) => {
-            // console.log("Form Values:", values);
-            // console.log("Form Errors:", errors);
-            // console.log("Touched Fields:", touched);
-            // console.log("Is Form Valid?", isValid);
-            // console.log("Is Form Dirty?", dirty);
-
+          
           const handleKeyDown = (e) => {
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();

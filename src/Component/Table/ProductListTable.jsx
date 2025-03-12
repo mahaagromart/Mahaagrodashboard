@@ -365,21 +365,22 @@ const ProductListTable = () => {
           )}
         />
         <Column title="Product Name" dataIndex="product_Name" key="product_Name" align="center" />
-        <Column title="Description" dataIndex="product_Description" key="product_Description" align="center" />
+        {/* <Column title="Description" dataIndex="product_Description" key="product_Description" align="center" /> */}
         <Column title="Price" dataIndex="calculateD_PRICE" key="sellincalculateD_PRICE" align="center" />
         <Column title="Quantity" dataIndex="currenT_STOCK_QUANTITY" key="currenT_STOCK_QUANTITY" align="center" />
         <Column
-            title="Rating"
-            dataIndex="rating"
-            key="rating"
-            align="center"
-            minWidth={180} 
-            render={(rating) => (
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Rate allowHalf defaultValue={rating} disabled />
-              </div>
-            )}
-          />
+          title="Rating"
+          dataIndex="rating"
+          key="rating"
+          align="center"
+          width={180}
+          render={(rating) => (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Rate allowHalf value={Number(rating)} disabled />
+            </div>
+          )}
+        />
+
 
             <Column
               title="Certification"

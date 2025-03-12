@@ -26,7 +26,7 @@ import { RiMessage2Fill, RiReactjsFill, RiRefund2Line } from "react-icons/ri";
 import { BiSolidOffer } from "react-icons/bi";
 import { FaBitcoin, FaShop } from "react-icons/fa6";
 import { PiBankFill, PiHandWithdraw } from "react-icons/pi";
-
+import { AiFillCloseCircle } from "react-icons/ai";
 
 export const vendorRoutes = [
   { label: "Dashboard", icon: <MdDashboard />, key: "/" },
@@ -48,10 +48,10 @@ export const vendorRoutes = [
       { label: "Pending", icon: <MdPendingActions />, key: "/pending-orders" },
       { label: "Confirmed", icon: <GiConfirmed />, key: "/confirmed-orders" },
       { label: "Packaging", icon: <GiBoxUnpacking />, key: "/packaging-orders" },
-      { label: "Out For Delivery", icon: <MdDeliveryDining />, key: "/delivery-orders" },
+      { label: "Out For Delivery", icon: <MdDeliveryDining />, key: "/out-for-delivery" },
       { label: "Delivered", icon: <AiOutlineDeliveredProcedure />, key: "/delivered-orders" },
       { label: "Returned", icon: <GiReturnArrow />, key: "/returned-orders" },
-      { label: "Failed To Deliver", icon: <MdList />, key: "/failed-orders" },
+      { label: "Failed To Deliver", icon: <AiFillCloseCircle />, key: "/failed-orders" },
       { label: "Cancelled", icon: <TbShoppingCartCancel />, key: "/cancelled-orders" },
     ],
   },

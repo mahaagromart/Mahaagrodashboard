@@ -13,7 +13,7 @@ import {
 import CardBox from "../../../Component/Charts/CardBox";
 import OrderListTable from "../../../Component/VendorTable/OrderListTable";
 
-const AllOrders = () => {
+const Delivered = () => {
   const [filterType, setFilterType] = useState("This Year");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -31,15 +31,7 @@ const AllOrders = () => {
 
       <CardBox>
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={6} p={4}>
-          <FormControl>
-            <FormLabel>Order Type</FormLabel>
-            <Select>
-              <option>Sanjeev Kumar</option>
-              <option>Rahul Kumar</option>
-              <option>Amar Kumar</option>
-              <option>Himanshu Kumar</option>
-            </Select>
-          </FormControl>
+
 
           <FormControl>
             <FormLabel>Customer</FormLabel>
@@ -99,7 +91,7 @@ const AllOrders = () => {
             <Box>
             <CardBox>
 
-            <OrderListTable type="allorders" />
+            <OrderListTable type="delivered" />
 
             </CardBox>
             </Box>
@@ -108,4 +100,5 @@ const AllOrders = () => {
   );
 };
 
-export default AllOrders;
+
+export default Delivered

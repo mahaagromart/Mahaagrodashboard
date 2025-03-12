@@ -49,9 +49,17 @@ import AddNewDeliveryman from "../../Pages/UserManagement/Delivery_man/AddNewDel
 import DeliverymanList from "../../Pages/UserManagement/Delivery_man/DeliverymanList";
 import EarningStatement from "../../Pages/UserManagement/Delivery_man/EarningStatement";
 import DeliverymanWithdraw from "../../Pages/UserManagement/Delivery_man/DeliverymanWithdraw";
-import VendorDashobard from "../../Pages/Vendor/VendorDashboard/VendorDashobard";
 import MobileBanner from "../../Pages/Promotionmanagement/Banner/MobileBanner";
-// **************************   therse are all Venodor Routes ****************************
+import AllOrders from "../../Pages/Vendor/Orders/AllOrders";
+import PendingOrders from "../../Pages/Vendor/Orders/PendingOrders";
+import ConfirmedOrders from "../../Pages/Vendor/Orders/ConfirmedOrders";
+import Packaging from "../../Pages/Vendor/Orders/Packaging";
+import OrderListTable from "../VendorTable/OrderListTable";
+import OutForDelivery from "../../Pages/Vendor/Orders/OutForDelivery";
+import Delivered from "../../Pages/Vendor/Orders/Delivered";
+import Returned from "../../Pages/Vendor/Orders/Returned";
+import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
+import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
 
 
 
@@ -65,6 +73,18 @@ const RouteContent = () => {
           {/*------------------------------ These are all admin Routes ---------------------------------- */}
 
         <Route path="/" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
+
+        {/* order management  */}
+        <Route path="/all-orders" element={<ProtectedRoutes> <AllOrders/>   </ProtectedRoutes>} />
+        <Route path="/pending-orders" element={<ProtectedRoutes> <PendingOrders/>   </ProtectedRoutes>} />
+        <Route path="/pending-orders" element={<ProtectedRoutes> <PendingOrders/>   </ProtectedRoutes>} />
+        <Route path="/confirmed-orders" element={<ProtectedRoutes> <ConfirmedOrders/>   </ProtectedRoutes>} />
+        <Route path="/packaging-orders" element={<ProtectedRoutes> <Packaging/>   </ProtectedRoutes>} />
+        <Route path="/out-for-delivery" element={<ProtectedRoutes> <OutForDelivery/>   </ProtectedRoutes>} />
+        <Route path="/delivered-orders" element={<ProtectedRoutes> <Delivered/>   </ProtectedRoutes>} />
+        <Route path="/returned-orders" element={<ProtectedRoutes> <Returned/>   </ProtectedRoutes>} />
+        <Route path="/failed-orders" element={<ProtectedRoutes> <FailedToDelivery/>   </ProtectedRoutes>} />
+        <Route path="/cancelled-orders" element={<ProtectedRoutes> <Cancelled/>   </ProtectedRoutes>} />
 
         {/* product management start here */}
         <Route path="/addCategory" element={<ProtectedRoutes><AddCategory /></ProtectedRoutes>} />
