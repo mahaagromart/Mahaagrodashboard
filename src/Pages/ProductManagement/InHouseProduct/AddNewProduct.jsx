@@ -627,7 +627,8 @@ const AddNewProduct = () => {
        
       };
       
-
+ 
+       console.log(payload)
 
   
         try {

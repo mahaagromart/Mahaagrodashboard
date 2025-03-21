@@ -103,36 +103,80 @@ const ProductListTable = () => {
   };
   
 
-  const getInHouseProduct = async () => {
-    try {
+//   const getInHouseProduct = async () => {
+//     try {
     
-      const res = await axios.get(
-        `${apiUrl}Product/GetAllProducts`, 
-        {
-          headers: { Authorization: `Bearer ${storedToken}` }
-        }
-      );
+//       const res = await axios.get(
+//         `${apiUrl}Product/GetAllProducts`, 
+//         {
+//           headers: { Authorization: `Bearer ${storedToken}` }
+//         }
+//       );
 
-      if (res.data.message === "SUCCESS") {
-        const products = res.data.dataset?.$values || [];
-        setProductList(products);
-      } else {
-        await Swal.fire({
-          title: "Error in Getting Product List",
-          text: "Please try again.",
-          icon: "error",
-        });
+//       if (res.data.message === "SUCCESS") {
+//         const products = res.data.dataset?.$values || [];
+//         setProductList(products);
+//       } else {
+//         await Swal.fire({
+//           title: "Error in Getting Product List",
+//           text: "Please try again.",
+//           icon: "error",
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error fetching data:", error.response || error);
+//       await Swal.fire({
+//         title: "Error",
+//         text: `Failed to fetch product list: ${error.response?.status} ${error.message}`,
+//         icon: "error",
+//       });
+//     }
+// };
+const getInHouseProduct = async () => {
+  try {
+    const res = await axios.get(
+      `${apiUrl}Product/GetAllProducts`, 
+      {
+        headers: { Authorization: `Bearer ${storedToken}` }
       }
-    } catch (error) {
-      console.error("Error fetching data:", error.response || error);
+    );
+
+    if (res.data.message === "SUCCESS") {
+      const products = res.data.dataset?.$values.map(product => {
+     
+        const variant = product.variants.$values[0]; 
+        return {
+          Product_id: product.proD_ID,
+          product_Name: product.product_Name,
+          product_Description: product.product_Description,
+          thumbnailImage: product.thumbnailImage,
+          calculateD_PRICE: variant.pricing.calculateD_PRICE,
+          currenT_STOCK_QUANTITY: variant.pricing.currenT_STOCK_QUANTITY,
+          certification: variant.certification, // Assuming this is part of the variant
+          status: product.status, // Assuming this is part of the product
+          rating: variant.rating || 0, // Assuming rating is part of the variant
+          categorY_ID: product.categorY_ID,
+          suB_CATEGORY_ID: product.suB_CATEGORY_ID,
+          // Add any other fields you need
+        };
+      }) || [];
+      setProductList(products);
+    } else {
       await Swal.fire({
-        title: "Error",
-        text: `Failed to fetch product list: ${error.response?.status} ${error.message}`,
+        title: "Error in Getting Product List",
+        text: "Please try again.",
         icon: "error",
       });
     }
+  } catch (error) {
+    console.error("Error fetching data:", error.response || error);
+    await Swal.fire({
+      title: "Error",
+      text: `Failed to fetch product list: ${error.response?.status} ${error.message}`,
+      icon: "error",
+    });
+  }
 };
-
   
   const handleToggleStatus = async (record) => {
     Swal.fire({
