@@ -48,9 +48,10 @@ const AddSubSubCategory = () => {
   // Fetch categories
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
+      console.log(res)
       
       if (res.data.message === "SUCCESS" || res.data.categoryList?.$values) {
         setCategoryList(res.data.categoryList.$values);
@@ -149,7 +150,7 @@ const AddSubSubCategory = () => {
     console.log("category name : ",cat_name)
     console.log("subcategory name : ",sub_name)
 
-    debugger
+
 
 
     const data = {
@@ -411,7 +412,7 @@ const AddSubSubCategory = () => {
       {/* Table Section */}
       <Box mt={5}>
         <CardBox>
-          <SubSubCategoryTable />
+          <SubSubCategoryTable categoryList={categoryList}  />
         </CardBox>
       </Box>
     </Box>

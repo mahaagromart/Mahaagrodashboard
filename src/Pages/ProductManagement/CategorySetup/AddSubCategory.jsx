@@ -50,7 +50,7 @@ const AddSubCategory = () => {
 
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
 
@@ -250,7 +250,7 @@ const AddSubCategory = () => {
         {/* Table Section */}
         <Box mt={5}>
           <CardBox>
-            <SubCategoryTable />
+            <SubCategoryTable  categoryList={categoryList}  />
           </CardBox>
         </Box>
       </Box>
