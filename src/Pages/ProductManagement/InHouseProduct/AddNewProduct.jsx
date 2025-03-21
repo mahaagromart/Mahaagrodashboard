@@ -48,10 +48,10 @@ const AddNewProduct = () => {
   const [productAttribute, setProductAttribute] = useState([]);
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-
+       console.log(res)
       if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
         setCategoryList(res.data.categoryList.$values);
       } else {
@@ -78,7 +78,7 @@ const AddNewProduct = () => {
       const res = await axios.get(`${apiUrl}ProductAttribute/GetAllAttribute`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-
+       console.log(res)
       if (res.data[0]?.retval === "SUCCESS" && res.data[0]?.dataset?.$values) {
         setProductAttribute(res.data[0].dataset.$values);
       } else {
