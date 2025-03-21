@@ -18,7 +18,7 @@ const CategoryTable = () => {
   const getCategoryData = async () => {
     try {
       const url = `${apiUrl}Category/GetAllCategory`;
-      const response = await axios.get(url, {
+      const response = await axios.post(url, {
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },
