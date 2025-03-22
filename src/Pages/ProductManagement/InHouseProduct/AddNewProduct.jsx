@@ -40,7 +40,7 @@ const AddNewProduct = () => {
   const [showPrice, setShowPrice] = useState(false);
   const [volume, setVolume] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
-  const { token } = useSelector((state) => state.auth);
+  const { token , role } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
@@ -51,7 +51,6 @@ const AddNewProduct = () => {
       const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-       console.log(res)
       if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
         setCategoryList(res.data.categoryList.$values);
       } else {
@@ -193,7 +192,8 @@ const AddNewProduct = () => {
     varients: [],
     varientsInput: "",
     varientsData: [],
-    images: ""
+    images: "",
+
   };
 
   // sku: yup.string().required("SKU is required"),
@@ -587,7 +587,7 @@ const AddNewProduct = () => {
         }
 
         let payload = {
-
+          Added_By : role.toString(),
           CATEGORY_ID: values.category.toString(),
           SUB_CATEGORY_ID: values.subCategory.toString(),
           SUB_SUB_CATEGORY_ID : values.subSubCategory.toString() || "",

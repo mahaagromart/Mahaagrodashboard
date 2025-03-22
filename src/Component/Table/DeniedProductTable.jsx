@@ -26,7 +26,7 @@ import {
 } from "@ant-design/icons";
 const { Column } = Table;
 
-const ProductListTable = () => {
+const DeniedProductTable = () => {
   const [productList, setProductList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -101,14 +101,14 @@ const ProductListTable = () => {
     const subCategory = subCategoryList.find(sub => sub.id === Number(subCategoryId));
     return subCategory ? subCategory.subcategory_Name : "Unknown Subcategory";
   };
-  
+
 
   const getInHouseProduct = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Product/GetAllProducts`, {
-        headers: { Authorization: `Bearer ${storedToken}` }
+      const res = await axios.get(`${apiUrl}Product/GetDeniedProducts`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
       });
-  
+
       if (res.data.message === "SUCCESS") {
         const products = res.data.dataset?.$values.flatMap(product => 
             product.variants.$values.map(variant => ({
@@ -122,7 +122,9 @@ const ProductListTable = () => {
             certification: variant.certification,
             status: variant.status,            
             rating: variant.rating || 0,      
-            thumbnailImage: variant.imageGallery?.$values?.[0]?.product_Images || product.thumbnailImage,
+            thumbnailImage:
+            variant.imageGallery?.$values?.[0]?.product_Images?.split(",")[0] ||
+            product.thumbnailImage?.split(",")[0],
             categorY_ID: product.categorY_ID,
             suB_CATEGORY_ID: product.suB_CATEGORY_ID,
           }))
@@ -145,6 +147,7 @@ const ProductListTable = () => {
       });
     }
   };
+  
   
   
   const handleToggleStatus = async (record) => {
@@ -196,6 +199,7 @@ const ProductListTable = () => {
     }
   }
 
+
   const handleToggleCertification = async (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -235,6 +239,7 @@ const ProductListTable = () => {
       }
     });
   };
+
   const handleGenerateCode = (record) => {
     navigate("/GenerateBarCode", {
       state: {
@@ -300,9 +305,12 @@ const ProductListTable = () => {
     setSelectedProduct(null);
   };
 
-  const filteredData = productList.filter((item) =>
-    item.product_Name.toLowerCase().includes(searchText.toLowerCase())
-  );
+
+    const filteredData = productList.filter((item) =>
+        item.product_Name.toLowerCase().includes(searchText.toLowerCase())
+    );
+ 
+    {console.log(filteredData)}
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
@@ -392,6 +400,7 @@ const ProductListTable = () => {
   )}
 />
 
+
       <Column
         title="Status"
         dataIndex="status"
@@ -433,6 +442,7 @@ const ProductListTable = () => {
     )}
   />
 </Table>
+
 
 
       <Modal
@@ -480,4 +490,7 @@ const ProductListTable = () => {
   );
 };
 
-export default ProductListTable;
+
+
+
+export default DeniedProductTable

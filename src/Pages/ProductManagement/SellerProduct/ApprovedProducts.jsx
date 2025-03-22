@@ -10,6 +10,8 @@ import {
   } from "@chakra-ui/react";
   import CardBox from "../../../Component/Charts/CardBox";
   import ProductListTable from "../../../Component/Table/ProductListTable";
+import NewProductRequestTable from '../../../Component/Table/NewProductRequestTable';
+import ApprovedProductsTable from '../../../Component/Table/ApprovedProductsTable';
 const ApprovedProducts = () => {
   return (
     <>
@@ -129,7 +131,7 @@ const ApprovedProducts = () => {
         <Box mt={5}>
           <CardBox>
             
-            <ProductListTable/>
+          <ApprovedProductsTable/>
           </CardBox>
         </Box>
       </Box>

@@ -25,7 +25,7 @@ const ProductList = () => {
 
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
     

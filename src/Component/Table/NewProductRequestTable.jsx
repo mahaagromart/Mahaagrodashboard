@@ -26,7 +26,7 @@ import {
 } from "@ant-design/icons";
 const { Column } = Table;
 
-const ProductListTable = () => {
+const NewProductRequestTable = ({type}) => {
   const [productList, setProductList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -101,34 +101,50 @@ const ProductListTable = () => {
     const subCategory = subCategoryList.find(sub => sub.id === Number(subCategoryId));
     return subCategory ? subCategory.subcategory_Name : "Unknown Subcategory";
   };
-  
+
 
   const getInHouseProduct = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Product/GetAllProducts`, {
-        headers: { Authorization: `Bearer ${storedToken}` }
+      const res = await axios.get(`${apiUrl}Product/GetAllNewProdcutRequest`, {
+        headers: { Authorization: `Bearer ${storedToken}` },
       });
-  
+
       if (res.data.message === "SUCCESS") {
-        const products = res.data.dataset?.$values.flatMap(product => 
-            product.variants.$values.map(variant => ({
-            Product_id: variant.varientS_ID,
-            product_Name: product.product_Name,
-            varient_Name: variant.varient_Name,  
-            sku: variant.sku,                    
-            hsn: variant.hsn || "N/A",           
-            calculateD_PRICE: variant.pricing.calculateD_PRICE || variant.pricing.sellinG_PRICE, 
-            currenT_STOCK_QUANTITY: variant.pricing.currenT_STOCK_QUANTITY,
-            certification: variant.certification,
-            status: variant.status,            
-            rating: variant.rating || 0,      
-            thumbnailImage: variant.imageGallery?.$values?.[0]?.product_Images || product.thumbnailImage,
-            categorY_ID: product.categorY_ID,
-            suB_CATEGORY_ID: product.suB_CATEGORY_ID,
-          }))
-        ) || [];
-  
-        setProductList(products);
+        const sellerProducts =
+          res.data.dataset?.$values
+            .filter((product) => product.addeD_BY?.toLowerCase() === "seller")
+            .flatMap((product) =>
+              product.variants?.$values?.map((variant) => ({
+                Product_id: variant.varientS_ID,
+                product_Name: product.product_Name,
+                varient_Name: variant.varient_Name,
+                sku: variant.sku,
+                hsn: variant.hsn || "N/A",
+                calculateD_PRICE:
+                  variant.pricing.calculateD_PRICE ||
+                  variant.pricing.sellinG_PRICE,
+                currenT_STOCK_QUANTITY:
+                  variant.pricing.currenT_STOCK_QUANTITY,
+                certification: variant.certification || "N/A",
+                status: variant.status,
+                rating: variant.rating || 0,
+                thumbnailImage:
+                  variant.imageGallery?.$values?.[0]?.product_Images?.split(",")[0] ||
+                  product.thumbnailImage?.split(",")[0],
+                categorY_ID: product.categorY_ID,
+                suB_CATEGORY_ID: product.suB_CATEGORY_ID,
+              }))
+            ) || [];
+
+        if (sellerProducts.length > 0) {
+          setProductList(sellerProducts);
+        } else {
+          await Swal.fire({
+            title: "No Seller Products",
+            text: "No products added by sellers were found.",
+            icon: "info",
+          });
+        }
       } else {
         await Swal.fire({
           title: "Error in Getting Product List",
@@ -145,6 +161,7 @@ const ProductListTable = () => {
       });
     }
   };
+  
   
   
   const handleToggleStatus = async (record) => {
@@ -196,6 +213,7 @@ const ProductListTable = () => {
     }
   }
 
+
   const handleToggleCertification = async (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -235,6 +253,7 @@ const ProductListTable = () => {
       }
     });
   };
+
   const handleGenerateCode = (record) => {
     navigate("/GenerateBarCode", {
       state: {
@@ -300,9 +319,12 @@ const ProductListTable = () => {
     setSelectedProduct(null);
   };
 
-  const filteredData = productList.filter((item) =>
-    item.product_Name.toLowerCase().includes(searchText.toLowerCase())
-  );
+
+    const filteredData = productList.filter((item) =>
+        item.product_Name.toLowerCase().includes(searchText.toLowerCase())
+    );
+ 
+    {console.log(filteredData)}
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
@@ -392,6 +414,7 @@ const ProductListTable = () => {
   )}
 />
 
+
       <Column
         title="Status"
         dataIndex="status"
@@ -433,6 +456,7 @@ const ProductListTable = () => {
     )}
   />
 </Table>
+
 
 
       <Modal
@@ -480,4 +504,5 @@ const ProductListTable = () => {
   );
 };
 
-export default ProductListTable;
+
+export default NewProductRequestTable;
