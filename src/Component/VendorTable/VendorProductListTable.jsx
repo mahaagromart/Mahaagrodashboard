@@ -26,14 +26,14 @@ import {
 } from "@ant-design/icons";
 const { Column } = Table;
 
-const NewProductRequestTable = ({type}) => {
+const VendorProductListTable = () => {
   const [productList, setProductList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL;
-  const { token } = useSelector((state) => state.auth);
+  const { token , UserId } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
   const [categoryData, setCategoryData] = useState([]);
   const [subCategoryData, setSubCategoryData] = useState([]);
@@ -101,50 +101,38 @@ const NewProductRequestTable = ({type}) => {
     const subCategory = subCategoryList.find(sub => sub.id === Number(subCategoryId));
     return subCategory ? subCategory.subcategory_Name : "Unknown Subcategory";
   };
-
+  
 
   const getInHouseProduct = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Product/GetAllNewProdcutRequest`, {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      });
-
+        const res = await axios.post(`${apiUrl}Product/GetProductsByUserId`, 
+            { userId: UserId },
+            {
+              headers: { Authorization: `Bearer ${storedToken}` } 
+            }
+          );
+          
+  
       if (res.data.message === "SUCCESS") {
-        const sellerProducts =
-          res.data.dataset?.$values
-            .filter((product) => product.addeD_BY?.toLowerCase() === "vendor")
-            .flatMap((product) =>
-              product.variants?.$values?.map((variant) => ({
-                Product_id: variant.varientS_ID,
-                product_Name: product.product_Name,
-                varient_Name: variant.varient_Name,
-                sku: variant.sku,
-                hsn: variant.hsn || "N/A",
-                calculateD_PRICE:
-                  variant.pricing.calculateD_PRICE ||
-                  variant.pricing.sellinG_PRICE,
-                currenT_STOCK_QUANTITY:
-                  variant.pricing.currenT_STOCK_QUANTITY,
-                certification: variant.certification || "N/A",
-                status: variant.status,
-                rating: variant.rating || 0,
-                thumbnailImage:
-                  variant.imageGallery?.$values?.[0]?.product_Images?.split(",")[0] ||
-                  product.thumbnailImage?.split(",")[0],
-                categorY_ID: product.categorY_ID,
-                suB_CATEGORY_ID: product.suB_CATEGORY_ID,
-              }))
-            ) || [];
-
-        if (sellerProducts.length > 0) {
-          setProductList(sellerProducts);
-        } else {
-          await Swal.fire({
-            title: "No Seller Products",
-            text: "No products added by sellers were found.",
-            icon: "info",
-          });
-        }
+        const products = res.data.dataset?.$values.flatMap(product => 
+            product.variants.$values.map(variant => ({
+            Product_id: variant.varientS_ID,
+            product_Name: product.product_Name,
+            varient_Name: variant.varient_Name,  
+            sku: variant.sku,                    
+            hsn: variant.hsn || "N/A",           
+            calculateD_PRICE: variant.pricing.calculateD_PRICE || variant.pricing.sellinG_PRICE, 
+            currenT_STOCK_QUANTITY: variant.pricing.currenT_STOCK_QUANTITY,
+            certification: variant.certification,
+            status: variant.status,            
+            rating: variant.rating || 0,      
+            thumbnailImage: variant.imageGallery?.$values?.[0]?.product_Images || product.thumbnailImage,
+            categorY_ID: product.categorY_ID,
+            suB_CATEGORY_ID: product.suB_CATEGORY_ID,
+          }))
+        ) || [];
+  
+        setProductList(products);
       } else {
         await Swal.fire({
           title: "Error in Getting Product List",
@@ -161,7 +149,6 @@ const NewProductRequestTable = ({type}) => {
       });
     }
   };
-  
   
   
   const handleToggleStatus = async (record) => {
@@ -213,7 +200,6 @@ const NewProductRequestTable = ({type}) => {
     }
   }
 
-
   const handleToggleCertification = async (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -253,7 +239,6 @@ const NewProductRequestTable = ({type}) => {
       }
     });
   };
-
   const handleGenerateCode = (record) => {
     navigate("/GenerateBarCode", {
       state: {
@@ -319,12 +304,9 @@ const NewProductRequestTable = ({type}) => {
     setSelectedProduct(null);
   };
 
-
-    const filteredData = productList.filter((item) =>
-        item.product_Name.toLowerCase().includes(searchText.toLowerCase())
-    );
- 
-    {console.log(filteredData)}
+  const filteredData = productList.filter((item) =>
+    item.product_Name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "auto" }}>
@@ -394,7 +376,7 @@ const NewProductRequestTable = ({type}) => {
     )}
   />
 
-<Column
+{/* <Column
   title="Certification"
   dataIndex="certification"
   key="certification"
@@ -412,27 +394,17 @@ const NewProductRequestTable = ({type}) => {
       {record.certification === "True" ? "Deactivate" : "Activate"}
     </Button>
   )}
+/> */}
+<Column
+  title="Approved By Admin"
+  dataIndex="status"
+  key="status"
+  align="center"
+  render={(_, record) => (
+    record.status === "True" ? "Approved" : "Not Approved"
+  )}
 />
 
-
-      <Column
-        title="Status"
-        dataIndex="status"
-        key="status"
-        align="center"
-        render={(_, record) => (
-            <Button
-            onClick={() => handleToggleStatus(record)}
-            style={{
-              background: record.status === "True" ? "#52c41a" : "#f5222d",
-              color: "#fff",
-              border: "none",
-            }}
-          >
-            {record.status === "True" ? "Deactivate" : "Activate"}
-          </Button>
-        )}
-      />
 
   <Column
     title="Action"
@@ -456,7 +428,6 @@ const NewProductRequestTable = ({type}) => {
     )}
   />
 </Table>
-
 
 
       <Modal
@@ -505,4 +476,5 @@ const NewProductRequestTable = ({type}) => {
 };
 
 
-export default NewProductRequestTable;
+
+export default VendorProductListTable

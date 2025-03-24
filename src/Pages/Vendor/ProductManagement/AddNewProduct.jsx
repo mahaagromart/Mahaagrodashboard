@@ -21,6 +21,8 @@ import "react-quill/dist/quill.snow.css";
 import { MdInfo, MdSettings } from "react-icons/md";
 import Logo1 from "../../../assets/1.png";
 import Logo2 from "../../../assets/2.png";
+import Logo3 from "../../../assets/JarImage.jpg";
+import Logo4 from "../../../assets/JarImage1.jpg";
 import CenterBox from "../../../Component/Charts/CenterBox";
 import UploadImages from "./UploadImages";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -40,7 +42,7 @@ const AddNewProduct = () => {
   const [showPrice, setShowPrice] = useState(false);
   const [volume, setVolume] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
-  const { token } = useSelector((state) => state.auth);
+  const { token , role ,UserId } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
@@ -48,10 +50,9 @@ const AddNewProduct = () => {
   const [productAttribute, setProductAttribute] = useState([]);
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-
       if (res.data.message === "SUCCESS" && res.data.categoryList?.$values) {
         setCategoryList(res.data.categoryList.$values);
       } else {
@@ -78,7 +79,7 @@ const AddNewProduct = () => {
       const res = await axios.get(`${apiUrl}ProductAttribute/GetAllAttribute`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-
+       console.log(res)
       if (res.data[0]?.retval === "SUCCESS" && res.data[0]?.dataset?.$values) {
         setProductAttribute(res.data[0].dataset.$values);
       } else {
@@ -193,10 +194,11 @@ const AddNewProduct = () => {
     varients: [],
     varientsInput: "",
     varientsData: [],
-    images: ""
+    images: "",
+
   };
 
-  // sku: yup.string().required("SKU is required"),
+
   // hsn: yup
   //   .string()
   //   .matches(/^\d{8}$/, "HSN must be exactly 8 digits")
@@ -408,45 +410,6 @@ const AddNewProduct = () => {
     return isNaN(volume) ? 0 : Math.round(volume);
   };
 
-  // const calculateDiscountedPrice = (values) => {
-  //   let {
-  //     sellingPrice,
-  //     discountAmount,
-  //     discountType,
-  //     taxCalculation,
-  //     taxAmount,
-  //   } = values;
-  //   sellingPrice = Number(sellingPrice) || 0;
-  //   discountAmount = Number(discountAmount) || 0;
-  //   taxAmount = Number(taxAmount) || 0;
-
-  //   let finalPrice = sellingPrice;
-
-  //   // Apply Discount
-  //   if (discountType === "Flat") {
-  //     finalPrice -= discountAmount;
-  //   } else if (discountType === "Percentage") {
-  //     finalPrice -= (finalPrice * discountAmount) / 100;
-  //   }
-
-  //   // Apply Tax (Only if "Exclude with product" is selected)
-  //   if (taxCalculation === "Exclude") {
-  //     finalPrice += (finalPrice * taxAmount) / 100;
-  //   }
-
-  //   values.calculatedPrice = Math.round(finalPrice);
-  //   return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
-  // };
-
-  // const handlePriceCalculation = (values) => {
-  //   const { mrp, sellingPrice, discountAmount, taxCalculation } = values;
-
-  //   if ((mrp && sellingPrice && discountAmount >= 0) || taxCalculation) {
-  //     setShowPrice(true);
-
-  //     let finalPrice = calculateDiscountedPrice(values);
-  //   }
-  // };
 
   const calculateDiscountedPrice = (variant) => {
     let {
@@ -558,6 +521,7 @@ const AddNewProduct = () => {
     try {
       dispatch(startLoading());
   
+      var PROD_ID = null;
       for (let i = 0; i < values.varientsData.length; i++) {
         let variant = values.varientsData[i];
   
@@ -565,7 +529,7 @@ const AddNewProduct = () => {
         let imagePathString = "";
         if (variant.images?.length > 0) {
           try {
-            let uploadedImagePaths = [];
+            let uploadedImagePaths = []; 
             for (const image of variant.images) {
               const uploadedImagePath = await uploadImage(image, "Products");
               if (!uploadedImagePath) {
@@ -584,57 +548,24 @@ const AddNewProduct = () => {
             return;
           }
         }
-  
-        // // ✅ Step 2: Prepare API Payload
-        // let payload = {
-        //   productName: values.productName,
-        //   productDescription: values.productDescription,
-        //   category: values.category,
-        //   subCategory: values.subCategory,
-        //   subSubCategory : values.subSubCategory,
-        //   brand: values.brand,
-        //   variantName: variant.variantName,
-        //   sku: variant.sku,
-        //   hsn: variant.hsn,
-        //   unit: variant.unit,
-        //   mrp: variant.mrp,
-        //   sellingPrice: variant.sellingPrice,
-        //   minimumOrderQty: variant.minimumOrderQty,
-        //   currentStockQty: variant.currentStockQty,
-        //   discountType: variant.discountType,
-        //   discountAmount: variant.discountAmount,
-        //   taxCalculation: variant.taxCalculation,
-        //   taxAmount: variant.taxAmount,
-        //   shape: variant.shape,
-        //   length: variant.length,
-        //   width: variant.width,
-        //   height: variant.height,
-        //   diameter: variant.diameter,
-        //   weight: variant.weight,
-        //   calculatedVolume: variant.calculatedVolume,
-        //   calculatedPrice: variant.calculatedPrice,
-        //   minimumCalculatePrice : variant.calculatedPrice*variant.minimumOrderQty,
-        //   images: imagePathString, 
-        // };
-
-        debugger
 
         let payload = {
-
+          Added_By : role.toString(),
+          UserId : UserId.toString(),
           CATEGORY_ID: values.category.toString(),
           SUB_CATEGORY_ID: values.subCategory.toString(),
           SUB_SUB_CATEGORY_ID : values.subSubCategory.toString() || "",
           Product_Name: values.productName.toString(),
           Product_Description: values.productDescription.toString(),
-          Images: imagePathString.toString(),
+          ThumbnailImage: imagePathString.toString(),
           BRAND: values.brand.toString() || "",
           sku: variant.sku.toString(),
           UNIT: values.unit.toString()  || "",
-          TAGS_INPUT: values.tags || [],  // Assuming tags input comes from values
+          TAGS_INPUT: values.tags || [], 
           HSN: variant.hsn.toString(),
-      
+          PROD_ID: PROD_ID,
           // Pricing
-          PRICING: Number(variant.mrp),  // Assuming PRICING is equivalent to MRP
+          PRICING: Number(variant.mrp), 
           MAXIMUM_RETAIL_PRICE: Number(variant.mrp),
           SELLING_PRICE: Number(variant.sellingPrice),
           MINIMUM_ORDER_QUANTITY: Number(variant.minimumOrderQty),
@@ -659,9 +590,6 @@ const AddNewProduct = () => {
           VAREINTS_NAME: variant.variantName.toString(),
        
       };
-      
-
-
   
         try {
           const res = await axios.post(`${apiUrl}Product/InsertProduct`, payload, {
@@ -670,18 +598,20 @@ const AddNewProduct = () => {
               "Content-Type": "application/json",
             },
           });
-  
-          if (res.data[0].message === "SUCCESS" || res.data[0].code === 200) {
-            console.log(`✅ Variant ${variant.variantName} inserted successfully!`);
+            console.log(res.data);
+          if (res.data[0].code === 200) {
+
+            PROD_ID = res.data[0].message;
+            console.log(PROD_ID)
+            
           } else {
-            console.warn(`⚠️ Variant ${variant.variantName} failed:`, res.data);
           }
         } catch (error) {
-          console.error(`❌ Error submitting variant ${variant.variantName}:`, error);
+
+
         }
       }
-  
-      // ✅ Success Message After All Variants Are Processed
+
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -689,7 +619,7 @@ const AddNewProduct = () => {
       });
   
     } catch (err) {
-      console.error("Unexpected Error:", err);
+   
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -699,42 +629,6 @@ const AddNewProduct = () => {
       dispatch(stopLoading());
     }
   };
-  
-
-
-
-  // const payload = {
-  //   Product_Name: values.productName.toString(),
-  //   PRODUCT_DESCRIPTION: values.productDescription.toString(),
-  //   CATEGORY_ID: values.category.toString(),
-  //   SUB_CATEGORY_ID: values.subCategory.toString(),
-  //   IMAGES: values.images.toString(),
-  //   BRAND: values.brand ? values.brand.toString() : "",
-  //   sku: values.sku.toString(),
-  //   UNIT: values.unit.toString(),
-  //   TAGS_INPUT: values.tags || [],
-  //   HSN: values.hsn ? values.hsn.toString() : "",
-  //   PRICING: Number(values.sellingPrice) || 0,
-  //   MAXIMUM_RETAIL_PRICE: Number(values.mrp) || 0,
-  //   SELLING_PRICE: Number(values.sellingPrice) || 0,
-  //   MINIMUM_ORDER_QUANTITY: Number(values.minimumOrderQty) || 0,
-  //   CURRENT_STOCK_QUANTITY: Number(values.currentStockQty) || 0,
-  //   DISCOUNT_TYPE: values.discountType
-  //     ? values.discountType.toString()
-  //     : "",
-  //   DISCOUNT_AMOUNT: values.discountAmount.toString() || "0",
-  //   TAX_AMOUNT: values.taxAmount.toString() || "",
-  //   TAX_CALCULATION: values.taxCalculation.toString() || "",
-  //   CALCULATED_PRICE: values.calculatedPrice.toString() || "",
-  //   PACKAGE_SHAPE: values.shape.toString() || "",
-  //   PACKAGE_LENGTH: values.length.toString() || "0",
-  //   PACKAGE_WIDTH: values.width.toString() || "0",
-  //   PACKAGE_HEIGHT: values.height.toString() || "0",
-  //   PACKAGE_WEIGHT: Number(values.weight) || 0,
-  //   PACKAGE_DIAMETER: values.diameter.toString() || "0",
-  //   PACKAGE_TOTAL_VOLUME: values.calculatedVolume.toString() || "0",
-  // };
-
 
 
   return (
@@ -749,12 +643,7 @@ const AddNewProduct = () => {
         }}
       >
     {({ values, errors, touched, setFieldValue, resetForm, isValid, dirty }) => {
-            // console.log("Form Values:", values);
-            // console.log("Form Errors:", errors);
-            // console.log("Touched Fields:", touched);
-            // console.log("Is Form Valid?", isValid);
-            // console.log("Is Form Dirty?", dirty);
-
+          
           const handleKeyDown = (e) => {
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();
@@ -1246,6 +1135,36 @@ const AddNewProduct = () => {
                     </SimpleGrid>
                   </CardBox>
                 </Box>
+                
+                                <Box mt={5}>
+                                  <CardBox>
+                                    <SimpleGrid
+                                      columns={{ base: 1, md: 2, lg: 3 }}
+                                      spacing={6}
+                                      alignItems="center"
+                                      p={3}
+                                      mb={1}
+                                    >
+                                      <GridItem textAlign="center">
+                                        <CenterBox>
+                                          <img src={Logo4} alt="Logo 4" width="500px" />
+                                        </CenterBox>
+                                      </GridItem>
+                
+                                      <GridItem textAlign="center">
+                                        <CenterBox>
+                                          <img src={Logo1} alt="Logo 1" width="300px" />
+                                        </CenterBox>
+                                      </GridItem>
+                
+                                      <GridItem textAlign="center">
+                                        <CenterBox>
+                                          <img src={Logo2} alt="Logo 2" width="300px" />
+                                        </CenterBox>
+                                      </GridItem>
+                                    </SimpleGrid>
+                                  </CardBox>
+                                </Box>
 
                 {/* First Loop  */}
                 {(values.varientsData || []).map((variant, index) => (

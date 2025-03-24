@@ -9,3 +9,7 @@
     font-family: "Poppins", serif;
     
 }
+.ant-dropdown-menu {
+    margin-top: 21px !important; 
+    position: relative !important;
+}

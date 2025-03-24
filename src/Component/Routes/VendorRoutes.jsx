@@ -15,6 +15,7 @@ import {
   MdReviews,
   MdAddBusiness,
   MdReport,
+  MdSettings,
 } from "react-icons/md";
 
 
@@ -144,6 +145,8 @@ export const vendorRoutes = [
     icon: <FaShop />,
     key: "/my-shop",
   },
+  
+    { label: 'My Account Setting', icon: <MdSettings />, key: '/my-setting',},
 
   {
     label: "Signout",

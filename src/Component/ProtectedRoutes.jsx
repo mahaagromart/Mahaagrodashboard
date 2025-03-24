@@ -124,7 +124,6 @@ const ProtectedRoutes = ({ children }) => {
           const userProfile = response.data.userProfilesEntity?.$values?.[0];
 
           if (!userProfile) {
-            console.error("User profile data is missing");
             navigate("/login");
             return;
           }

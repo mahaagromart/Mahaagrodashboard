@@ -9,7 +9,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import CardBox from "../../../Component/Charts/CardBox";
-import ProductListTable from "../../../Component/Table/ProductListTable";
+import VendorProductListTable from '../../../Component/VendorTable/VendorProductListTable';
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -18,14 +18,14 @@ const ProductList = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
   const [subSubCategoryList, setSubSubCategoryList] = useState([]);
-  const { token } = useSelector((state) => state.auth);
+  const { token ,UserId  } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const getCategory = async () => {
     try {
-      const res = await axios.get(`${apiUrl}Category/GetAllCategory`, {
+      const res = await axios.post(`${apiUrl}Category/GetAllCategory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
     
@@ -126,62 +126,6 @@ const ProductList = () => {
     }
   };
   
-
-  const getSubCategory = async () => {
-    try {
-      const res = await axios.post(
-        `${apiUrl}EcommerceSubcategory/GetAllSubCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubCategoryList(res.data.SubCategoryList);
-
-      } else {
-        await Swal.fire({
-          title: "Error in Getting Sub Category List",
-          text: "Please try again.",
-          icon: "error",
-        });
-      }
-    } catch (error) {
-      await Swal.fire({
-        title: "Error",
-        text: "Failed to fetch the Sub category list. Please try again later.",
-        icon: "error",
-      });
-    }
-  };
-
-  const getSubSubSubCategory = async () => {
-    try {
-      const res = await axios.post(
-        `${apiUrl}/EcommerceSubSubsubCategory/GetAllSubsubCategory`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${storedToken}` },
-        }
-      );
-      if (res.data.Message.toLowerCase() === "success") {
-        setSubSubCategoryList(res.data.CategoryList);
-      } else {
-        await Swal.fire({
-          title: "Error in Getting Sub Sub Category List",
-          text: "Please try again.",
-          icon: "error",
-        });
-      }
-    } catch (error) {
-      await Swal.fire({
-        title: "Error",
-        text: "Failed to fetch the sub sub category list. Please try again later.",
-        icon: "error",
-      });
-    }
-  };
 
   useEffect(() => {
     getCategory();
@@ -322,7 +266,7 @@ const ProductList = () => {
 
         <Box mt={5}>
           <CardBox>
-            <ProductListTable />
+           <VendorProductListTable/>
           </CardBox>
         </Box>
       </Box>

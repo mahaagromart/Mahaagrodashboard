@@ -60,6 +60,7 @@ import Delivered from "../../Pages/Vendor/Orders/Delivered";
 import Returned from "../../Pages/Vendor/Orders/Returned";
 import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
 import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
+import MyAccountSettingPage from "../../Pages/AccountSetting/MyAccountSettingPage";
 
 
 
@@ -147,6 +148,8 @@ const RouteContent = () => {
 
 
         {/* authentication routes */}
+
+        <Route path="/my-setting" element={<MyAccountSettingPage/>} />
         <Route path="/signout" element={<LoginForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/Register" element={<Register />} />

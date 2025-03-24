@@ -17,6 +17,8 @@ import Delivered from "../../Pages/Vendor/Orders/Delivered";
 import Returned from "../../Pages/Vendor/Orders/Returned";
 import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
 import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
+import MyAccountSettingPage from "../../Pages/AccountSetting/MyAccountSettingPage";
+import Coupon from "../../Pages/Vendor/OffersandDeals/Coupon";
 
 
 const VendorRouteContent = () => {
@@ -51,6 +53,14 @@ const VendorRouteContent = () => {
 
         <Route path="/add-product" element={<ProtectedRoutes> <AddNewProduct/>  </ProtectedRoutes>} />
         <Route path="/product-list" element={<ProtectedRoutes> <ProductList/>  </ProtectedRoutes>} />
+
+    {/* Offers and deals */}
+
+        <Route path="/coupons" element={<ProtectedRoutes> <Coupon/>  </ProtectedRoutes>} />
+
+
+        {/* Authentication */}
+        <Route path="/my-setting" element={<MyAccountSettingPage/> } />
         
         
 

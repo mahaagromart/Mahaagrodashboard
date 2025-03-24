@@ -31,7 +31,7 @@ import { useDispatch , useSelector } from "react-redux";
 
 
 
-const AddNewProduct = () => {
+const ViewProduct = () => {
 
   const dispatch = useDispatch();
   const apiUrl = import.meta.env.VITE_API_URL;
