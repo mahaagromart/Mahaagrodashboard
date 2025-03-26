@@ -17,7 +17,7 @@ const GenerateBarCode = () => {
   const [numberOfBarcodes, setNumberOfBarcodes] = useState(3);
   const [generatedBarcodes, setGeneratedBarcodes] = useState([]);
 
-  // Handle missing productSku or productPrice by navigating back to /ProductList
+ 
   useEffect(() => {
     if (!productSku || !productPrice) {
       Swal.fire({

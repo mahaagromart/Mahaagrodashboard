@@ -19,7 +19,8 @@ import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
 import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
 import MyAccountSettingPage from "../../Pages/AccountSetting/MyAccountSettingPage";
 import Coupon from "../../Pages/Vendor/OffersandDeals/Coupon";
-
+import ProductReview from "../../Pages/Vendor/ProductManagement/ProductReview";
+import GenerateBarCode from "../../Pages/ProductManagement/InHouseProduct/GenerateBarCode"
 
 const VendorRouteContent = () => {
   return (
@@ -53,6 +54,8 @@ const VendorRouteContent = () => {
 
         <Route path="/add-product" element={<ProtectedRoutes> <AddNewProduct/>  </ProtectedRoutes>} />
         <Route path="/product-list" element={<ProtectedRoutes> <ProductList/>  </ProtectedRoutes>} />
+        <Route path="/GenerateBarCode" element={<ProtectedRoutes> <GenerateBarCode/>  </ProtectedRoutes>} />
+        <Route path="/product-review" element={<ProtectedRoutes> <ProductReview/>  </ProtectedRoutes>} />
 
     {/* Offers and deals */}
 

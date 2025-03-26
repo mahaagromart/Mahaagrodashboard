@@ -441,9 +441,11 @@ const VendorProductListTable = () => {
       ]}
 
     >
+
       {selectedProduct && (
         <div style={{ lineHeight: "1.8", fontSize: "16px" }}>
-          <p style={{margin: "5px 0px"}}><IdcardOutlined /> <strong>ID:</strong> {selectedProduct.id}</p>
+
+          <p style={{margin: "5px 0px"}}><IdcardOutlined /> <strong>ID:</strong> {selectedProduct.Product_id}</p>
           <p style={{margin: "5px 0px"}}><BarcodeOutlined /> <strong>Product ID:</strong> {selectedProduct.proD_ID}</p>
           <p style={{margin: "5px 0px"}}><TagOutlined /> <strong>Name:</strong> {selectedProduct.product_Name}</p>
           <p style={{margin: "5px 0px"}}><FileTextOutlined /> <strong>Description:</strong> { selectedProduct.product_Description }</p>

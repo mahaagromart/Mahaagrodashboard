@@ -61,6 +61,7 @@ import Returned from "../../Pages/Vendor/Orders/Returned";
 import FailedToDelivery from "../../Pages/Vendor/Orders/FailedToDelivery";
 import Cancelled from "../../Pages/Vendor/Orders/Cancelled";
 import MyAccountSettingPage from "../../Pages/AccountSetting/MyAccountSettingPage";
+import UpdateProduct from "../../Pages/ProductManagement/InHouseProduct/UpdateProduct";
 
 
 
@@ -99,6 +100,7 @@ const RouteContent = () => {
         <Route path="/ProductList" element={<ProtectedRoutes><ProductList /></ProtectedRoutes>} />
         <Route path="/AddNewProduct" element={<ProtectedRoutes><AddNewProduct /></ProtectedRoutes>} />
         <Route path="/GenerateBarCode" element={<ProtectedRoutes><GenerateBarCode /></ProtectedRoutes>} />
+        <Route path="/UpdateProduct" element={<ProtectedRoutes><UpdateProduct /></ProtectedRoutes>} />
         <Route path="/BulkInsert" element={<ProtectedRoutes><BulkInsert /></ProtectedRoutes>} />
 
         {/* seller product starts */}
