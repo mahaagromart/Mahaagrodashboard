@@ -312,7 +312,14 @@ const AddNewProduct = () => {
           .number()
           .required("Current Stock Quantity is required")
           .min(0, "Current Stock Quantity must be positive"),
-
+        calculatedPrice: yup
+          .number()
+          .required("Click on Calculate price.")
+          .min(0, "please recheck the Logistics setup again"),
+        calculatedVolume: yup
+          .number()
+          .required("Click on Calculate Volume.")
+          .min(0, "please recheck the Logistics setup again."),
         discountType: yup
           .string()
           .required("Discount Type is required")
@@ -335,7 +342,6 @@ const AddNewProduct = () => {
           otherwise: (schema) => schema.notRequired().nullable(),
         }),
 
-        // **Logistic Setup Validation**
         shape: yup.string().required("Shape is required"),
         length: yup.number().when("shape", {
           is: "cuboid",
@@ -366,13 +372,33 @@ const AddNewProduct = () => {
           .number()
           .min(1, "Weight must be greater than 0")
           .required("Weight is required"),
-      })
+        imagesValues: yup.array()
+        .of(yup.mixed()) 
+        .min(1, "At least one image is required")
+        .required("Images are required"),
+      }),
+      
     ),
   });
 
-  const handleVolumeCalculation = (index, values) => {
+  const handleVolumeCalculation = async (
+    index,
+    values,
+    { setFieldValue, validateField }
+  ) => {
     const variant = values.varientsData[index];
+    const calculatedVolume = calculateVolume(variant);
 
+    // Update calculatedVolume in Formik
+    await setFieldValue(
+      `varientsData[${index}].calculatedVolume`,
+      calculatedVolume
+    );
+
+    // Validate the field
+    await validateField(`varientsData[${index}].calculatedVolume`);
+
+    // Show volume if conditions are met and validation passes
     if (
       (variant.shape === "cuboid" &&
         variant.length &&
@@ -386,10 +412,10 @@ const AddNewProduct = () => {
 
   // Calculate Volume
   const calculateVolume = (variant) => {
-    if (!variant) return 0; // Prevent undefined errors
+    if (!variant) return 0;
 
     let { shape, length, width, height, diameter } = variant;
-
+    console.log(shape, length, width, height, diameter);
     length = Number(length) || 0;
     width = Number(width) || 0;
     height = Number(height) || 0;
@@ -406,45 +432,6 @@ const AddNewProduct = () => {
 
     return isNaN(volume) ? 0 : Math.round(volume);
   };
-
-  //   let {
-  //     sellingPrice,
-  //     discountAmount,
-  //     discountType,
-  //     taxCalculation,
-  //     taxAmount,
-  //   } = values;
-  //   sellingPrice = Number(sellingPrice) || 0;
-  //   discountAmount = Number(discountAmount) || 0;
-  //   taxAmount = Number(taxAmount) || 0;
-
-  //   let finalPrice = sellingPrice;
-
-  //   // Apply Discount
-  //   if (discountType === "Flat") {
-  //     finalPrice -= discountAmount;
-  //   } else if (discountType === "Percentage") {
-  //     finalPrice -= (finalPrice * discountAmount) / 100;
-  //   }
-
-  //   // Apply Tax (Only if "Exclude with product" is selected)
-  //   if (taxCalculation === "Exclude") {
-  //     finalPrice += (finalPrice * taxAmount) / 100;
-  //   }
-
-  //   values.calculatedPrice = Math.round(finalPrice);
-  //   return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
-  // };
-
-  // const handlePriceCalculation = (values) => {
-  //   const { mrp, sellingPrice, discountAmount, taxCalculation } = values;
-
-  //   if ((mrp && sellingPrice && discountAmount >= 0) || taxCalculation) {
-  //     setShowPrice(true);
-
-  //     let finalPrice = calculateDiscountedPrice(values);
-  //   }
-  // };
 
   const calculateDiscountedPrice = (variant) => {
     let {
@@ -476,9 +463,21 @@ const AddNewProduct = () => {
     return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
   };
 
-  // Handle Price Calculation for a specific variant
-  const handlePriceCalculation = (index, values) => {
+  const handlePriceCalculation = async (
+    index,
+    values,
+    { setFieldValue, validateField }
+  ) => {
     const variant = values.varientsData[index];
+    const calculatedPrice = calculateDiscountedPrice(variant);
+
+    await setFieldValue(
+      `varientsData[${index}].calculatedPrice`,
+      calculatedPrice
+    );
+
+    // Validate the field
+    await validateField(`varientsData[${index}].calculatedPrice`);
 
     if (
       (variant.mrp && variant.sellingPrice && variant.discountAmount >= 0) ||
@@ -561,10 +560,10 @@ const AddNewProduct = () => {
         let variant = values.varientsData[i];
 
         let imagePathString = "";
-        if (variant.images?.length > 0) {
+        if (variant.imagesValues?.length > 0) {
           try {
             let uploadedImagePaths = [];
-            for (const image of variant.images) {
+            for (const image of variant.imagesValues) {
               const uploadedImagePath = await uploadImage(image, "Products");
               if (!uploadedImagePath) {
                 throw new Error("Image upload failed.");
@@ -582,6 +581,8 @@ const AddNewProduct = () => {
             return;
           }
         }
+
+       
 
         let payload = {
           Added_By: role.toString(),
@@ -668,7 +669,6 @@ const AddNewProduct = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values, { resetForm }) => {
-          console.log(values);
           await submitFormData(values);
         }}
       >
@@ -680,6 +680,7 @@ const AddNewProduct = () => {
           resetForm,
           isValid,
           dirty,
+          validateField,
         }) => {
           const handleKeyDown = (e) => {
             if (e.key === "Enter" || e.key === ",") {
@@ -716,7 +717,7 @@ const AddNewProduct = () => {
                     height: "",
                     diameter: "",
                     calculatedVolume: "",
-                    images: [],
+                    imagesValues: [],
                   },
                 ]);
 
@@ -1864,7 +1865,7 @@ const AddNewProduct = () => {
 
                           {/* Price Calculation Button */}
                           <CardBox>
-                            <Box mt={5}>
+                            {/* <Box mt={5}>
                               <Button
                                 onClick={() =>
                                   handlePriceCalculation(index, values)
@@ -1872,11 +1873,30 @@ const AddNewProduct = () => {
                               >
                                 Calculate Price
                               </Button>
+                            </Box> */}
+
+                            <Box mt={5}>
+                              <Button
+                                onClick={() =>
+                                  handlePriceCalculation(index, values, {
+                                    setFieldValue,
+                                    validateField,
+                                  })
+                                }
+                              >
+                                Calculate Price
+                              </Button>
                             </Box>
+                            <ErrorMessage
+                              name={`varientsData[${index}].calculatedPrice`}
+                              component={Text}
+                              color="red.500"
+                              fontSize="sm"
+                            />
                           </CardBox>
 
                           {/* Conditionally render price and buttons */}
-                          {showPrice[index] && (
+                          {/* {showPrice[index] && (
                             <CardBox>
                               <Box
                                 mt={6}
@@ -1916,6 +1936,41 @@ const AddNewProduct = () => {
                                 </Text>
                               </Box>
                             </CardBox>
+                          )} */}
+
+                          {showPrice[index] && (
+                            <Box
+                              mt={6}
+                              p={4}
+                              borderRadius="md"
+                              backgroundColor="gray.100"
+                            >
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="blue.600"
+                              >
+                                💰 1 Piece Final Price: ₹{" "}
+                                {calculateDiscountedPrice(
+                                  values.varientsData[index]
+                                ).toFixed(2)}
+                              </Text>
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="green.600"
+                                mt={2}
+                              >
+                                💰 Gross Total Price: ₹{" "}
+                                {(
+                                  (values.varientsData[index].minimumOrderQty ||
+                                    1) *
+                                  calculateDiscountedPrice(
+                                    values.varientsData[index]
+                                  )
+                                ).toFixed(2)}
+                              </Text>
+                            </Box>
                           )}
                         </SimpleGrid>
 
@@ -2131,12 +2186,21 @@ const AddNewProduct = () => {
                               <Box mt={8}>
                                 <Button
                                   onClick={() =>
-                                    handleVolumeCalculation(index, values)
+                                    handleVolumeCalculation(index, values, {
+                                      setFieldValue,
+                                      validateField,
+                                    })
                                   }
                                 >
                                   Calculate Volume
                                 </Button>
                               </Box>
+                              <ErrorMessage
+                                name={`varientsData[${index}].calculatedVolume`}
+                                component={Text}
+                                color="red.500"
+                                fontSize="sm"
+                              />
                             </CardBox>
 
                             {/* Display Volume */}
@@ -2150,13 +2214,9 @@ const AddNewProduct = () => {
                                   >
                                     📦 Calculated Volume:{" "}
                                     <Text as="span" color="red.500">
-                                      {
-                                        (values.varientsData[
-                                          index
-                                        ].calculatedVolume = calculateVolume(
-                                          values.varientsData[index]
-                                        ))
-                                      }{" "}
+                                      {calculateVolume(
+                                        values.varientsData[index]
+                                      )}{" "}
                                       cm³
                                     </Text>
                                   </Text>
@@ -2191,11 +2251,18 @@ const AddNewProduct = () => {
                             >
                               {/* come here */}
                               <UploadImages
-                                values={values} // Pass the entire values object
-                                index={index} // Pass the index of the variant
-                                setFieldValue={setFieldValue} // Pass Formik's setFieldValue directly
-                              />
+                            values={values}
+                            index={index}
+                            setFieldValue={setFieldValue}
+                          />
+
                             </SimpleGrid>
+                            <ErrorMessage
+                            name={`varientsData[${index}].imagesValues`}
+                            component={Text}
+                            color="red.500"
+                            fontSize="sm"
+                          />
                           </CardBox>
                         </Box>
 

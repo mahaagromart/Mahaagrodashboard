@@ -122,7 +122,7 @@ const ProductListTable = () => {
         headers: { Authorization: `Bearer ${storedToken}` }
       });
       
-      console.log(res.data.dataset?.$values)
+
 
       if (res.data.message === "SUCCESS") {
         const products = res.data.dataset?.$values.flatMap(product => 
@@ -171,7 +171,7 @@ const ProductListTable = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching data:", error.response || error);
+
       await Swal.fire({
         title: "Error",
         text: `Failed to fetch product list: ${error.response?.status} ${error.message}`,
@@ -222,13 +222,7 @@ const ProductListTable = () => {
   };
 
 
-  const getValue = (value)=>{
-    if(value === 0){
-      return "Active";
-    }else{
-      return "Deactivate"
-    }
-  }
+
 
   const handleToggleCertification = async (record) => {
     Swal.fire({
@@ -290,22 +284,21 @@ const ProductListTable = () => {
       if (result.isConfirmed) {
         try {
           const res = await axios.post(
-            `${apiUrl}EcommerceProduct/DeleteProduct`,
-            { Product_id: record.Product_id },
+            `${apiUrl}Product/DeleteProduct`,
+            { Product_id: record.Product_id.toString() },
             {
               headers: { Authorization: `Bearer ${storedToken}` },
             }
           );
+      
 
-          if (res.data.Message === "Success") {
+          if (res.data[0].retval === "SUCCESS" || res.data[0].code === 200) {
             Swal.fire({
               title: "Deleted",
               text: "Data deleted successfully",
               icon: "success",
             });
-            setData((prevData) =>
-              prevData.filter((item) => item.Product_id !== record.Product_id)
-            );
+            getInHouseProduct();
           } else {
             await Swal.fire({
               title: "Error While Deleting",

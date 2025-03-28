@@ -14,6 +14,7 @@ import {
   Image,
   Text,
   GridItem,
+  Center,
 } from "@chakra-ui/react";
 import CardBox from "../../../Component/Charts/CardBox";
 import ReactQuill from "react-quill";
@@ -42,7 +43,7 @@ const AddNewProduct = () => {
   const [showPrice, setShowPrice] = useState(false);
   const [volume, setVolume] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
-  const { token , role ,UserId } = useSelector((state) => state.auth);
+  const { token, role, UserId } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
   const [categoryList, setCategoryList] = useState([]);
   const [subCategoryList, setSubCategoryList] = useState([]);
@@ -79,7 +80,7 @@ const AddNewProduct = () => {
       const res = await axios.get(`${apiUrl}ProductAttribute/GetAllAttribute`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-       console.log(res)
+      console.log(res);
       if (res.data[0]?.retval === "SUCCESS" && res.data[0]?.dataset?.$values) {
         setProductAttribute(res.data[0].dataset.$values);
       } else {
@@ -158,8 +159,6 @@ const AddNewProduct = () => {
         }
       );
 
-   
-
       if (res.data[0].message === "SUCCESS") {
         setSubSubCategoryList(res.data[0].dataset.$values);
       } else {
@@ -195,9 +194,7 @@ const AddNewProduct = () => {
     varientsInput: "",
     varientsData: [],
     images: "",
-
   };
-
 
   // hsn: yup
   //   .string()
@@ -289,11 +286,11 @@ const AddNewProduct = () => {
     subCategory: yup.string().required("Sub Category is required"),
     subSubCategory: yup.string().notRequired(),
     brand: yup.string().notRequired(),
-    unit : yup.string().required(),
+    unit: yup.string().required(),
     varients: yup
-    .array()
-    .of(yup.string().required("Each variant must be a valid string"))
-    .min(1, "At least one variant is required"),
+      .array()
+      .of(yup.string().required("Each variant must be a valid string"))
+      .min(1, "At least one variant is required"),
     varientsData: yup.array().of(
       yup.object().shape({
         variantName: yup.string().required("Variant Name is required"),
@@ -315,7 +312,14 @@ const AddNewProduct = () => {
           .number()
           .required("Current Stock Quantity is required")
           .min(0, "Current Stock Quantity must be positive"),
-
+        calculatedPrice: yup
+          .number()
+          .required("Click on Calculate price.")
+          .min(0, "please recheck the Logistics setup again"),
+        calculatedVolume: yup
+          .number()
+          .required("Click on Calculate Volume.")
+          .min(0, "please recheck the Logistics setup again."),
         discountType: yup
           .string()
           .required("Discount Type is required")
@@ -338,7 +342,6 @@ const AddNewProduct = () => {
           otherwise: (schema) => schema.notRequired().nullable(),
         }),
 
-        // **Logistic Setup Validation**
         shape: yup.string().required("Shape is required"),
         length: yup.number().when("shape", {
           is: "cuboid",
@@ -369,13 +372,33 @@ const AddNewProduct = () => {
           .number()
           .min(1, "Weight must be greater than 0")
           .required("Weight is required"),
-      })
+        imagesValues: yup.array()
+        .of(yup.mixed()) 
+        .min(1, "At least one image is required")
+        .required("Images are required"),
+      }),
+      
     ),
   });
 
-  const handleVolumeCalculation = (index, values) => {
+  const handleVolumeCalculation = async (
+    index,
+    values,
+    { setFieldValue, validateField }
+  ) => {
     const variant = values.varientsData[index];
+    const calculatedVolume = calculateVolume(variant);
 
+    // Update calculatedVolume in Formik
+    await setFieldValue(
+      `varientsData[${index}].calculatedVolume`,
+      calculatedVolume
+    );
+
+    // Validate the field
+    await validateField(`varientsData[${index}].calculatedVolume`);
+
+    // Show volume if conditions are met and validation passes
     if (
       (variant.shape === "cuboid" &&
         variant.length &&
@@ -389,10 +412,10 @@ const AddNewProduct = () => {
 
   // Calculate Volume
   const calculateVolume = (variant) => {
-    if (!variant) return 0; // Prevent undefined errors
+    if (!variant) return 0;
 
     let { shape, length, width, height, diameter } = variant;
-
+    console.log(shape, length, width, height, diameter);
     length = Number(length) || 0;
     width = Number(width) || 0;
     height = Number(height) || 0;
@@ -409,7 +432,6 @@ const AddNewProduct = () => {
 
     return isNaN(volume) ? 0 : Math.round(volume);
   };
-
 
   const calculateDiscountedPrice = (variant) => {
     let {
@@ -441,9 +463,21 @@ const AddNewProduct = () => {
     return isNaN(finalPrice) ? 0 : Math.round(finalPrice);
   };
 
-  // Handle Price Calculation for a specific variant
-  const handlePriceCalculation = (index, values) => {
+  const handlePriceCalculation = async (
+    index,
+    values,
+    { setFieldValue, validateField }
+  ) => {
     const variant = values.varientsData[index];
+    const calculatedPrice = calculateDiscountedPrice(variant);
+
+    await setFieldValue(
+      `varientsData[${index}].calculatedPrice`,
+      calculatedPrice
+    );
+
+    // Validate the field
+    await validateField(`varientsData[${index}].calculatedPrice`);
 
     if (
       (variant.mrp && variant.sellingPrice && variant.discountAmount >= 0) ||
@@ -520,17 +554,16 @@ const AddNewProduct = () => {
   const submitFormData = async (values) => {
     try {
       dispatch(startLoading());
-  
+
       var PROD_ID = null;
       for (let i = 0; i < values.varientsData.length; i++) {
         let variant = values.varientsData[i];
-  
-       
+
         let imagePathString = "";
-        if (variant.images?.length > 0) {
+        if (variant.imagesValues?.length > 0) {
           try {
-            let uploadedImagePaths = []; 
-            for (const image of variant.images) {
+            let uploadedImagePaths = [];
+            for (const image of variant.imagesValues) {
               const uploadedImagePath = await uploadImage(image, "Products");
               if (!uploadedImagePath) {
                 throw new Error("Image upload failed.");
@@ -549,32 +582,36 @@ const AddNewProduct = () => {
           }
         }
 
+       
+
         let payload = {
-          Added_By : role.toString(),
-          UserId : UserId.toString(),
+          Added_By: role.toString(),
+          UserId: UserId.toString(),
           CATEGORY_ID: values.category.toString(),
           SUB_CATEGORY_ID: values.subCategory.toString(),
-          SUB_SUB_CATEGORY_ID : values.subSubCategory.toString() || "",
+          SUB_SUB_CATEGORY_ID: values.subSubCategory.toString() || "",
           Product_Name: values.productName.toString(),
           Product_Description: values.productDescription.toString(),
           ThumbnailImage: imagePathString.toString(),
           BRAND: values.brand.toString() || "",
           sku: variant.sku.toString(),
-          UNIT: values.unit.toString()  || "",
-          TAGS_INPUT: values.tags || [], 
+          UNIT: values.unit.toString() || "",
+          TAGS_INPUT: values.tags || [],
           HSN: variant.hsn.toString(),
           PROD_ID: PROD_ID,
           // Pricing
-          PRICING: Number(variant.mrp), 
+          PRICING: Number(variant.mrp),
           MAXIMUM_RETAIL_PRICE: Number(variant.mrp),
           SELLING_PRICE: Number(variant.sellingPrice),
           MINIMUM_ORDER_QUANTITY: Number(variant.minimumOrderQty),
           CURRENT_STOCK_QUANTITY: Number(variant.currentStockQty),
-          CALCULATED_MINIMUM_ORDER_PRICE : Number(variant.minimumOrderQty*variant.calculatedPrice).toString(),
+          CALCULATED_MINIMUM_ORDER_PRICE: Number(
+            variant.minimumOrderQty * variant.calculatedPrice
+          ).toString(),
 
           // Logistics
           PACKAGE_WEIGHT: Number(variant.weight),
-          PACKAGE_SHAPE: variant.shape.toString() ,
+          PACKAGE_SHAPE: variant.shape.toString(),
           PACKAGE_LENGTH: variant.length.toString() || "",
           PACKAGE_WIDTH: variant.width.toString() || "",
           PACKAGE_HEIGHT: variant.height.toString() || "",
@@ -585,31 +622,29 @@ const AddNewProduct = () => {
           TAX_AMOUNT: variant.taxAmount.toString(),
           TAX_CALCULATION: variant.taxCalculation.toString(),
           CALCULATED_PRICE: variant.calculatedPrice.toString(),
-      
+
           // Variants
           VAREINTS_NAME: variant.variantName.toString(),
-       
-      };
-  
-        try {
-          const res = await axios.post(`${apiUrl}Product/InsertProduct`, payload, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-              "Content-Type": "application/json",
-            },
-          });
-            console.log(res.data);
-          if (res.data[0].code === 200) {
+        };
 
+        try {
+          const res = await axios.post(
+            `${apiUrl}Product/InsertProduct`,
+            payload,
+            {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (res.data[0].code === 200) {
             PROD_ID = res.data[0].message;
-            console.log(PROD_ID)
-            
+            console.log(PROD_ID);
           } else {
           }
-        } catch (error) {
-
-
-        }
+        } catch (error) {}
       }
 
       Swal.fire({
@@ -617,9 +652,7 @@ const AddNewProduct = () => {
         title: "Success",
         text: "Product and variants inserted successfully!",
       });
-  
     } catch (err) {
-   
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -630,20 +663,25 @@ const AddNewProduct = () => {
     }
   };
 
-
   return (
     <>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values, { resetForm }) => {
-          console.log(values); 
           await submitFormData(values);
-          // resetForm(); 
         }}
       >
-    {({ values, errors, touched, setFieldValue, resetForm, isValid, dirty }) => {
-          
+        {({
+          values,
+          errors,
+          touched,
+          setFieldValue,
+          resetForm,
+          isValid,
+          dirty,
+          validateField,
+        }) => {
           const handleKeyDown = (e) => {
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();
@@ -679,7 +717,7 @@ const AddNewProduct = () => {
                     height: "",
                     diameter: "",
                     calculatedVolume: "",
-                    images : [],
+                    imagesValues: [],
                   },
                 ]);
 
@@ -692,8 +730,6 @@ const AddNewProduct = () => {
               }
             }
           };
-
-         
 
           return (
             <Form>
@@ -1025,6 +1061,8 @@ const AddNewProduct = () => {
 
                 {/* For Loop */}
 
+                {/* For Loop */}
+
                 <Box mt={4}>
                   <CardBox>
                     <div style={{ paddingTop: "10px" }}>
@@ -1048,34 +1086,41 @@ const AddNewProduct = () => {
                       p={3}
                       mb={1}
                     >
-                          <CardBox>
-                            <FormControl>
-                              <FormLabel htmlFor="unit">Unit</FormLabel>
-                              <Field
-                                as={Select}
-                                name="unit"
-                                size="md"
-                                borderRadius="md"
-                                h="40px"
-                                focusBorderColor="blue.500"
+                      <CardBox>
+                        <FormControl>
+                          <FormLabel htmlFor="unit">Unit</FormLabel>
+                          <Field
+                            as={Select}
+                            name="unit"
+                            size="md"
+                            borderRadius="md"
+                            h="40px"
+                            focusBorderColor="blue.500"
+                          >
+                            <option value="" disabled selected>
+                              Select Unit
+                            </option>
+
+                            {productAttribute?.map((attribut) => (
+                              <option
+                                key={attribut.id}
+                                value={attribut.attribute_Name}
                               >
-                                <option value="" disabled selected>
-                                  Select Unit
-                                </option>
+                                {attribut.attribute_Name}
+                              </option>
+                            ))}
+                          </Field>
 
-                                {productAttribute?.map((attribut) => (
-                                  <option key={attribut.id} value={attribut.attribute_Name}>
-                                    {attribut.attribute_Name}
-                                  </option>
-                                ))}
-                              </Field>
-
-                              <Text color="red.500" fontSize="sm" minH="20px" display="block">
-                                <ErrorMessage name="unit" />
-                              </Text>
-                            </FormControl>
-                          </CardBox>
-
+                          <Text
+                            color="red.500"
+                            fontSize="sm"
+                            minH="20px"
+                            display="block"
+                          >
+                            <ErrorMessage name="unit" />
+                          </Text>
+                        </FormControl>
+                      </CardBox>
 
                       <GridItem colSpan={2}>
                         <FormControl>
@@ -1135,36 +1180,36 @@ const AddNewProduct = () => {
                     </SimpleGrid>
                   </CardBox>
                 </Box>
-                
-                                <Box mt={5}>
-                                  <CardBox>
-                                    <SimpleGrid
-                                      columns={{ base: 1, md: 2, lg: 3 }}
-                                      spacing={6}
-                                      alignItems="center"
-                                      p={3}
-                                      mb={1}
-                                    >
-                                      <GridItem textAlign="center">
-                                        <CenterBox>
-                                          <img src={Logo4} alt="Logo 4" width="500px" />
-                                        </CenterBox>
-                                      </GridItem>
-                
-                                      <GridItem textAlign="center">
-                                        <CenterBox>
-                                          <img src={Logo1} alt="Logo 1" width="300px" />
-                                        </CenterBox>
-                                      </GridItem>
-                
-                                      <GridItem textAlign="center">
-                                        <CenterBox>
-                                          <img src={Logo2} alt="Logo 2" width="300px" />
-                                        </CenterBox>
-                                      </GridItem>
-                                    </SimpleGrid>
-                                  </CardBox>
-                                </Box>
+
+                <Box mt={5}>
+                  <CardBox>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2, lg: 3 }}
+                      spacing={6}
+                      alignItems="center"
+                      p={3}
+                      mb={1}
+                    >
+                      <GridItem textAlign="center">
+                        <CenterBox>
+                          <img src={Logo4} alt="Logo 4" width="500px" />
+                        </CenterBox>
+                      </GridItem>
+
+                      <GridItem textAlign="center">
+                        <CenterBox>
+                          <img src={Logo1} alt="Logo 1" width="300px" />
+                        </CenterBox>
+                      </GridItem>
+
+                      <GridItem textAlign="center">
+                        <CenterBox>
+                          <img src={Logo2} alt="Logo 2" width="300px" />
+                        </CenterBox>
+                      </GridItem>
+                    </SimpleGrid>
+                  </CardBox>
+                </Box>
 
                 {/* First Loop  */}
                 {(values.varientsData || []).map((variant, index) => (
@@ -1820,7 +1865,7 @@ const AddNewProduct = () => {
 
                           {/* Price Calculation Button */}
                           <CardBox>
-                            <Box mt={5}>
+                            {/* <Box mt={5}>
                               <Button
                                 onClick={() =>
                                   handlePriceCalculation(index, values)
@@ -1828,11 +1873,30 @@ const AddNewProduct = () => {
                               >
                                 Calculate Price
                               </Button>
+                            </Box> */}
+
+                            <Box mt={5}>
+                              <Button
+                                onClick={() =>
+                                  handlePriceCalculation(index, values, {
+                                    setFieldValue,
+                                    validateField,
+                                  })
+                                }
+                              >
+                                Calculate Price
+                              </Button>
                             </Box>
+                            <ErrorMessage
+                              name={`varientsData[${index}].calculatedPrice`}
+                              component={Text}
+                              color="red.500"
+                              fontSize="sm"
+                            />
                           </CardBox>
 
                           {/* Conditionally render price and buttons */}
-                          {showPrice[index] && (
+                          {/* {showPrice[index] && (
                             <CardBox>
                               <Box
                                 mt={6}
@@ -1872,6 +1936,41 @@ const AddNewProduct = () => {
                                 </Text>
                               </Box>
                             </CardBox>
+                          )} */}
+
+                          {showPrice[index] && (
+                            <Box
+                              mt={6}
+                              p={4}
+                              borderRadius="md"
+                              backgroundColor="gray.100"
+                            >
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="blue.600"
+                              >
+                                💰 1 Piece Final Price: ₹{" "}
+                                {calculateDiscountedPrice(
+                                  values.varientsData[index]
+                                ).toFixed(2)}
+                              </Text>
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="green.600"
+                                mt={2}
+                              >
+                                💰 Gross Total Price: ₹{" "}
+                                {(
+                                  (values.varientsData[index].minimumOrderQty ||
+                                    1) *
+                                  calculateDiscountedPrice(
+                                    values.varientsData[index]
+                                  )
+                                ).toFixed(2)}
+                              </Text>
+                            </Box>
                           )}
                         </SimpleGrid>
 
@@ -1904,7 +2003,6 @@ const AddNewProduct = () => {
                                   alignItems="center"
                                 >
                                   Package Shape
-
                                 </FormLabel>
 
                                 <Field
@@ -1946,7 +2044,6 @@ const AddNewProduct = () => {
                                         {field.charAt(0).toUpperCase() +
                                           field.slice(1)}{" "}
                                         (cm)
-                                       
                                       </FormLabel>
 
                                       <Field
@@ -2057,7 +2154,6 @@ const AddNewProduct = () => {
                               <FormControl>
                                 <FormLabel display="flex" alignItems="center">
                                   Weight (gram)
-
                                 </FormLabel>
 
                                 <Field
@@ -2090,12 +2186,21 @@ const AddNewProduct = () => {
                               <Box mt={8}>
                                 <Button
                                   onClick={() =>
-                                    handleVolumeCalculation(index, values)
+                                    handleVolumeCalculation(index, values, {
+                                      setFieldValue,
+                                      validateField,
+                                    })
                                   }
                                 >
                                   Calculate Volume
                                 </Button>
                               </Box>
+                              <ErrorMessage
+                                name={`varientsData[${index}].calculatedVolume`}
+                                component={Text}
+                                color="red.500"
+                                fontSize="sm"
+                              />
                             </CardBox>
 
                             {/* Display Volume */}
@@ -2109,13 +2214,9 @@ const AddNewProduct = () => {
                                   >
                                     📦 Calculated Volume:{" "}
                                     <Text as="span" color="red.500">
-                                      {
-                                        (values.varientsData[
-                                          index
-                                        ].calculatedVolume = calculateVolume(
-                                          values.varientsData[index]
-                                        ))
-                                      }{" "}
+                                      {calculateVolume(
+                                        values.varientsData[index]
+                                      )}{" "}
                                       cm³
                                     </Text>
                                   </Text>
@@ -2150,13 +2251,18 @@ const AddNewProduct = () => {
                             >
                               {/* come here */}
                               <UploadImages
-                                values={values}  // Pass the entire values object
-                                index={index} // Pass the index of the variant
-                                setFieldValue={setFieldValue} // Pass Formik's setFieldValue directly
-                              />
-
+                            values={values}
+                            index={index}
+                            setFieldValue={setFieldValue}
+                          />
 
                             </SimpleGrid>
+                            <ErrorMessage
+                            name={`varientsData[${index}].imagesValues`}
+                            component={Text}
+                            color="red.500"
+                            fontSize="sm"
+                          />
                           </CardBox>
                         </Box>
 

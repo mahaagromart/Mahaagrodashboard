@@ -115,22 +115,40 @@ const VendorProductListTable = () => {
   
       if (res.data.message === "SUCCESS") {
         const products = res.data.dataset?.$values.flatMap(product => 
-            product.variants.$values.map(variant => ({
-            Product_id: variant.varientS_ID,
-            product_Name: product.product_Name,
-            varient_Name: variant.varient_Name,  
-            sku: variant.sku,                    
-            hsn: variant.hsn || "N/A",           
-            calculateD_PRICE: variant.pricing.calculateD_PRICE || variant.pricing.sellinG_PRICE, 
-            currenT_STOCK_QUANTITY: variant.pricing.currenT_STOCK_QUANTITY,
-            certification: variant.certification,
-            status: variant.status,            
-            rating: variant.rating || 0,      
-            thumbnailImage: variant.imageGallery?.$values?.[0]?.product_Images || product.thumbnailImage,
-            categorY_ID: product.categorY_ID,
-            suB_CATEGORY_ID: product.suB_CATEGORY_ID,
-          }))
-        ) || [];
+          product.variants.$values.map(variant => ({
+          Product_id: variant.varientS_ID,
+          proD_Id : product.proD_ID,
+          product_Name: product.product_Name,
+          product_Description: product.product_Description,
+          varient_Name: variant.varient_Name,  
+          sku: variant.sku,                    
+          hsn: variant.hsn || "N/A",           
+          calculateD_PRICE: variant.pricing.calculateD_PRICE ,
+          sellinG_PRICE: variant.pricing.sellinG_PRICE, 
+          discounT_TYPE : variant.pricing.discounT_TYPE,
+          discounT_AMOUNT : variant.pricing.discounT_AMOUNT,
+          taX_AMOUNT : variant.pricing.taX_AMOUNT,
+          taX_CALCULATION : variant.pricing.taX_CALCULATION,
+          maximuM_RETAIL_PRICE : variant.pricing.maximuM_RETAIL_PRICE,
+          currenT_STOCK_QUANTITY: variant.pricing.currenT_STOCK_QUANTITY,
+          packagE_DIAMETER : variant.logistics.packagE_DIAMETER,
+          minimuM_ORDER_QUANTITY : variant.pricing.minimuM_ORDER_QUANTITY,
+          packagE_HEIGHT : variant.logistics.packagE_HEIGHT,
+          packagE_LENGTH :variant.logistics.packagE_LENGTH,
+          packagE_SHAPE : variant.logistics.packagE_SHAPE,
+          packagE_TOTAL_VOLUME : variant.logistics.packagE_TOTAL_VOLUME,
+          packagE_WEIGHT : variant.logistics.packagE_WEIGHT,
+          packagE_WIDTH : variant.logistics.packagE_WIDTH,
+          certification: variant.certification,
+          status: variant.status,            
+          rating: variant.rating || 0,      
+          tags: product.tagS_INPUT || [],
+          thumbnailImages : variant.imageGallery?.$values?.map(img => img.product_Images) || [product.thumbnailImage],
+          categorY_ID: product.categorY_ID,
+          suB_CATEGORY_ID: product.suB_CATEGORY_ID,
+          unit : product.unit,
+        }))
+      ) || [];
   
         setProductList(products);
       } else {
@@ -260,22 +278,21 @@ const VendorProductListTable = () => {
       if (result.isConfirmed) {
         try {
           const res = await axios.post(
-            `${apiUrl}EcommerceProduct/DeleteProduct`,
-            { Product_id: record.Product_id },
+            `${apiUrl}Product/DeleteProduct`,
+            { Product_id: record.Product_id.toString() },
             {
               headers: { Authorization: `Bearer ${storedToken}` },
             }
           );
+      
 
-          if (res.data.Message === "Success") {
+          if (res.data[0].retval === "SUCCESS" || res.data[0].code === 200) {
             Swal.fire({
               title: "Deleted",
               text: "Data deleted successfully",
               icon: "success",
             });
-            setData((prevData) =>
-              prevData.filter((item) => item.Product_id !== record.Product_id)
-            );
+            getInHouseProduct();
           } else {
             await Swal.fire({
               title: "Error While Deleting",
@@ -293,6 +310,15 @@ const VendorProductListTable = () => {
       }
     });
   };
+
+  const handleEdit =async(record)=>{
+
+    navigate("/UpdateProduct", {
+      state: {
+       record : record
+      },
+    });
+  }
 
   const handleView = (record) => {
     setSelectedProduct(record);
@@ -332,29 +358,29 @@ const VendorProductListTable = () => {
   <Column title="ID" dataIndex="Product_id" key="Product_id" align="center" />
 
   <Column
-    title="Product Image"
-    dataIndex="thumbnailImage"
-    key="thumbnailImage"
-    align="center"
-    render={(image) => (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <img
-          src={`${apiUrl}${image}`}
-          alt="Product"
-          style={{
-            width: "80px",
-            height: "80px",
-            objectFit: "contain",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-            padding: "5px",
-            backgroundColor: "#fff",
-          }}
-          onError={(e) => (e.target.style.display = "none")}
-        />
-      </div>
-    )}
-  />
+  title="Product Image"
+  dataIndex="thumbnailImages"
+  key="thumbnailImages"
+  align="center"
+  render={(images) => (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <img
+        src={`${apiUrl}${images?.[0] || "default-image.jpg"}`} 
+        alt="Product"
+        style={{
+          width: "80px",
+          height: "80px",
+          objectFit: "contain",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+          padding: "5px",
+          backgroundColor: "#fff",
+        }}
+        onError={(e) => (e.target.style.display = "none")}
+      />
+    </div>
+  )}
+/>
 
   <Column title="Product Name" dataIndex="product_Name" key="product_Name" align="center" />
   <Column title="Variant Name" dataIndex="varient_Name" key="varient_Name" align="center" />
@@ -419,7 +445,7 @@ const VendorProductListTable = () => {
           <Button icon={<FaEye />} type="primary" onClick={() => handleView(record)} />
         </Tooltip>
         <Tooltip title="Edit">
-          <Button icon={<MdEdit />} type="primary" />
+          <Button icon={<MdEdit />} type="primary" onClick={() => handleEdit(record)}  />
         </Tooltip>
         <Tooltip title="Delete">
           <Button icon={<MdDelete />} type="primary" danger onClick={() => handleDelete(record)} />
@@ -443,34 +469,37 @@ const VendorProductListTable = () => {
     >
 
       {selectedProduct && (
-        <div style={{ lineHeight: "1.8", fontSize: "16px" }}>
-
-          <p style={{margin: "5px 0px"}}><IdcardOutlined /> <strong>ID:</strong> {selectedProduct.Product_id}</p>
-          <p style={{margin: "5px 0px"}}><BarcodeOutlined /> <strong>Product ID:</strong> {selectedProduct.proD_ID}</p>
-          <p style={{margin: "5px 0px"}}><TagOutlined /> <strong>Name:</strong> {selectedProduct.product_Name}</p>
-          <p style={{margin: "5px 0px"}}><FileTextOutlined /> <strong>Description:</strong> { selectedProduct.product_Description }</p>
-          <p style={{margin: "5px 0px"}}><GiftOutlined /> <strong>Category:</strong> {getCategoryName(selectedProduct.categorY_ID, categoryData)}</p>
-          <p style={{margin: "5px 0px"}}><GoldOutlined /> <strong>Subcategory:</strong> {getSubCategoryName(selectedProduct.suB_CATEGORY_ID, subCategoryData)}</p>
-          <p style={{margin: "5px 0px"}}><ShoppingCartOutlined /> <strong>Stock Quantity:</strong> {selectedProduct.currenT_STOCK_QUANTITY}</p>
-          <p style={{margin: "5px 0px"}}><StarOutlined style={{ color: "#fadb14" }} /> <strong>Rating:</strong> {selectedProduct.rating} ⭐</p>
-          <p style={{margin: "5px 0px"}}><ContainerOutlined /> <strong>Packaging:</strong> {selectedProduct.packagE_WEIGHT}g, {selectedProduct.packagE_SHAPE}</p>
-          <p style={{margin: "5px 0px"}}><BoxPlotOutlined /> <strong>Dimensions:</strong> {selectedProduct.packagE_LENGTH}x{selectedProduct.packagE_WIDTH}x{selectedProduct.packagE_HEIGHT} cm</p>
-          <p style={{margin: "5px 0px"}}><PercentageOutlined /> <strong>Discount:</strong> {selectedProduct.discounT_TYPE} - ₹{selectedProduct.discounT_AMOUNT}</p>
-          <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Tax Amount:</strong> ₹{selectedProduct.taX_AMOUNT} ({selectedProduct.taX_CALCULATION})</p>
-          <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Final Price:</strong> ₹{selectedProduct.calculateD_PRICE}</p>
-          <p>
-            <SafetyCertificateOutlined style={{ color: selectedProduct.certification === 0 ? "green" : "red" }} />
-            <strong> Certification:</strong> {selectedProduct.certification === 0 ? "Certified" : "Uncertified"}
-          </p>
-          <p>
-            {selectedProduct.status === 0 ? (
-              <CheckCircleOutlined style={{ color: "green" }} />
-            ) : (
-              <CloseCircleOutlined style={{ color: "red" }} />
-            )}
-            <strong> Status:</strong> {selectedProduct.status === 0 ? "Activated" : "Deactivated"}
-          </p>
-        </div>
+              <div style={{ lineHeight: "1.8", fontSize: "16px" }}>
+                <p style={{margin: "5px 0px"}}><IdcardOutlined /> <strong>ID:</strong> {selectedProduct.Product_id}</p>
+                <p style={{margin: "5px 0px"}}><BarcodeOutlined /> <strong>Product ID:</strong> {selectedProduct.proD_Id}</p>
+                <p style={{margin: "5px 0px"}}><TagOutlined /> <strong>Product Name:</strong> {selectedProduct.product_Name}</p>
+                <p style={{margin: "5px 0px"}}><TagOutlined /> <strong>Varient Name:</strong> {selectedProduct.varient_Name}</p>
+                <p style={{margin: "5px 0px"}}><GiftOutlined /> <strong>Category:</strong>   {getCategoryName(selectedProduct.categorY_ID, categoryData)}</p>
+                <p style={{margin: "5px 0px"}}><GoldOutlined /> <strong>Subcategory:</strong> {getSubCategoryName(selectedProduct.suB_CATEGORY_ID, subCategoryData)}</p>
+                <p style={{margin: "5px 0px"}}><ShoppingCartOutlined /> <strong>Stock Quantity:</strong> {selectedProduct.currenT_STOCK_QUANTITY}</p>
+                <p style={{margin: "5px 0px"}}><ShoppingCartOutlined /> <strong>MRP</strong> {selectedProduct.maximuM_RETAIL_PRICE}</p>
+                <p style={{ margin: "5px 0px" }}><ShoppingCartOutlined /> <strong>Discount:</strong> {selectedProduct.discounT_TYPE === "Flat" ? `-${selectedProduct.discounT_AMOUNT}` : `-${selectedProduct.discounT_AMOUNT}%`}</p>
+                <p style={{margin: "5px 0px"}}><StarOutlined style={{ color: "#fadb14" }} /> <strong>Rating:</strong> {selectedProduct.rating} ⭐</p>
+                <p style={{margin: "5px 0px"}}><PercentageOutlined /> <strong>Discount:</strong> {selectedProduct.discounT_TYPE} - ₹{selectedProduct.discounT_AMOUNT}</p>
+                <p style={{margin: "5px 0px"}}><ContainerOutlined /> <strong>Packaging Weight:</strong> {selectedProduct.packagE_WEIGHT}g, {selectedProduct.packagE_SHAPE}</p>
+                <p style={{margin: "5px 0px"}}><BoxPlotOutlined /> <strong>Dimensions:</strong> {selectedProduct.packagE_LENGTH}x{selectedProduct.packagE_WIDTH}x{selectedProduct.packagE_HEIGHT} cm</p>
+                <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Tax Amount:</strong> ₹{selectedProduct.taX_AMOUNT} ({selectedProduct.taX_CALCULATION})</p>
+                <p style={{margin: "5px 0px"}}><DollarOutlined /> <strong>Final Price:</strong> ₹{selectedProduct.calculateD_PRICE}</p>
+                <p>
+                  <SafetyCertificateOutlined style={{ color: selectedProduct.certification === "True" ? "green" : "red" }} />
+                  <strong> Certification:</strong> {selectedProduct.certification === "True" ? "Certified" : "Uncertified"}
+                </p>
+      
+                <p>
+                  {selectedProduct.status === "True" ? (
+                    <CheckCircleOutlined style={{ color: "green" }} />
+                  ) : (
+                    <CloseCircleOutlined style={{ color: "red" }} />
+                  )}
+                  <strong> Status:</strong> {selectedProduct.status === "True" ? "Activated" : "Deactivated"}
+                </p>
+      
+              </div>
       )}
     </Modal>
     </div>

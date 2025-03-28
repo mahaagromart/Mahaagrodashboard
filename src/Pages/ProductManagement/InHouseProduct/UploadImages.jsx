@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Upload, Modal, message } from "antd";
@@ -16,19 +14,18 @@ const UploadImages = ({ values, index, setFieldValue }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]); // Maintain state for images
+  const [fileList, setFileList] = useState([]);
 
-  // Sync fileList with varientsData[index].images when component mounts or updates
+  // Sync fileList with varientsData[index].imagesValues when component mounts or updates
   useEffect(() => {
-    if (values.varientsData[index]?.images) {
-      const newFileList = values.varientsData[index].images.map((img, idx) => ({
-        uid: idx.toString(),
-        name: img.name || `image-${idx}`,
-        url: img.preview || (img instanceof File ? URL.createObjectURL(img) : img),
-        originFileObj: img instanceof File ? img : undefined, // Store File object
-      }));
-      setFileList(newFileList);
-    }
+    const images = values.varientsData[index]?.imagesValues || [];
+    const newFileList = images.map((img, idx) => ({
+      uid: idx.toString(),
+      name: img.name || `image-${idx}`,
+      url: img.preview || (img instanceof File ? URL.createObjectURL(img) : img),
+      originFileObj: img instanceof File ? img : undefined,
+    }));
+    setFileList(newFileList);
   }, [values.varientsData, index]);
 
   const handlePreview = async (file) => {
@@ -46,25 +43,17 @@ const UploadImages = ({ values, index, setFieldValue }) => {
       return;
     }
 
-    setFileList(newFileList); // Update state
-    const updatedVariants = [...values.varientsData];
-
-    // Ensure the variant exists
-    if (!updatedVariants[index]) {
-      updatedVariants[index] = { images: [] };
-    }
-
-    updatedVariants[index].images = newFileList.map((f) => f.originFileObj || f); // Store files
-    setFieldValue("varientsData", updatedVariants);
+    setFileList(newFileList); // Update local state
+    const images = newFileList.map((f) => f.originFileObj || f);
+    // Update only the imagesValues field for this index
+    setFieldValue(`varientsData[${index}].imagesValues`, images);
   };
 
   const handleRemove = (file) => {
     const updatedFileList = fileList.filter((item) => item.uid !== file.uid);
-    setFileList(updatedFileList); // Update state
-
-    const updatedVariants = [...values.varientsData];
-    updatedVariants[index].images = updatedFileList.map((f) => f.originFileObj || f);
-    setFieldValue("varientsData", updatedVariants);
+    setFileList(updatedFileList); // Update local state
+    const images = updatedFileList.map((f) => f.originFileObj || f);
+    setFieldValue(`varientsData[${index}].imagesValues`, images);
   };
 
   return (
@@ -75,7 +64,7 @@ const UploadImages = ({ values, index, setFieldValue }) => {
         onPreview={handlePreview}
         onChange={handleUpload}
         onRemove={handleRemove}
-        beforeUpload={() => false} // Prevent auto-upload
+        beforeUpload={() => false} 
       >
         {fileList.length >= 8 ? null : (
           <div>
@@ -89,7 +78,12 @@ const UploadImages = ({ values, index, setFieldValue }) => {
         {fileList.length} / 8 images uploaded
       </p>
 
-      <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={() => setPreviewOpen(false)}>
+      <Modal
+        open={previewOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={() => setPreviewOpen(false)}
+      >
         <img alt="Preview" style={{ width: "100%" }} src={previewImage} />
       </Modal>
     </>

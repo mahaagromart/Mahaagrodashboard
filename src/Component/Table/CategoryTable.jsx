@@ -635,6 +635,342 @@
 // };
 
 // export default CategoryTable;
+// "use client";
+// import { useEffect, useState } from "react";
+// import { Button, Space, Table, Input, Modal, Form, Switch, Upload } from "antd";
+// import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
+// import { useSelector } from "react-redux";
+// import Swal from "sweetalert2";
+// import axios from "axios";
+// import { UploadOutlined } from "@ant-design/icons";
+
+// const { Column } = Table;
+
+// const CategoryTable = () => {
+//     const apiUrl = import.meta.env.VITE_API_URL;
+//     const [categoryData, setCategoryData] = useState([]);
+//     const [searchText, setSearchText] = useState("");
+//     const { token } = useSelector((state) => state.auth);
+//     const storedToken = token || localStorage.getItem("token");
+//     const [isModalOpen, setIsModalOpen] = useState(false);
+//     const [selectedCategory, setSelectedCategory] = useState(null);
+//     const [form] = Form.useForm();
+//     const [fileList, setFileList] = useState([]);
+
+//     // Fetch category data
+//     const getCategoryData = async () => {
+//         try {
+//             const url = `${apiUrl}Category/GetAllCategory`;
+//             const response = await axios.post(url, {}, {
+//                 headers: {
+//                     Authorization: `Bearer ${storedToken}`,
+//                 },
+//             });
+//             if (response.data.message === "SUCCESS" && response.data.retval === "SUCCESS") {
+//                 setCategoryData(response.data.categoryList.$values);
+//             }
+//         } catch (error) {
+//             console.error("Error fetching categories:", error);
+//         }
+//     };
+
+//     // Open edit modal
+//     const handleEdit = (record) => {
+//         setSelectedCategory(record);
+//         form.setFieldsValue({
+//             category_Name: record.category_Name,
+//             priority: record.priority,
+//             status: record.status === "True",
+//         });
+//         if (record.image) {
+//             setFileList([
+//                 {
+//                     uid: "-1",
+//                     name: "current-image",
+//                     status: "done",
+//                     url: `${apiUrl}${record.image}`,
+//                 },
+//             ]);
+//         } else {
+//             setFileList([]);
+//         }
+//         setIsModalOpen(true);
+//     };
+
+//     // Update category
+//     const handleUpdate = async () => {
+//         try {
+//             const values = await form.validateFields();
+//             let imagePath = selectedCategory.image || null;
+
+//             if (fileList.length === 0) {
+//                 imagePath = null; // Explicitly remove image if fileList is cleared
+//             } else if (fileList.length > 0 && fileList[0].originFileObj) {
+//                 const imageUrl = `${apiUrl}Category/UploadCategoryImage`;
+//                 const imageFormData = new FormData();
+//                 imageFormData.append("image", fileList[0].originFileObj);
+//                 imageFormData.append("category_id", selectedCategory.category_id);
+
+//                 const imageResponse = await axios.post(imageUrl, imageFormData, {
+//                     headers: {
+//                         Authorization: `Bearer ${storedToken}`,
+//                     },
+//                 });
+                 
+//                 if (imageResponse.data.message === "SUCCESS") {
+//                     imagePath = imageResponse.data.imagePath;
+//                     console.log("New image path:", imagePath);
+//                 } else {
+//                     throw new Error("Image upload failed");
+//                 }
+//             }
+
+//             const url = `${apiUrl}Category/UpdateProductCategory`;
+//             const payload = {
+//                 category_id: selectedCategory.category_id,
+//                 category_Name: values.category_Name,
+//                 priority: values.priority,
+//                 status: values.status ? "True" : "False",
+//                 image: imagePath,
+//             };
+//             console.log("Sending payload:", payload);
+
+//             const response = await axios.put(url, payload, {
+//                 headers: {
+//                     Authorization: `Bearer ${storedToken}`,
+//                     "Content-Type": "application/json",
+//                 },
+//             });
+
+//             if (response.data.message === "SUCCESS") {
+//                 await Swal.fire({
+//                     title: "Success",
+//                     text: "Category updated successfully",
+//                     icon: "success",
+//                     confirmButtonText: "OK",
+//                 });
+//                 setIsModalOpen(false);
+//                 setFileList([]);
+//                 getCategoryData();
+//             } else {
+//                 Swal.fire({
+//                     title: "Error",
+//                     text: "Failed to update category",
+//                     icon: "error",
+//                     confirmButtonText: "OK",
+//                 });
+//             }
+//         } catch (error) {
+//             console.error("Update error:", error);
+//             Swal.fire({
+//                 title: "Error",
+//                 text: "Failed to update category: " + error.message,
+//                 icon: "error",
+//                 confirmButtonText: "OK",
+//             });
+//         }
+//     };
+
+//     // Delete category
+//     const handleDelete = async (record) => {
+//         try {
+//             const confirm = await Swal.fire({
+//                 title: "Are you sure?",
+//                 text: "You will not be able to recover this category!",
+//                 icon: "warning",
+//                 showCancelButton: true,
+//                 confirmButtonText: "Yes, delete it!",
+//                 cancelButtonText: "No, cancel!",
+//             });
+
+//             if (confirm.isConfirmed) {
+//                 const url = `${apiUrl}Category/DeleteProductCategory`;
+//                 const response = await axios.delete(url, {
+//                     headers: {
+//                         Authorization: `Bearer ${storedToken}`,
+//                     },
+//                     data: { category_id: record.category_id },
+//                 });
+
+//                 if (response.data.message === "SUCCESS") {
+//                     Swal.fire("Deleted!", "The category has been deleted.", "success");
+//                     getCategoryData();
+//                 } else {
+//                     Swal.fire("Error", "Failed to delete category.", "error");
+//                 }
+//             }
+//         } catch (error) {
+//             console.error("Delete error:", error);
+//             Swal.fire("Error", "Failed to delete category.", "error");
+//         }
+//     };
+
+//     // Filtered data based on search
+//     const filteredData = categoryData.filter((item) =>
+//         item.category_Name.toLowerCase().includes(searchText.toLowerCase())
+//     );
+
+//     useEffect(() => {
+//         getCategoryData();
+//     }, []);
+
+//     return (
+//         <CategoryComponent
+//             categoryData={filteredData}
+//             searchText={searchText}
+//             setSearchText={setSearchText}
+//             handleEdit={handleEdit}
+//             handleDelete={handleDelete}
+//             isModalOpen={isModalOpen}
+//             form={form}
+//             handleUpdate={handleUpdate}
+//             setIsModalOpen={setIsModalOpen}
+//             fileList={fileList}
+//             setFileList={setFileList}
+//             apiUrl={apiUrl}
+//         />
+//     );
+// };
+
+// const CategoryComponent = ({
+//     categoryData,
+//     searchText,
+//     setSearchText,
+//     handleEdit,
+//     handleDelete,
+//     isModalOpen,
+//     form,
+//     handleUpdate,
+//     setIsModalOpen,
+//     fileList,
+//     setFileList,
+//     apiUrl,
+// }) => {
+//     const uploadProps = {
+//         onRemove: () => {
+//             setFileList([]);
+//         },
+//         beforeUpload: (file) => {
+//             const isImage = file.type.startsWith("image/");
+//             if (!isImage) {
+//                 Swal.fire("Error", "Please upload an image file!", "error");
+//                 return false;
+//             }
+//             setFileList([file]);
+//             return false; // Prevent automatic upload
+//         },
+//         fileList,
+//         maxCount: 1, // Allow only one image
+//     };
+
+//     return (
+//         <div style={{ padding: "20px" }}>
+//             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+//                 <h2>Category List</h2>
+//                 <Input
+//                     placeholder="Search by category name"
+//                     value={searchText}
+//                     onChange={(e) => setSearchText(e.target.value)}
+//                     prefix={<MdSearch />}
+//                     style={{ width: "250px" }}
+//                 />
+//             </div>
+//             <Table dataSource={categoryData} rowKey="category_id" pagination={{ pageSize: 5 }}>
+//                 <Column title="Id" dataIndex="category_id" key="category_id" align="center" />
+//                 <Column title="Category" dataIndex="category_Name" key="category_Name" align="center" />
+//                 <Column
+//                       title="Category Image"
+//                       dataIndex="image"
+//                       key="image"
+//                       align="center"
+//                       render={(images) => (
+//                       <div style={{ display: "flex", justifyContent: "center" }}>
+//                         <img
+//                         src={`${apiUrl}${images}`}
+//                           alt="Brand Logo"
+//                           style={{
+//                             width: "80px",
+//                             height: "80px",
+//                             objectFit: "contain",
+//                             borderRadius: "10px",
+//                             border: "1px solid #ddd",
+//                             padding: "5px",
+//                             backgroundColor: "#fff",
+//                           }}
+//                           onError={(e) => (e.target.style.display = "none")}
+//                         />
+//                       </div>
+//                     )}
+//                   />
+//                 <Column title="Priority" dataIndex="priority" key="priority" align="center" />
+//                 <Column
+//                     title="Status"
+//                     dataIndex="status"
+//                     key="status"
+//                     align="center"
+//                     render={(status) => (status === "True" ? "Active" : "Inactive")}
+//                 />
+//                 <Column
+//                     title="Action"
+//                     key="action"
+//                     align="center"
+//                     render={(_, record) => (
+//                         <Space size="middle">
+//                             <Button icon={<MdEdit />} onClick={() => handleEdit(record)} />
+//                             <Button icon={<MdDelete />} danger onClick={() => handleDelete(record)} />
+//                         </Space>
+//                     )}
+//                 />
+//             </Table>
+//             <Modal
+//                 title="Edit Category"
+//                 open={isModalOpen}
+//                 onOk={handleUpdate}
+//                 onCancel={() => {
+//                     setIsModalOpen(false);
+//                     setFileList([]);
+//                 }}
+//                 okText="Update"
+//             >
+//                 <Form form={form} layout="vertical">
+//                     <Form.Item
+//                         name="category_Name"
+//                         label="Category Name"
+//                         rules={[{ required: true, message: "Required" }]}
+//                     >
+//                         <Input />
+//                     </Form.Item>
+//                     <Form.Item
+//                         name="priority"
+//                         label="Priority"
+//                         rules={[{ required: true, message: "Required" }]}
+//                     >
+//                         <Input type="number" />
+//                     </Form.Item>
+//                     <Form.Item
+//                         name="status"
+//                         label="Status"
+//                         valuePropName="checked"
+//                     >
+//                         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+//                     </Form.Item>
+//                     <Form.Item label="Category Image" name="image">
+//                         {fileList.length === 0 && (
+//                             <p style={{ color: "#888", marginBottom: "8px" }}>No image currently set</p>
+//                         )}
+//                         <Upload {...uploadProps} listType="picture">
+//                             <Button icon={<UploadOutlined />}>Upload New Image</Button>
+//                         </Upload>
+//                     </Form.Item>
+//                 </Form>
+//             </Modal>
+//         </div>
+//     );
+// };
+
+// export default CategoryTable;
+
+
 "use client";
 import { useEffect, useState } from "react";
 import { Button, Space, Table, Input, Modal, Form, Switch, Upload } from "antd";
@@ -668,6 +1004,7 @@ const CategoryTable = () => {
             });
             if (response.data.message === "SUCCESS" && response.data.retval === "SUCCESS") {
                 setCategoryData(response.data.categoryList.$values);
+                console.log(response.data.categoryList.$values)
             }
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -680,7 +1017,7 @@ const CategoryTable = () => {
         form.setFieldsValue({
             category_Name: record.category_Name,
             priority: record.priority,
-            status: record.status === "True",
+            status: record.status==="False" ? true:false,
         });
         if (record.image) {
             setFileList([
@@ -697,35 +1034,69 @@ const CategoryTable = () => {
         setIsModalOpen(true);
     };
 
-    // Update category
+  
+
+    
+    const uploadImage = async (imageFile, folderType) => {
+        try {
+          if (!imageFile) {
+            throw new Error("No image file selected");
+          }
+    
+          const formData = new FormData();
+          formData.append("Image", imageFile.originFileObj || imageFile);
+          formData.append("folderType", folderType);
+    
+          console.log("Uploading Image:", imageFile.name);
+    
+          const response = await axios.post(
+            `${apiUrl}SaveFile/SaveImage`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+    
+          if (response.data.success) {
+            return response.data.path;
+          } else {
+            throw new Error(response.data.message || "Image upload failed");
+          }
+        } catch (error) {
+          console.error(" Error uploading image:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Image Upload Failed",
+            text: error.message || "Failed to upload image",
+          });
+          return null;
+        }
+      };
+
+
+
+
+
+
     const handleUpdate = async () => {
         try {
             const values = await form.validateFields();
-            let imagePath = selectedCategory.image || null;
-
-            if (fileList.length === 0) {
-                imagePath = null; // Explicitly remove image if fileList is cleared
-            } else if (fileList.length > 0 && fileList[0].originFileObj) {
-                const imageUrl = `${apiUrl}Category/UploadCategoryImage`;
-                const imageFormData = new FormData();
-                imageFormData.append("image", fileList[0].originFileObj);
-                imageFormData.append("category_id", selectedCategory.category_id);
-
-                const imageResponse = await axios.post(imageUrl, imageFormData, {
-                    headers: {
-                        Authorization: `Bearer ${storedToken}`,
-                    },
-                });
-
-                if (imageResponse.data.message === "SUCCESS") {
-                    imagePath = imageResponse.data.imagePath;
-                    console.log("New image path:", imagePath);
-                } else {
-                    throw new Error("Image upload failed");
+            let imagePath = selectedCategory.image; // Keep existing image path
+    
+            // Check if a new image has been uploaded
+            if (fileList.length > 0 && fileList[0].originFileObj) {
+                imagePath = await uploadImage(fileList[0], "categoryicon");
+                
+                if (!imagePath) {
+                    throw new Error("Failed to upload new image");
                 }
+                console.log("New image path:", imagePath);
             }
-
-            const url = `${apiUrl}Category/UpdateProductCategory`;
+    
+            // Prepare payload for update
             const payload = {
                 category_id: selectedCategory.category_id,
                 category_Name: values.category_Name,
@@ -733,46 +1104,38 @@ const CategoryTable = () => {
                 status: values.status ? "True" : "False",
                 image: imagePath,
             };
-            console.log("Sending payload:", payload);
-
+            
+    
+            // Call update API
+            const url = `${apiUrl}Category/UpdateProductCategory`;
             const response = await axios.put(url, payload, {
                 headers: {
                     Authorization: `Bearer ${storedToken}`,
                     "Content-Type": "application/json",
                 },
             });
-
+    
             if (response.data.message === "SUCCESS") {
-                await Swal.fire({
-                    title: "Success",
-                    text: "Category updated successfully",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                });
+                Swal.fire("Success", "Category updated successfully", "success");
                 setIsModalOpen(false);
                 setFileList([]);
                 getCategoryData();
             } else {
-                Swal.fire({
-                    title: "Error",
-                    text: "Failed to update category",
-                    icon: "error",
-                    confirmButtonText: "OK",
-                });
+                throw new Error(response.data.message || "Update failed");
             }
         } catch (error) {
             console.error("Update error:", error);
-            Swal.fire({
-                title: "Error",
-                text: "Failed to update category: " + error.message,
-                icon: "error",
-                confirmButtonText: "OK",
-            });
+            Swal.fire("Error", "Failed to update category: " + error.message, "error");
         }
     };
+    
+
+
+    
 
     // Delete category
     const handleDelete = async (record) => {
+ 
         try {
             const confirm = await Swal.fire({
                 title: "Are you sure?",
@@ -857,10 +1220,10 @@ const CategoryComponent = ({
                 return false;
             }
             setFileList([file]);
-            return false; // Prevent automatic upload
+            return false; 
         },
         fileList,
-        maxCount: 1, // Allow only one image
+        maxCount: 1, 
     };
 
     return (
@@ -878,10 +1241,7 @@ const CategoryComponent = ({
             <Table dataSource={categoryData} rowKey="category_id" pagination={{ pageSize: 5 }}>
                 <Column title="Id" dataIndex="category_id" key="category_id" align="center" />
                 <Column title="Category" dataIndex="category_Name" key="category_Name" align="center" />
-                <Column
-                      title="Category Image"
-                      dataIndex="image"
-                      key="image"
+                <Column title="Category Image" dataIndex="image" key="image"
                       align="center"
                       render={(images) => (
                       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -908,7 +1268,7 @@ const CategoryComponent = ({
                     dataIndex="status"
                     key="status"
                     align="center"
-                    render={(status) => (status === "True" ? "Active" : "Inactive")}
+                    render={(status) => status==Number("0") ? "Active" :"InActive"}
                 />
                 <Column
                     title="Action"
@@ -958,9 +1318,14 @@ const CategoryComponent = ({
                         {fileList.length === 0 && (
                             <p style={{ color: "#888", marginBottom: "8px" }}>No image currently set</p>
                         )}
-                        <Upload {...uploadProps} listType="picture">
-                            <Button icon={<UploadOutlined />}>Upload New Image</Button>
-                        </Upload>
+            <Upload
+            listType="picture"
+            onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+            beforeUpload={() => false}  // Prevents immediate upload
+            >
+    <Button icon={<UploadOutlined />}>Upload New Image</Button>
+</Upload>
+
                     </Form.Item>
                 </Form>
             </Modal>

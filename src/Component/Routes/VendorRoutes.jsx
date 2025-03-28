@@ -72,7 +72,7 @@ export const vendorRoutes = [
     label: "Product Management",
     icon: <AiOutlineProduct />,
     children: [
-      { label: "Product List", icon: <MdList />, key: "/product-list" },
+      { label: "Product List", icon: <MdList />, key: "/ProductList" },
       { label: "Add New Product", icon: <MdAdd />, key: "/add-product" },
       // { label: "Bulk Import", icon: <MdAddToPhotos />, key: "/bulk-import" },
     ],

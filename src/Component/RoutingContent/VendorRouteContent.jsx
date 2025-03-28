@@ -21,6 +21,7 @@ import MyAccountSettingPage from "../../Pages/AccountSetting/MyAccountSettingPag
 import Coupon from "../../Pages/Vendor/OffersandDeals/Coupon";
 import ProductReview from "../../Pages/Vendor/ProductManagement/ProductReview";
 import GenerateBarCode from "../../Pages/ProductManagement/InHouseProduct/GenerateBarCode"
+import UpdateProduct from "../../Pages/ProductManagement/InHouseProduct/UpdateProduct";
 
 const VendorRouteContent = () => {
   return (
@@ -53,9 +54,10 @@ const VendorRouteContent = () => {
       {/* Product Management section */}
 
         <Route path="/add-product" element={<ProtectedRoutes> <AddNewProduct/>  </ProtectedRoutes>} />
-        <Route path="/product-list" element={<ProtectedRoutes> <ProductList/>  </ProtectedRoutes>} />
+        <Route path="/ProductList" element={<ProtectedRoutes> <ProductList/>  </ProtectedRoutes>} />
         <Route path="/GenerateBarCode" element={<ProtectedRoutes> <GenerateBarCode/>  </ProtectedRoutes>} />
         <Route path="/product-review" element={<ProtectedRoutes> <ProductReview/>  </ProtectedRoutes>} />
+        <Route path="/UpdateProduct" element={<ProtectedRoutes> <UpdateProduct/>  </ProtectedRoutes>} />
 
     {/* Offers and deals */}
 
