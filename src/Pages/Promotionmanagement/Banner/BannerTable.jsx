@@ -131,10 +131,11 @@ const BannerTable = ({ reload }) => {
           key="image"
           align="center"
           render={(text) => (
+            
             <img
               src={`${apiUrl}${text}`}
               alt="Banner"
-              style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
+              style={{ alignItems:"center", width: "75px", height: "75px", objectFit: "cover", borderRadius: "8px" }}
             />
           )}
         />

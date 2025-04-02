@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   FormControl,
@@ -9,18 +9,64 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Upload, message, Modal } from "antd";
+import { Upload, message, Modal, Flex } from "antd";
 import CardBox from "../../../Component/Charts/CardBox";
 import BannerTable from "./BannerTable";
 import { Image } from "@chakra-ui/react";
 import BannerImage from "../../../assets/banner/bannerDemo.png"
+import BannerImageAndroid from "../../../assets/banner/bannerDemoAndroid.png"
 import axios from "axios";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { Spinner } from "@chakra-ui/react";
 import { DatePicker, Space } from "antd";
 import dayjs from "dayjs";
-// import { height } from "@mui/system";
+import Slider from "react-slick";
+
+
+const ImageSlideshow = () => {
+  const [currentImage, setCurrentImage] = useState(0);
+  const images = [BannerImage, BannerImageAndroid];
+
+  const handleNextImage = () => {
+    setCurrentImage((prevImage) => (prevImage + 1) % images.length);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImage((prevImage) => (prevImage - 1 + images.length) % images.length);
+  };
+
+  return (
+    <SimpleGrid columns={1} gap={6} p={4} display="flex" justifyContent="center" alignItems="center" position="relative">
+      <Button
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          zIndex: 1,
+        }}
+        onClick={handlePrevImage}
+      >
+        &lt;
+      </Button>
+      <Image height={500} src={images[currentImage]} />
+      <Button
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          zIndex: 1,
+        }}
+        onClick={handleNextImage}
+      >
+        &gt;
+      </Button>
+    </SimpleGrid>
+  );
+};
+
 
 const Banner = () => {
   const [fileList, setFileList] = useState([]);
@@ -31,11 +77,23 @@ const Banner = () => {
   const [previewTitle, setPreviewTitle] = useState("");
   const [bannerType, setBannerType] = useState("Banner 1");
   const [bannerURL, setBannerURL] = useState("");
+  const [bannerDescription, setBannerDescription] = useState("");
   const [submitClick, setSubmitClick] = useState(false);
-  const [tableReload,setTableReload] = useState(true);
+  const [tableReload, setTableReload] = useState(true);
   const apiUrl = import.meta.env.VITE_API_URL;
   const { token } = useSelector((state) => state.auth);
   const storedToken = token || localStorage.getItem("token");
+  const images = [BannerImage, BannerImageAndroid]
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false,
+  };
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -60,7 +118,9 @@ const Banner = () => {
               BannerUrl: bannerURL,
               StartDate: dateRange[0],
               EndDate: dateRange[1],
+              Description: bannerDescription,
               BannerList: fileUploadData.map(item => item.path)
+
             }
           ]
         }, {
@@ -80,11 +140,12 @@ const Banner = () => {
               if (result.isConfirmed) {
                 setFileList([]);
                 setFileUploadData([]);
-                setBannerURL("")
+                setBannerURL("");
+                setBannerDescription("");
               }
             });
             setTableReload(!tableReload);
-          }else{
+          } else {
             Swal.fire({
               title: "Failed to upload Banner",
               text: "Due to a network error, the upload failed.",
@@ -92,8 +153,9 @@ const Banner = () => {
             });
             setFileList([]);
             setFileUploadData([]);
-            setBannerURL("")
-      
+            setBannerURL("");
+            setBannerDescription("");
+
           }
         })
         .catch((error) => {
@@ -142,7 +204,7 @@ const Banner = () => {
 
   const beforeUpload = (file) => {
     const sizeInMB = file.size / 1024 / 1024;
-    if (sizeInMB < 1 || sizeInMB > 5) {
+    if (sizeInMB > 5) {
       message.warning(`Image must be between 2MB and 5MB, but it's ${sizeInMB.toFixed(2)}MB`);
       return false;
     }
@@ -173,28 +235,34 @@ const Banner = () => {
       </Box>
 
       <CardBox>
-        <SimpleGrid
+        {/* <SimpleGrid
           columns={{ base: 1, md: 2 }}
           gap={6}
           p={4}
           display="flex"
           justifyContent="center"
           alignItems="center">
-          <Image
-            src={BannerImage}
-          />
-        </SimpleGrid>
+            <Image
+              src={BannerImage}
+            />
+          <Image height={305} src={BannerImageAndroid}/>
+
+          
+        </SimpleGrid> */}
+        <ImageSlideshow />
+
         {/* </CardBox>
       <Img src={{api.link?? "content/def.jpg":api.link}} ></Img>
       <CardBox> */}
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={6} p={4}>
           <FormControl>
             <FormLabel>Banner Type</FormLabel>
-            <Select value={bannerType} onChange={(e) => { setBannerType(e.target.value); setFileList([]); setFileUploadData([]); setBannerURL("") }}>
+            <Select value={bannerType} onChange={(e) => { setBannerType(e.target.value); setFileList([]); setFileUploadData([]); setBannerURL(""); setBannerDescription("")}}>
               <option value="Banner 1">Banner 1</option>
               <option value="Banner 2">Banner 2</option>
               <option value="Banner 3">Banner 3</option>
               <option value="Banner 4">Banner 4</option>
+              <option value="Banner 5">Banner 5</option>
             </Select>
           </FormControl>
 
@@ -219,6 +287,11 @@ const Banner = () => {
                 style={{ height: "2.5rem" }}
               />
             </Space>
+          </FormControl>
+          {/* Description */}
+          <FormControl>
+            <FormLabel>Add Banner Caption</FormLabel>
+            <Input placeholder="add caption on banner" value={bannerDescription} onChange={(e)=>{setBannerDescription(e.target.value)}} ></Input>
           </FormControl>
 
         </SimpleGrid>
@@ -275,7 +348,7 @@ const Banner = () => {
         </SimpleGrid>
 
         <Box mt={4} display="flex" justifyContent="flex-start" gap={4} px={4} >
-          <Button colorScheme="gray" style={{ margin: "1%" }} onClick={() => { setFileList([]); setFileUploadData([]); setBannerURL("") }} >Reset</Button>
+          <Button colorScheme="gray" style={{ margin: "1%" }} onClick={() => { setFileList([]); setFileUploadData([]); setBannerURL("");setBannerDescription("")}} >Reset</Button>
           <Button
             colorScheme="blue"
             style={{ margin: "1%" }}
@@ -300,7 +373,7 @@ const Banner = () => {
 
       <Box mt={6}>
         <CardBox>
-          <BannerTable reload={tableReload}/>
+          <BannerTable reload={tableReload} />
         </CardBox>
       </Box>
     </Box>
