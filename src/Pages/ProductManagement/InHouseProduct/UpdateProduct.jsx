@@ -57,7 +57,7 @@ const UpdateProduct = () => {
   const Navigate = useNavigate();
 
   const { record } = location.state || {}; 
-
+  
  
   const getCategory = async () => {
     try {
@@ -518,7 +518,7 @@ const UpdateProduct = () => {
   const submitFormData = async (values) => {
     var PROD_ID = null;
     try {
-      debugger
+     
       dispatch(startLoading());
 
       for (let i = 0; i < values.varientsData.length; i++) {

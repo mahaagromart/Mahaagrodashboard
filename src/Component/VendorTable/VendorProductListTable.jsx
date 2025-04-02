@@ -149,7 +149,8 @@ const VendorProductListTable = () => {
           unit : product.unit,
         }))
       ) || [];
-  
+      
+      console.log(products)
         setProductList(products);
       } else {
         await Swal.fire({
@@ -210,13 +211,6 @@ const VendorProductListTable = () => {
   };
 
 
-  const getValue = (value)=>{
-    if(value === 0){
-      return "Active";
-    }else{
-      return "Deactivate"
-    }
-  }
 
   const handleToggleCertification = async (record) => {
     Swal.fire({
