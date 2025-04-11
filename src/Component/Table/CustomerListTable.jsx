@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Space, Input, Tooltip } from "antd";
 import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
 import { FaEye } from "react-icons/fa6";
 import Swal from "sweetalert2";
-
+import { useDispatch , useSelector } from "react-redux";
 
 const { Column } = Table;
 
@@ -47,6 +47,10 @@ const CustomerListTable = () => {
   const [data, setData] = useState(initialData);
   const [searchText, setSearchText] = useState("");
 
+  const { token } = useSelector((state) => state.auth);
+  const storedToken = token || localStorage.getItem("token");
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   const handleDelete = (record) => {
     Swal.fire({
       title: "Are you sure?",
@@ -62,6 +66,9 @@ const CustomerListTable = () => {
       }
     });
   };
+
+
+
 
   // Filtered data based on search
   const filteredData = data.filter((item) =>
@@ -107,7 +114,34 @@ const CustomerListTable = () => {
         bordered={false}
         pagination={{ pageSize: 12 }}
       >
+        
         <Column title="SL" dataIndex="SL" key="SL" align="center" />
+        
+              <Column
+              title="Profile Image"
+              dataIndex="thumbnailImages"
+              key="thumbnailImages"
+              align="center"
+              render={(images) => (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <img
+                    src={`${apiUrl}${images?.[0] || "default-image.jpg"}`} 
+                    alt="Product"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "contain",
+                      borderRadius: "5px",
+                      border: "1px solid #ddd",
+                      padding: "5px",
+                      backgroundColor: "#fff",
+                    }}
+                    onError={(e) => (e.target.style.display = "none")}
+                  />
+                </div>
+              )}
+            />
+
         <Column title="Customer Name" dataIndex="CustomerName" key="CustomerName" align="center" />
         <Column title="Contact Info" dataIndex="ContactInfo" key="ContactInfo" align="center" />
         <Column title="Email" dataIndex="Email" key="Email" align="center" />
@@ -121,9 +155,9 @@ const CustomerListTable = () => {
               <Tooltip title="View">
                 <Button icon={<FaEye />} type="primary" onClick={() => handleView(record)} />
               </Tooltip>
-              <Tooltip title="Delete">
+              {/* <Tooltip title="Delete">
                 <Button icon={<MdDelete />} type="primary" danger onClick={() => handleDelete(record)} />
-              </Tooltip>
+              </Tooltip> */}
             </Space>
           )}
         />
